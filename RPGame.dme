@@ -1,0 +1,40 @@
+// DM Environment file for RPGame.dme.
+// All manual changes should be made outside the BEGIN_ and END_ blocks.
+// New source code should be placed in .dm files: choose File/New --> Code File.
+
+// BEGIN_INTERNALS
+// END_INTERNALS
+
+// BEGIN_FILE_DIR
+#define FILE_DIR .
+// END_FILE_DIR
+
+// BEGIN_PREFERENCES
+// END_PREFERENCES
+
+// BEGIN_INCLUDE
+#include "_Defines.dm"
+#include "Main.dm"
+#include "Code\definitions_starter.dm"
+#include "Code\Admin Stuff\admin_combat.dm"
+#include "Code\Datums\Classes.dm"
+#include "Code\Datums\Components.dm"
+#include "Code\Datums\Items.dm"
+#include "Code\Mobs\Base.dm"
+#include "Code\Mobs\Enemy_Ai.dm"
+#include "Code\Mobs\NPCS.dm"
+#include "Code\Player\Player_Logic.dm"
+#include "Code\Player\player_verbs.dm"
+#include "Code\Player\Players.dm"
+#include "Code\Skill\skill_base.dm"
+#include "Code\Skill\Skill_Components.dm"
+#include "Code\Skill\skill_events.dm"
+#include "Code\Skill\Skill_factory.dm"
+#include "Code\Skill\skill_logic.dm"
+#include "Code\Skill\skill_parser.dm"
+#include "Code\systems\Communication.dm"
+#include "Code\systems\Saving.dm"
+#include "Code\systems\Turn_Engine.dm"
+#include "Code\systems\Combat\Damage.dm"
+// END_INCLUDE
+
