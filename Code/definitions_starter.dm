@@ -99,11 +99,9 @@ datum/skill/heavy_strike
     cost = 10
     
     New()
-        var/datum/skill_event/message/M = new()
-        M.txt = "(I) delivers a crushing blow to (enemy)!"
-        
         var/datum/skill_event/damage/D = new()
+        // We added (I) and (enemy) so the engine knows where to put the names!
+        D.txt = "(I) delivers a crushing blow to (enemy)!" 
         D.formula = "ATK * 1.5" 
         
-        src.event_timeline += M
         src.event_timeline += D

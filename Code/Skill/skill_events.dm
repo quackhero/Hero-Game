@@ -24,7 +24,7 @@ datum/skill_event/damage
 
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
         // Guard Rail Check
-        if(!user.CanAct(S) || !user.CanTarget(target)) return
+        if(!user.CanAct() || !user.CanTarget(target)) return
         
         // Accuracy Check
         if(!prob(src.accuracy))
@@ -49,7 +49,7 @@ datum/skill_event/heal
     var/formula = "AP"
 
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
-        if(!user.CanAct(S)) return
+        if(!user.CanAct()) return
         
         var/amt = parser.Evaluate(src.formula, user, target)
         target.hp += amt

@@ -63,3 +63,9 @@ mob/verb
         new /datum/encounter(P, E)
         
         world << "<b>Debug: 2v2 Party Battle Initialized!</b>"
+
+mob/verb/Test_Give_Item()
+    set category = "Admin"
+    var/datum/item/equipment/weapon/iron_sword/W = new()
+    src.inventory += W
+    src << "Gave you an [W.name]!"

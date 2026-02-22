@@ -38,3 +38,11 @@ mob/verb/Debug_Level_Up()
     // Give ourselves the Novice class if we don't have it
     if(!src.Primary_class) src.Primary_class = new /datum/class/novice()
     src.LevelUp()
+
+mob/verb/Open_Menu()
+    set category = "Commands"
+    set name = "Menu"
+    if(src.current_encounter)
+        src << "You can't do this in battle!"
+        return
+    src.UpdateMainMenu("Main")
