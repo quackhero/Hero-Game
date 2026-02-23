@@ -18,23 +18,20 @@ datum/skill_parser
         var/processed = formula
         
         // --- STEP A: Replace User Stats ---
-        // (Make sure 'ap', 'atk', etc. exist in Base.dm!)
         if(user)
-            processed = replacetext(processed, "ATK", "[user.atk]")
-            processed = replacetext(processed, "DEF", "[user.def]")
-            processed = replacetext(processed, "SPD", "[user.spd]")
-            processed = replacetext(processed, "SK",  "[user.sk]")
+            processed = replacetext(processed, "ATK", "[user.strength]")
+            processed = replacetext(processed, "DEF", "[user.resilience]")
+            processed = replacetext(processed, "SPD", "[user.dexterity]")
+            processed = replacetext(processed, "AP",  "[user.intelligence]")
             processed = replacetext(processed, "HP",  "[user.hp]")
             processed = replacetext(processed, "MP",  "[user.mp]")
-            // Only use AP if you added var/ap to Base.dm
-            if("ap" in user.vars) processed = replacetext(processed, "AP", "[user.ap]")
 
         // --- STEP B: Replace Target Stats ---
         if(target)
-            processed = replacetext(processed, "ATK(E)", "[target.atk]")
-            processed = replacetext(processed, "DEF(E)", "[target.def]")
-            processed = replacetext(processed, "SPD(E)", "[target.spd]")
-            processed = replacetext(processed, "SK(E)",  "[target.sk]")
+            processed = replacetext(processed, "ATK(E)", "[target.strength]")
+            processed = replacetext(processed, "DEF(E)", "[target.resilience]")
+            processed = replacetext(processed, "SPD(E)", "[target.dexterity]")
+            processed = replacetext(processed, "AP(E)",  "[target.intelligence]")
             processed = replacetext(processed, "HP(E)",  "[target.hp]")
             processed = replacetext(processed, "MP(E)",  "[target.mp]")
 

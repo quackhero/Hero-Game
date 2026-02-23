@@ -6,10 +6,12 @@ mob
     var/max_hp = 100
     var/mp = 50
     var/max_mp = 50
-    var/atk = 10
-    var/def = 10
-    var/ap = 10
-    var/spd = 10
+    var/strength = 10
+    var/dexterity = 10
+    var/intelligence = 10
+    var/mind = 10
+    var/resilience = 10
+    var/vitality = 10
     var/sk = 10
     var/combat_flags = 0
     var/turn_id = 0
@@ -137,7 +139,7 @@ mob
 
     proc/BasicAttack(mob/target)
         if(!src.CanAct() || !src.CanTarget(target)) return src.EndTurn()
-        var/dmg = max(1, src.atk - target.def)
+        var/dmg = max(1, src.strength - target.resilience)
         target.TakeDamage(dmg, src, "Physical")
         src.EndTurn()
     

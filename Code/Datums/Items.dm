@@ -13,9 +13,14 @@ datum/item
 
 // --- EQUIPMENT BASE ---
 datum/item/equipment
-    var/atk_bonus = 0
-    var/def_bonus = 0
-    var/spd_bonus = 0
+    // --- The New Six Attribute Bonuses ---
+    var/strength_bonus = 0
+    var/dexterity_bonus = 0
+    var/intelligence_bonus = 0
+    var/mind_bonus = 0
+    var/vitality_bonus = 0
+    var/resilience_bonus = 0
+    
     var/max_hp_bonus = 0
     var/max_mp_bonus = 0
     
@@ -27,7 +32,9 @@ datum/item/equipment/weapon/iron_sword
     name = "Iron Sword"
     desc = "A standard, reliable blade. Grants the 'Bladerush' skill."
     item_type = "Weapon"
-    atk_bonus = 5
+    
+    // Updated to strength_bonus!
+    strength_bonus = 5
     
     New()
         ..()
@@ -45,6 +52,7 @@ datum/item/consumable/potion
         target.ClampStats()
         world << "<b>[user.name] uses a Health Potion on [target.name], restoring 50 HP!</b>"
         return 1
+
 datum/item/potion
     name = "Potion"
 

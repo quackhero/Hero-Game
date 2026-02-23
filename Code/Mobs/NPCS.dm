@@ -14,16 +14,15 @@ mob/enemy/training_dummy
     // Override the base stats just for the dummy
     max_hp = 10
     hp = 10
-    atk = 0
-    def = 5
-    spd = 15
+    strength = 0    // (Was atk)
+    resilience = 5  // (Was def)
+    dexterity = 15  // (Was spd)
     loot_table = list(/datum/item/potion = 100, /datum/item/ether = 30)
     
     New()
         ..() // Call the parent New()
         // Give the dummy some skills if you want it to fight back!
         src.skills += new /datum/skill/heavy_strike()
-
 
 
 mob/enemy/TakeAction(datum/encounter/E)

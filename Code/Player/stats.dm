@@ -1,14 +1,14 @@
 mob
-    var
-        strength = 0
-        atk = 0
-        intelligence = 0
-        sk = 0
-        agility = 0
-        spd = 0
-        style = 0
-        ap = 0
-        charisma = 0
-        hp = 0
-        endurance = 0
-        def = 0
+    // The New Core Attributes
+    var/strength = 10     // Replaces atk
+    var/dexterity = 10    // Replaces spd
+    var/intelligence = 10 // Replaces ap
+    var/mind = 10         // Scales MP
+    var/vitality = 10     // Scales HP
+    var/resilience = 10   // Replaces def
+    
+    // Derived Stats
+    var/hp = 100
+    var/max_hp = 100
+    var/mp = 50
+    var/max_mp = 50

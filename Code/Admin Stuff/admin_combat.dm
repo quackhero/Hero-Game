@@ -13,22 +13,22 @@ mob/verb
         var/mob/ally = new /mob()
         ally.name = "Cleric (Ally)"
         ally.hp = 80
-        ally.spd = 9 // Fast!
-        ally.atk = 4
-        ally.def = 5
+        ally.dexterity = 9 // Fast! (Was spd)
+        ally.strength = 4  // (Was atk)
+        ally.resilience = 5 // (Was def)
 
         // 3. Setup Enemies
         var/mob/e1 = new /mob()
         e1.name = "Goblin A"
         e1.hp = 50
-        e1.spd = 6
-        e1.atk = 7
+        e1.dexterity = 6 // (Was spd)
+        e1.strength = 7  // (Was atk)
 
         var/mob/e2 = new /mob()
         e2.name = "Goblin B"
         e2.hp = 50
-        e2.spd = 7
-        e2.atk = 7
+        e2.dexterity = 7 // (Was spd)
+        e2.strength = 7  // (Was atk)
 
         // 4. Start the 2v2 Encounter
         var/list/P = list(src, ally)

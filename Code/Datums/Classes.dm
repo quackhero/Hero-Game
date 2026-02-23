@@ -9,14 +9,17 @@ datum/class
 
 datum/class/novice
     name = "Novice"
-    // Changed to target the new "base_" stats
     stat_growths = list(
-        "base_max_hp" = 3, 
-        "base_max_mp" = 1, 
-        "base_atk" = 2, 
-        "base_def" = 1, 
-        "base_spd" = 1
+        "max_hp" = 3, 
+        "max_mp" = 1, 
+        "strength" = 2, 
+        "resilience" = 1, 
+        "dexterity" = 1,
+        "intelligence" = 1,
+        "mind" = 1,
+        "vitality" = 2
     )
+    
     
     skill_tree = list(
         "2" = /datum/skill/heavy_strike,

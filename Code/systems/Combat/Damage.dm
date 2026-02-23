@@ -1,7 +1,7 @@
 mob/proc/CalculateDamage(raw_amount, damage_type = "Physical", mob/attacker, bypass = 0)
     // 1. Initial Math
     var/final_damage = raw_amount
-    var/effective_def = max(0, src.def - bypass) // Bypass reduces effective DEF, but not below 0
+    var/effective_def = max(0, src.resilience - bypass) // Bypass reduces effective DEF, but not below 0
     
     // 2. Defense Reduction
     // We subtract the target's DEF from the incoming ATK

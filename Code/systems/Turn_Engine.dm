@@ -26,7 +26,7 @@ datum/encounter
                     // Supports Negative HP/Death Thresholds and prevents double turns
                     if(M.is_dead || M.hp <= M.death_threshold || M.is_busy) continue
 
-                    M.atb_gauge += (M.spd + 1)
+                    M.atb_gauge += (M.dexterity + 1)
                     
                     if(M.atb_gauge >= ATB_GAUGE_MAX)
                         M.atb_gauge = ATB_GAUGE_MAX

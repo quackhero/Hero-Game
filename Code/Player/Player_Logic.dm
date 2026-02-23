@@ -64,6 +64,7 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
     html += "</body></html>"
     
     src << browse(html, "window=battle_menu;size=250x450;can_close=0;can_resize=0")
+
 // The override for player turns
 mob/TakeAction(datum/encounter/E)
     if(!src.client) return ..() 
@@ -229,6 +230,7 @@ mob/Topic(href, href_list)
             if(I.Use(src, T, E))
                 src.equipped_items -= I // Consume the item!
             src.EndTurn()
+
 mob/proc/UpdateMainMenu(menu_state = "Main", target_slot = null, target_idx = 0)
     var/html = {"
     <html><head>
@@ -246,7 +248,10 @@ mob/proc/UpdateMainMenu(menu_state = "Main", target_slot = null, target_idx = 0)
     if(menu_state == "Main")
         html += "<div class='header'>[src.name] - Lvl [src.level]</div>"
         html += "<div class='stat-text'>HP: [src.hp]/[src.max_hp] | MP: [src.mp]/[src.max_mp]<br>"
-        html += "ATK: [src.atk] | DEF: [src.def] | SPD: [src.spd]</div>"
+        
+        // --- NEW SIX-STAT DISPLAY ---
+        html += "STR: [src.strength] | DEX: [src.dexterity] | INT: [src.intelligence]<br>"
+        html += "MND: [src.mind] | VIT: [src.vitality] | RES: [src.resilience]</div>"
 
         html += "<div class='section-title'>==Equipment==</div>"
         html += "<a href='?src=\ref[src];action=camp_equip;slot=Weapon'>Weapon: [(src.equipped_weapon ? src.equipped_weapon.name : "None")]</a><br>"

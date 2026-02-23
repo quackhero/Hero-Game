@@ -7,15 +7,19 @@ mob
         F["level"] << src.level
         F["stat_points"] << src.stat_points
         
+        // Save current health and mana
         F["hp"] << src.hp
-        F["max_hp"] << src.max_hp
         F["mp"] << src.mp
-        F["max_mp"] << src.max_mp
         
-        F["atk"] << src.atk
-        F["def"] << src.def
-        F["spd"] << src.spd
-        F["ap"] << src.ap
+        // Save BASE stats (so equipment bonuses don't accidentally get permanently baked in)
+        F["base_max_hp"] << src.base_max_hp
+        F["base_max_mp"] << src.base_max_mp
+        F["base_strength"] << src.base_strength
+        F["base_dexterity"] << src.base_dexterity
+        F["base_intelligence"] << src.base_intelligence
+        F["base_mind"] << src.base_mind
+        F["base_vitality"] << src.base_vitality
+        F["base_resilience"] << src.base_resilience
 
         if(src.Primary_class)
             F["class"] << src.Primary_class.type
@@ -38,14 +42,17 @@ mob
         F["stat_points"] >> src.stat_points
         
         F["hp"] >> src.hp
-        F["max_hp"] >> src.max_hp
         F["mp"] >> src.mp
-        F["max_mp"] >> src.max_mp
         
-        F["atk"] >> src.atk
-        F["def"] >> src.def
-        F["spd"] >> src.spd
-        F["ap"] >> src.ap
+        // Load BASE stats
+        F["base_max_hp"] >> src.base_max_hp
+        F["base_max_mp"] >> src.base_max_mp
+        F["base_strength"] >> src.base_strength
+        F["base_dexterity"] >> src.base_dexterity
+        F["base_intelligence"] >> src.base_intelligence
+        F["base_mind"] >> src.base_mind
+        F["base_vitality"] >> src.base_vitality
+        F["base_resilience"] >> src.base_resilience
 
         var/class_path
         F["class"] >> class_path
@@ -59,5 +66,9 @@ mob
         if(saved_skill_paths)
             for(var/path in saved_skill_paths)
                 src.skills += new path() // Rebuild each skill from its path
+        
+        // --- REBUILD STATS ---
+        // Recalculate their true stats (Base + Equipment) now that base stats are loaded
+        src.UpdateStats()
         
         return 1

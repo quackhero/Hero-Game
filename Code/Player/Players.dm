@@ -14,44 +14,57 @@ mob
     // --- NEW: BASE STATS (Naked Stats) ---
     var/base_max_hp = 100
     var/base_max_mp = 50
-    var/base_atk = 10
-    var/base_def = 10
-    var/base_spd = 10
-    var/base_ap = 10
+    var/base_strength = 10
+    var/base_dexterity = 10
+    var/base_intelligence = 10
+    var/base_mind = 10
+    var/base_vitality = 10
+    var/base_resilience = 10
 
     // --- THE MATH ENGINE ---
     proc/UpdateStats()
         // 1. Reset to naked stats
         src.max_hp = src.base_max_hp
         src.max_mp = src.base_max_mp
-        src.atk = src.base_atk
-        src.def = src.base_def
-        src.spd = src.base_spd
-        src.ap = src.base_ap
+        src.strength = src.base_strength
+        src.dexterity = src.base_dexterity
+        src.intelligence = src.base_intelligence
+        src.mind = src.base_mind
+        src.vitality = src.base_vitality
+        src.resilience = src.base_resilience
 
         // 2. Add Weapon Stats
         if(src.equipped_weapon)
             src.max_hp += src.equipped_weapon.max_hp_bonus
             src.max_mp += src.equipped_weapon.max_mp_bonus
-            src.atk += src.equipped_weapon.atk_bonus
-            src.def += src.equipped_weapon.def_bonus
-            src.spd += src.equipped_weapon.spd_bonus
+            src.strength += src.equipped_weapon.strength_bonus
+            src.dexterity += src.equipped_weapon.dexterity_bonus
+            src.intelligence += src.equipped_weapon.intelligence_bonus
+            src.mind += src.equipped_weapon.mind_bonus
+            src.vitality += src.equipped_weapon.vitality_bonus
+            src.resilience += src.equipped_weapon.resilience_bonus
 
         // 3. Add Armor Stats
         if(src.equipped_armor)
             src.max_hp += src.equipped_armor.max_hp_bonus
             src.max_mp += src.equipped_armor.max_mp_bonus
-            src.atk += src.equipped_armor.atk_bonus
-            src.def += src.equipped_armor.def_bonus
-            src.spd += src.equipped_armor.spd_bonus
+            src.strength += src.equipped_armor.strength_bonus
+            src.dexterity += src.equipped_armor.dexterity_bonus
+            src.intelligence += src.equipped_armor.intelligence_bonus
+            src.mind += src.equipped_armor.mind_bonus
+            src.vitality += src.equipped_armor.vitality_bonus
+            src.resilience += src.equipped_armor.resilience_bonus
             
         // 4. Add Accessory Stats
         if(src.equipped_accessory)
             src.max_hp += src.equipped_accessory.max_hp_bonus
             src.max_mp += src.equipped_accessory.max_mp_bonus
-            src.atk += src.equipped_accessory.atk_bonus
-            src.def += src.equipped_accessory.def_bonus
-            src.spd += src.equipped_accessory.spd_bonus
+            src.strength += src.equipped_accessory.strength_bonus
+            src.dexterity += src.equipped_accessory.dexterity_bonus
+            src.intelligence += src.equipped_accessory.intelligence_bonus
+            src.mind += src.equipped_accessory.mind_bonus
+            src.vitality += src.equipped_accessory.vitality_bonus
+            src.resilience += src.equipped_accessory.resilience_bonus
 
         src.ClampStats()
 
@@ -100,10 +113,12 @@ mob
         src.max_exp = GetMaxExpForLevel(src.level)
         src.base_max_hp = 20
         src.base_max_mp = 10
-        src.base_atk = 5
-        src.base_def = 5
-        src.base_spd = 5
-        src.base_ap = 5
+        src.base_strength = 5
+        src.base_dexterity = 5
+        src.base_intelligence = 5
+        src.base_mind = 5
+        src.base_vitality = 5
+        src.base_resilience = 5
         src.stat_points = 5 
 
         for(var/stat_name in src.Primary_class.stat_growths)
