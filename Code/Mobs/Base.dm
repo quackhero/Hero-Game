@@ -22,6 +22,9 @@ mob
     var/max_skill_slots = 4
     var/list/equipped_skills = list() 
 
+    mob/enemy
+        var/base_exp = 50
+
     var/max_item_slots = 3
     var/list/equipped_items = list()
     

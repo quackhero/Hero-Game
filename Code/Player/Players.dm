@@ -58,7 +58,7 @@ mob
     proc/LevelUp()
         src.level++
         src.stat_points += 2 
-        
+        src.max_exp = GetMaxExpForLevel(src.level)
         src << "<font color='#FFFF00'><b>*** LEVEL UP! You are now Level [src.level]! ***</b></font>"
 
         if(src.Primary_class)
@@ -96,6 +96,8 @@ mob
             src.Primary_class = new /datum/class/novice()
 
         src.level = 1
+        src.current_exp = 0
+        src.max_exp = GetMaxExpForLevel(src.level)
         src.base_max_hp = 20
         src.base_max_mp = 10
         src.base_atk = 5
@@ -118,3 +120,74 @@ mob
 
         world << "<b>[src.name]</b> has begun their journey as a <b>[src.Primary_class.name]</b>!"
         src << "<b>Creation complete! You have [src.stat_points] unspent stat points. Check the 'Tools' tab to spend them.</b>"
+
+    proc/GainEXP(amount)
+        if(amount <= 0) return
+        if(src.level >= 50) return // Stop them at the level 50 cap!
+        
+        src.current_exp += amount
+        src << "<font color='#00FFFF'><b>You gained [amount] EXP!</b></font>"
+        
+        // Loop just in case they gained enough EXP to level up multiple times at once
+        while(src.current_exp >= src.max_exp && src.level < 50)
+            src.current_exp -= src.max_exp // Keep the leftover EXP for the next level
+            src.LevelUp()
+    
+    proc/GetMaxExpForLevel(lvl)
+        var/list/exp_table = list(
+            10,     // Level 1
+            15,     // Level 2
+            25,     // Level 3
+            37,     // Level 4
+            50,     // Level 5
+            75,     // Level 6
+            100,    // Level 7
+            150,    // Level 8
+            200,    // Level 9
+            250,    // Level 10
+            325,    // Level 11
+            400,    // Level 12
+            475,    // Level 13
+            525,    // Level 14
+            625,    // Level 15
+            750,    // Level 16
+            875,    // Level 17
+            900,    // Level 18
+            1000,   // Level 19
+            1250,   // Level 20
+            1450,   // Level 21
+            1700,   // Level 22
+            2000,   // Level 23
+            2300,   // Level 24
+            2500,   // Level 25
+            2750,   // Level 26
+            3000,   // Level 27
+            3750,   // Level 28
+            4500,   // Level 29
+            5000,   // Level 30
+            5500,   // Level 31
+            6000,   // Level 32
+            6750,   // Level 33
+            7500,   // Level 34
+            9000,   // Level 35
+            9999,   // Level 36
+            12500,  // Level 37
+            15000,  // Level 38
+            17500,  // Level 39
+            20000,  // Level 40
+            23500,  // Level 41
+            27000,  // Level 42
+            30000,  // Level 43
+            33000,  // Level 44
+            35000,  // Level 45
+            38000,  // Level 46
+            42000,  // Level 47
+            45000,  // Level 48
+            47500,  // Level 49
+            50000   // Level 50
+        )
+        
+        // Safety check: If they somehow pass Level 50, cap their requirement
+        if(lvl > exp_table.len) return 999999 
+        
+        return exp_table[lvl]

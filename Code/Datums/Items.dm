@@ -45,3 +45,8 @@ datum/item/consumable/potion
         target.ClampStats()
         world << "<b>[user.name] uses a Health Potion on [target.name], restoring 50 HP!</b>"
         return 1
+datum/item/potion
+    name = "Potion"
+
+datum/item/ether
+    name = "Ether"

@@ -1,32 +1,5 @@
-mob/verb
-    Test_Battle()
-        set category = "Debug"
+var/list/global_main_party = list()
 
-        // Setup Player
-        src.hp = src.max_hp
-        src.is_dead = 0
-        src.is_busy = 0
-        src.death_threshold = -20 // TESTING NEGATIVE HP
-
-        // Setup Dummy
-        var/mob/dummy = new /mob()
-        dummy.name = "Training Dummy"
-        dummy.hp = 100
-        dummy.spd = 5 // Slower than player
-        dummy.atk = 8
-        dummy.def = 2
-
-        // Start Encounter
-        var/list/P = list(src)
-        var/list/E = list(dummy)
-        new /datum/encounter(P, E)
-
-        world << "<i>Debug: Fight initialized. You have a -20 Death Threshold.</i>"
-
-    Set_Threshold(n as num)
-        set category = "Debug"
-        src.death_threshold = n
-        src << "Your death threshold is now [n]."
 mob/verb
     Party_Test_Battle()
         set category = "Debug"
@@ -69,3 +42,65 @@ mob/verb/Test_Give_Item()
     var/datum/item/equipment/weapon/iron_sword/W = new()
     src.inventory += W
     src << "Gave you an [W.name]!"
+
+// This list should be defined at the top of your admin_combat.dm file
+
+mob/verb/Main_Party()
+    set category = "Admin"
+    var/action = input(src, "What would you like to do with the party?", "Main Party") in list("Add Player", "Remove Player", "View Party", "Clear Party", "Cancel")
+    
+    switch(action)
+        if("Add Player")
+            var/list/candidates = list()
+            for(var/mob/M in world)
+                // We filter for players with clients who aren't in the party yet
+                if(M.client && !(M in global_main_party))
+                    candidates += M
+            
+            if(!candidates.len)
+                src << "No other players online to add."
+                return
+            
+            // FIX: Put the 'as mob' filter to the right of the list
+            var/mob/choice = input(src, "Select a player to add:", "Add Player") in candidates as mob|null
+            if(choice)
+                global_main_party += choice
+                world << "<b>[choice.name] has been added to the Main Party.</b>"
+
+        if("Remove Player")
+            if(!global_main_party.len) return
+            
+            // FIX: Put the 'as mob' filter to the right of the list
+            var/mob/choice = input(src, "Select a player to remove:", "Remove Player") in global_main_party as mob|null
+            if(choice)
+                global_main_party -= choice
+                world << "<b>[choice.name] has been removed from the Main Party.</b>"
+
+        if("View Party")
+            if(!global_main_party.len)
+                src << "The party is currently empty."
+            else
+                src << "<b>--- Current Main Party ---</b>"
+                for(var/mob/M in global_main_party)
+                    src << "- [M.name] (Level [M.level])"
+
+        if("Clear Party")
+            global_main_party.Cut()
+            world << "<b>The Main Party has been cleared.</b>"
+
+mob/verb/Start_Party_Encounter()
+    set category = "Admin"
+    if(!global_main_party.len)
+        src << "The Main Party is empty! Add members first."
+        return
+
+    // Setup Enemies (Using your new Training Dummy type)
+    var/mob/enemy/E1 = new /mob/enemy/training_dummy()
+    var/mob/enemy/E2 = new /mob/enemy/training_dummy()
+    
+    var/list/Enemies = list(E1, E2)
+    
+    // Launch the encounter using the admin-defined party
+    new /datum/encounter(global_main_party, Enemies)
+    
+    world << "<b>Admin: Starting encounter for the Main Party!</b>"
