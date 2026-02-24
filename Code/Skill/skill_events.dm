@@ -15,6 +15,9 @@ datum/skill_event/message
             msg = replacetext(msg, "(target)", target.name)
         world << "<b>[msg]</b>"
 
+/**
+ * Damage Event: Handles Health Reduction & Reactions
+ */
 datum/skill_event/damage
     var/txt = ""
     var/formula = "0"
@@ -24,7 +27,7 @@ datum/skill_event/damage
     var/leech = 0.0     
 
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
-        if(!target || target.hp <= 0) return 
+        if(!target) return
         if(src.hitrate < 100 && !prob(src.hitrate))
             world << "<i>[user.name] missed [target.name]!</i>"
             return 
@@ -35,13 +38,22 @@ datum/skill_event/damage
         
         var/msg = src.txt
         if(msg)
-            // CRITICAL: We parse (dmg) and (enemy) HERE!
+            // 1. Names
             msg = replacetext(msg, "(I)", user.name)
+            msg = replacetext(msg, "(user)", user.name)
             msg = replacetext(msg, "(E)", target.name)
             msg = replacetext(msg, "(enemy)", target.name)
+            msg = replacetext(msg, "(target)", target.name)
+            
+            // 2. Damage (Notice the backslash \ before the bracket!)
+            msg = replacetext(msg, "\[dmg]", "[final_dmg]")
             msg = replacetext(msg, "(dmg)", "[final_dmg]")
+            
+            // 3. Type
+            msg = replacetext(msg, "\[type]", src.damage_type)
             msg = replacetext(msg, "(type)", src.damage_type)
-            world << msg
+            
+            world << "<b>[msg]</b>"
         else
             world << "<b>[user.name]</b> deals <b>[final_dmg] [src.damage_type]</b> damage to <b>[target.name]</b>!"
 
@@ -54,7 +66,21 @@ datum/skill_event/damage
                 user.ClampStats() 
                 world << "<i>[user.name] absorbs [heal] HP!</i>"
 
-// ... (Keep your Heal, Sound, Inflict, StatMod, and Condition events as they were)
+        // --- THE TRIGGER / COUNTER HOOK ---
+        // 1. Ensure the target is alive.
+        // 2. Ensure the user didn't just hit themselves (prevents infinite self-damage loops).
+        if(target && target.hp > 0 && user != target)
+            for(var/datum/skill/reaction in target.skills)
+                if(reaction.trigger_condition == "OnDamaged")
+                    if(prob(reaction.trigger_chance))
+                        world << "<i><font color='#FFA500'>[target.name] reacts with [reaction.name]!</font></i>"
+                        
+                        // FLIP THE SCRIPT: The target becomes the user, the attacker becomes the target!
+                        // FIXED: Added the ', 1' at the end to properly flag this as a reaction!
+                        reaction.ProcessTimeline(target, user, E, 1)
+                        
+                        break // Stop after one counter to prevent spam!
+
 /**
  * Heal Event: Handles restoration
  */

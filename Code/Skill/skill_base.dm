@@ -4,7 +4,7 @@ datum/skill
     var/targeting_flags = 0 
     var/damage_type = "Physical"
     
-    // --- Add these back for Trigger/Counter support ---
+    // --- Trigger/Counter Support ---
     var/trigger_condition = "" 
     var/trigger_chance = 100
     var/targeting_mode = "Target" 
@@ -15,6 +15,7 @@ datum/skill
     var/ammo_cost = 0
     var/fizzle_chance = 0
     var/final_attack = 0
+    var/afterlink = ""
     
     var/list/req_target_name = null 
     var/list/req_target_race = null 
@@ -24,6 +25,8 @@ datum/skill
 
     var/list/event_timeline = list()
     var/uninterrupt_level = 0
+
+    var/on_target_death = "STOP"
 
     // --- Filter Logic ---
     proc/ExecuteStep(mob/user, mob/target, step_data)
@@ -65,43 +68,76 @@ datum/skill
         user.ClampStats()
 
     proc/Execute(mob/user, target, datum/encounter/E)
-        // REMOVED: is_processing check. We handle turn-flow on the mob now.
-        
         if(src.fizzle_chance > 0 && prob(src.fizzle_chance))
-           // world << "<i>[user.name] attempts to use [src.name], but it fizzles out!</i>"
+            user.is_busy = 0 
             user.EndTurn()
             return
 
+        user.is_busy = 1
         src.PayCost(user)
         src.ProcessTimeline(user, target, E)
 
-    proc/ProcessTimeline(mob/user, target, datum/encounter/E)
+    // --- FIXED: Added the is_reaction flag here! ---
+    proc/ProcessTimeline(mob/user, target, datum/encounter/E, is_reaction = 0)
         spawn(0)
             for(var/datum/skill_event/EV in src.event_timeline)
-                if(user.hp <= 0) break // Stop if the user dies mid-skill
+                if(user.hp <= 0) break 
                 
-                if(EV.delay > 0)
-                    sleep(EV.delay)
+                if(EV.delay > 0) sleep(EV.delay)
                 
+                // --- The Target Death Check ---
+                if(!islist(target)) 
+                    var/mob/T = target
+                    if(T && T.hp <= 0) // The target is dead!
+                        if(src.on_target_death == "STOP")
+                            break // End the timeline immediately
+                            
+                        else if(src.on_target_death == "RETARGET")
+                            var/list/alive_enemies = list()
+                            for(var/mob/enemy in E.GetEnemies(user))
+                                if(enemy.hp > 0) alive_enemies += enemy
+                                
+                            if(alive_enemies.len > 0)
+                                target = pick(alive_enemies)
+                                world << "<i>[user.name] redirects to [(target:name)]!</i>"
+                            else
+                                break // No enemies left to retarget, end combat/skill early
+                                
+                        // If it's "CONTINUE", it bypasses these checks and naturally falls through to hit the body.
+
+                // --- Run the Event ---
                 if(islist(target))
-                    if(EV.is_global)
-                        EV.Run(user, target[1], src, E)
-                    else
-                        for(var/mob/T in target)
-                            EV.Run(user, T, src, E)
-                else
-                    EV.Run(user, target, src, E)
+                    if(EV.is_global) EV.Run(user, target[1], src, E)
+                    else { for(var/mob/T in target) EV.Run(user, T, src, E) }
+                else EV.Run(user, target, src, E)
 
             if(src.final_attack)
-                world << "<b>[user.name] sacrifices themselves to unleash the attack!</b>"
+                world << "<b>[user.name] sacrifices themselves!</b>"
                 user.hp = 0
                 user.ClampStats()
 
-            // THE FIX: The Turn ends here once the timeline finishes.
-            user.EndTurn()
+            // --- THE REACTION EXIT ---
+            // If this timeline was a counter-attack, quietly stop here. No turn-ending!
+            if(is_reaction)
+                return
+
+            // --- Skill Chaining (afterlink) ---
+            if(src.afterlink)
+                var/datum/skill/next_skill = skill_factory.loaded_skills[src.afterlink]
+                
+                if(next_skill)
+                    next_skill.ProcessTimeline(user, target, E)
+                    return 
+                else
+                    world.log << "ERROR: Skill [src.name] tried to afterlink to '[src.afterlink]', but it doesn't exist!"
+
+            // If there is no afterlink, OR the afterlink failed to load, end the turn safely.
+            user.is_busy = 0
+            if(hascall(user, "EndTurn"))
+                user.EndTurn()
 
 // ============================================================
-// THE EVENT BASE DEFINITION (REQUIRED FOR skill_events.dm)
+// THE EVENT BASE DEFINITION
 // ============================================================
 datum/skill_event
     var/delay = 0 

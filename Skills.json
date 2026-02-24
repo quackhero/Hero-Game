@@ -108,5 +108,77 @@
             "text": "(I) lunges at (E) with a blood-draining thrust! ([dmg] [type] Damage)"
         }
     ]
+},
+{
+    "id": "shadow_dance",
+    "name": "Shadow Dance",
+    "cost": 10,
+    "targeting_flags": ["TARGET_SINGLE", "TARGET_ENEMY"],
+    "on_target_death": "RETARGET",
+    "timeline": [
+        {
+            "type": "damage",
+            "formula": "STR * 0.8",
+            "damage_type": "Physical",
+            "text": "(I) dashes in and slashes (E)! ([dmg] Damage)"
+        },
+        {
+            "type": "damage",
+            "delay": 5,
+            "formula": "STR * 0.8",
+            "damage_type": "Physical",
+            "text": "(I) vanishes and strikes (enemy) from behind! ([dmg] Damage)"
+        },
+        {
+            "type": "damage",
+            "delay": 5,
+            "formula": "STR * 1.5",
+            "damage_type": "Physical",
+            "text": "(I) reappears above (target) for a crushing final blow! ([dmg] Damage)"
+        }
+    ]
+},
+{
+    "id": "fireball",
+    "name": "Fireball",
+    "cost": 15,
+    "afterlink": "fireball_explosion", 
+    "timeline": [
+        {
+            "type": "damage",
+            "formula": "INT * 2",
+            "damage_type": "Fire",
+            "text": "(I) hurls a massive fireball at (target)! ([dmg] Fire Damage)"
+        }
+    ]
+},
+{
+    "id": "fireball_explosion",
+    "name": "Explosion Aftermath",
+    "cost": 0, 
+    "timeline": [
+        {
+            "type": "damage",
+            "delay": 5,
+            "formula": "INT * 0.5",
+            "damage_type": "Fire",
+            "text": "The fireball erupts, scorching (target) again! ([dmg] Damage)"
+        }
+    ]
+},
+{
+    "id": "vengeful_strike",
+    "name": "Vengeful Strike",
+    "trigger_condition": "OnDamaged",
+    "trigger_chance": 100,
+    "timeline": [
+        {
+            "type": "damage",
+            "delay": 5,
+            "formula": "STR * 1.5",
+            "damage_type": "Physical",
+            "text": "(I) absorbs the blow and viciously retaliates against (target)! ([dmg] Damage)"
+        }
+    ]
 }
 ]

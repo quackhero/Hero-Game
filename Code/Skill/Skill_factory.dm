@@ -24,6 +24,12 @@ datum/skill_factory
         if("ammo_type" in data) S.ammo_type = data["ammo_type"]
         if("ammo_cost" in data) S.ammo_cost = data["ammo_cost"]
         
+        // --- NEW: The Missing Link & Targeting Behaviors ---
+        if("afterlink" in data) S.afterlink = data["afterlink"]
+        if("on_target_death" in data) S.on_target_death = data["on_target_death"]
+        if("trigger_condition" in data) S.trigger_condition = data["trigger_condition"]
+        if("trigger_chance" in data) S.trigger_chance = data["trigger_chance"]
+        
         // 1. Bitflags
         if(data["target_flags"])
             for(var/flag_str in data["target_flags"])
@@ -51,8 +57,7 @@ datum/skill_factory
 
         return S
 
-    // --- NEW: The Recursive Event Builder ---
-    // This allows conditions to have their own mini-timelines
+    // --- The Recursive Event Builder ---
     proc/BuildEvent(list/event_data)
         var/type = event_data["type"]
         var/datum/skill_event/EV
@@ -63,11 +68,15 @@ datum/skill_factory
                 M.txt = event_data["text"]
                 EV = M
                 
+            // --- FIXED: Merged Both Damage Blocks Together! ---
             if("damage")
                 var/datum/skill_event/damage/D = new()
                 if("text" in event_data) D.txt = event_data["text"]
                 D.formula = event_data["formula"]
                 if("damage_type" in event_data) D.damage_type = event_data["damage_type"]
+                if("hitrate" in event_data) D.hitrate = event_data["hitrate"]
+                if("bypass" in event_data) D.bypass = event_data["bypass"]
+                if("leech" in event_data) D.leech = event_data["leech"]
                 EV = D
                 
             if("heal")
@@ -88,7 +97,6 @@ datum/skill_factory
                 SM.stat_to_mod = event_data["stat"]
                 SM.formula = event_data["formula"]
                 SM.mod_type = uppertext(event_data["mod_type"])
-                // NEW: Read the target type from JSON
                 if("target_type" in event_data) SM.target_type = event_data["target_type"]
                 EV = SM
 
@@ -102,19 +110,6 @@ datum/skill_factory
                         var/datum/skill_event/SUB = src.BuildEvent(sub_event)
                         if(SUB) C.true_events += SUB
                 EV = C
-
-            if("damage")
-                var/datum/skill_event/damage/D = new()
-                if("text" in event_data) D.txt = event_data["text"]
-                D.formula = event_data["formula"]
-                if("damage_type" in event_data) D.damage_type = event_data["damage_type"]
-                
-                // --- NEW: Load the Advanced Math ---
-                if("hitrate" in event_data) D.hitrate = event_data["hitrate"]
-                if("bypass" in event_data) D.bypass = event_data["bypass"]
-                if("leech" in event_data) D.leech = event_data["leech"]
-                
-                EV = D
 
         if(EV && "delay" in event_data) 
             EV.delay = event_data["delay"]

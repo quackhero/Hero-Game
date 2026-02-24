@@ -9,15 +9,25 @@ datum/encounter
         src.players = P
         src.enemies = E
         src.all_participants = P + E
+        
+        // --- THE CLEAN SLATE INITIALIZATION ---
         for(var/mob/M in src.all_participants)
             M.current_encounter = src
             M.atb_gauge = 0 
+            M.is_busy = 0 // Guarantees nobody enters combat locked out!
+
+            if(M.hp < 1)
+                M.hp = 1
+            if(M.is_dead)
+                M.is_dead = 0
+            
         src.Start()
 
     proc/Start()
         src.is_active = 1
         world << "<b>*** BATTLE START ***</b>"
         src.CombatLoop()
+        
 
     proc/CombatLoop()
         spawn(0)
@@ -102,19 +112,14 @@ datum/encounter
                         for(var/i = 1 to amount)
                             M.inventory += new item_path()
                             
-        // ... the rest of your cleanup code ...
-        for(var/mob/M in src.all_participants)
-            M.atb_gauge = 0
-
+        // --- CONSOLIDATED CLEANUP LOOP ---
         for(var/mob/M in src.all_participants)
             M.atb_gauge = 0
             M.is_busy = 0
             M.current_encounter = null
-            
-        for(var/mob/M in src.all_participants) 
             if(M.client) 
                 M << browse(null, "window=battle_menu")
-                M.is_busy = 0
+
     proc/CalculateRewardEXP(list/mob/party, list/mob/enemies)
         if(!party || !party.len || !enemies || !enemies.len) return 0
         var/P = party.len

@@ -21,6 +21,8 @@ mob
             for(var/line in chat_log)
                 src << line
             src << "<span style='color: #555555'>-----------------------</span>"
+        if(!src.current_encounter)
+            src.is_busy = 0
 
         // --- THE LOAD / CREATE FORK ---
         if(src.LoadPlayer())
