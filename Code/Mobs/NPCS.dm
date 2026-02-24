@@ -38,7 +38,7 @@ mob/enemy/TakeAction(datum/encounter/E)
     var/mob/target = pick(E.players)
     
     if(target)
-        world << "<b>[src.name]</b> uses <b>[S.name]</b> on [target.name]!"
+     //   world << "<b>[src.name]</b> uses <b>[S.name]</b> on [target.name]!"
         S.Execute(src, target, E)
     else
         src.EndTurn()

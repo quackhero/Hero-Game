@@ -1,0 +1,112 @@
+[
+    {
+        "id": "fire_json",
+        "name": "Fire",
+        "cost": 9,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {
+            "target_dead": 0,
+            "fizzle_chance": 0
+        },
+        "timeline": [
+            {
+                "type": "damage",
+                "text": "blasts",
+                "formula": "INT * 1.75",
+                "damage_type": "Fire"
+            }
+        ]
+    },
+    {
+        "id": "poison_strike",
+        "name": "Poison Strike",
+        "cost": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {
+            "target_dead": 0,
+            "fizzle_chance": 10
+        },
+        "timeline": [
+            {
+                "type": "message",
+                "text": "(I) lunges at (enemy) with a toxic blade!"
+            },
+            {
+                "type": "damage",
+                "text": "strikes",
+                "formula": "STR * 1.2",
+                "damage_type": "Physical"
+            },
+            {
+                "type": "inflict",
+                "status": "/datum/component/dot/burn", 
+                "duration": 3,
+                "amount": 5,
+                "chance": 100
+            }
+        ]
+    },
+    {
+    "id": "desperation",
+    "name": "Desperation",
+    "cost": 0,
+    "target_flags": ["TARGET_SELF"],
+    "timeline": [
+        {
+            "type": "message",
+            "text": "(I) is backed into a corner!"
+        },
+        {
+            "type": "condition",
+            "formula": "HP < 30",
+            "if_true": [
+                {
+                    "type": "message",
+                    "text": "(I) taps into their survival instincts! Strength Up!"
+                },
+                {
+                    "type": "stat_mod",
+                    "stat": "STR",
+                    "target_type": "Self",
+                    "formula": "20",
+                    "mod_type": "ADD"
+                }
+            ]
+        }
+    ]
+},
+{
+    "id": "goblin_slayer",
+    "name": "Goblin Slayer",
+    "cost": 5,
+    "target_flags": ["TARGET_SINGLE"],
+    "requirements": {
+        "req_target_race": ["Goblin", "Hobgoblin"]
+    },
+    "timeline": [
+        {
+            "type": "message",
+            "text": "(I) strikes down a Goblin!"
+        },
+        {
+            "type": "damage",
+            "text": "slashes",
+            "formula": "STR * 2.0",
+            "damage_type": "Physical"
+        }
+    ]
+},
+{
+    "id": "vamp_pierce",
+    "name": "Vampiric Pierce",
+    "timeline": [
+        {
+            "type": "damage",
+            "formula": "STR * 2",
+            "damage_type": "Necrotic",
+            "leech": 0.50,
+            "text": "(I) lunges at (E) with a blood-draining thrust! ([dmg] [type] Damage)"
+        }
+    ]
+}
+]

@@ -6,43 +6,24 @@ datum/skill/fire
         var/datum/skill_event/damage/D = new(); D.txt = "blasts"; D.formula = "AP * 1.75"
         src.event_timeline += D
 
-datum/skill/cure
-    name = "Cure"
-    cost = 7
-    charge_time = 0 
-    targeting_flags = TARGET_HEAL // <--- Add this line!
-    New()
-        var/datum/skill_event/heal/H = new(); 
-        H.formula = "AP * 1.5"
-        src.event_timeline += H
-
 datum/skill/explosion
     name = "Explosion"
     cost = 20
-    targeting_flags = TARGET_AOE 
-    
+    targeting_flags = TARGET_AOE
+
     New()
         var/datum/skill_event/message/M = new()
         // Add (I) here so it prints the user's name!
         M.txt = "(I) unleashes a massive explosion!"
-        
+
         var/datum/skill_event/damage/D = new()
         D.formula = "AP * 2"
         // Add (enemy) here so it puts the target's name at the front!
         D.txt = "(enemy) is scorched by the blast!"
-        
+
         src.event_timeline += M
         src.event_timeline += D
 
-datum/skill/bladerush
-    name = "Bladerush"
-    cost = 15
-    damage_type = "Slash"
-    New()
-        for(var/i=1 to 4)
-            var/datum/skill_event/damage/D = new()
-            D.txt = "slashes"; D.formula = "(ATK + SPD) / 3"; D.accuracy = 85
-            src.event_timeline += D
 
 datum/skill/vengeful_strike
     name = "Vengeful Strike"
@@ -56,15 +37,6 @@ datum/skill/vengeful_strike
         src.event_timeline += D
 
 
-mob/verb/Give_Starter_Kit()
-    src.skills += new /datum/skill/fire()
-    src.skills += new /datum/skill/cure()
-    src.skills += new /datum/skill/bladerush()
-    src.skills += new /datum/skill/vengeful_strike()
-    src.skills += new /datum/skill/explosion()
-    src.skills += new /datum/skill/ignite()
-    src << "Starter Kit Equipped. Test the Negative HP logic with Vengeful Strike!"
-
 
 // 1. Define what 'Burn' is
 datum/component/dot/burn
@@ -75,33 +47,33 @@ datum/component/dot/burn
 datum/skill/ignite
     name = "Ignite"
     cost = 8
-    
+
     New()
         var/datum/skill_event/message/M = new()
         M.txt = "(I) snaps their fingers!"
-        
+
         var/datum/skill_event/damage/D = new()
         D.formula = "AP * 1"
         D.txt = "(enemy) bursts into flames"
-        
+
         // 3. The Inflict Event
         var/datum/skill_event/inflict/I = new()
         I.status_type = /datum/component/dot/burn
         I.amount = 5      // 5 Damage per turn
         I.duration = 3    // Lasts 3 turns
         I.chance = 100    // 100% chance to apply
-        
+
         src.event_timeline += M
         src.event_timeline += D
         src.event_timeline += I
 datum/skill/heavy_strike
     name = "Heavy Strike"
     cost = 10
-    
+
     New()
         var/datum/skill_event/damage/D = new()
         // We added (I) and (enemy) so the engine knows where to put the names!
-        D.txt = "(I) delivers a crushing blow to (enemy)!" 
-        D.formula = "ATK * 1.5" 
-        
+        D.txt = "(I) delivers a crushing blow to (enemy)!"
+        D.formula = "ATK * 1.5"
+
         src.event_timeline += D

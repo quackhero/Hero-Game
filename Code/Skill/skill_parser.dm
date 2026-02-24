@@ -1,5 +1,5 @@
 // ============================================================
-// 1. GLOBAL DEFINITION (Fixes "undefined var" error)
+// 1. GLOBAL DEFINITION
 // ============================================================
 var/datum/skill_parser/parser = new()
 
@@ -19,19 +19,23 @@ datum/skill_parser
         
         // --- STEP A: Replace User Stats ---
         if(user)
-            processed = replacetext(processed, "ATK", "[user.strength]")
-            processed = replacetext(processed, "DEF", "[user.resilience]")
-            processed = replacetext(processed, "SPD", "[user.dexterity]")
-            processed = replacetext(processed, "AP",  "[user.intelligence]")
+            processed = replacetext(processed, "STR", "[user.strength]")
+            processed = replacetext(processed, "RES", "[user.resilience]")
+            processed = replacetext(processed, "DEX", "[user.dexterity]")
+            processed = replacetext(processed, "INT", "[user.intelligence]")
+            processed = replacetext(processed, "MND", "[user.mind]")
+            processed = replacetext(processed, "VIT", "[user.vitality]")
             processed = replacetext(processed, "HP",  "[user.hp]")
             processed = replacetext(processed, "MP",  "[user.mp]")
 
         // --- STEP B: Replace Target Stats ---
         if(target)
-            processed = replacetext(processed, "ATK(E)", "[target.strength]")
-            processed = replacetext(processed, "DEF(E)", "[target.resilience]")
-            processed = replacetext(processed, "SPD(E)", "[target.dexterity]")
-            processed = replacetext(processed, "AP(E)",  "[target.intelligence]")
+            processed = replacetext(processed, "STR(E)", "[target.strength]")
+            processed = replacetext(processed, "RES(E)", "[target.resilience]")
+            processed = replacetext(processed, "DEX(E)", "[target.dexterity]")
+            processed = replacetext(processed, "INT(E)", "[target.intelligence]")
+            processed = replacetext(processed, "MND(E)", "[target.mind]")
+            processed = replacetext(processed, "VIT(E)", "[target.vitality]")
             processed = replacetext(processed, "HP(E)",  "[target.hp]")
             processed = replacetext(processed, "MP(E)",  "[target.mp]")
 
@@ -39,7 +43,6 @@ datum/skill_parser
         return CalculateMath(processed)
 
     // A simple parser that handles + - * / 
-    // Example input: "10 * 5 + 2"
     proc/CalculateMath(t)
         // 1. Remove spaces for easier parsing
         t = replacetext(t, " ", "")

@@ -52,7 +52,9 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
             html += "<a href='?src=\ref[src];action=do_skill;skill_ref=\ref[pending_skill];target=AOE'>-All Valid Targets-</a><br>"
         else
             for(var/mob/T in valid_targets)
-                html += "<a href='?src=\ref[src];action=do_skill;skill_ref=\ref[pending_skill];target=\ref[T]'>-[T.name]-</a><br>"
+                // --- NEW: Verify the target meets the JSON filters! ---
+                if(pending_skill.IsValidTarget(src, T))
+                    html += "<a href='?src=\ref[src];action=do_skill;skill_ref=\ref[pending_skill];target=\ref[T]'>-[T.name]-</a><br>"
         html += "<br><a href='?src=\ref[src];action=menu_main'>-Cancel-</a><br>"
 
     else if(menu_state == "Target_Item" && pending_item)
@@ -180,8 +182,16 @@ mob/Topic(href, href_list)
         var/idx = text2num(href_list["skill_idx"])
         if(idx <= src.equipped_skills.len)
             var/datum/skill/S = src.equipped_skills[idx]
-            if(src.mp >= S.cost) src.UpdateBattleMenu(E, "Target_Skill", S)
-            else src << "Not enough MP!"
+            if(src.mp >= S.cost)
+                if(S.targeting_flags & TARGET_SELF)
+                    src << browse(null, "window=battle_menu") 
+                    src.is_busy = 0
+                    src.turn_id++
+                    S.Execute(src, src, E)
+                else
+                    src.UpdateBattleMenu(E, "Target_Skill", S)
+            else
+                src << "Not enough MP!"
 
     else if(action == "menu_target_item")
         var/idx = text2num(href_list["item_idx"])

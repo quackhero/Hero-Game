@@ -7,6 +7,9 @@ datum/item
     var/desc = "A generic item."
     var/item_type = "Misc" // "Weapon", "Armor", "Accessory", "Consumable"
     
+    // --- NEW: Stack Tracking for Ammo & Inventory ---
+    var/amount = 1 
+    
     // For Consumables
     proc/Use(mob/user, mob/target, datum/encounter/E)
         return 0 // Returns 1 if successfully used, 0 if canceled/failed
@@ -39,12 +42,15 @@ datum/item/equipment/weapon/iron_sword
     New()
         ..()
         // It grants the Bladerush skill you already made!
-        src.granted_skills += /datum/skill/bladerush
+
+// --- CONSUMABLES BASE ---
+// Defining this explicitly helps BYOND categorize them properly!
+datum/item/consumable
+    item_type = "Consumable"
 
 datum/item/consumable/potion
     name = "Health Potion"
     desc = "Restores 50 HP."
-    item_type = "Consumable"
     
     Use(mob/user, mob/target, datum/encounter/E)
         if(!target) target = user
@@ -53,8 +59,10 @@ datum/item/consumable/potion
         world << "<b>[user.name] uses a Health Potion on [target.name], restoring 50 HP!</b>"
         return 1
 
-datum/item/potion
-    name = "Potion"
-
 datum/item/ether
     name = "Ether"
+    desc = "Restores 50 MP."
+datum/item/potion
+    name = "Health Potion"
+    desc = "Restores 50 HP."
+    

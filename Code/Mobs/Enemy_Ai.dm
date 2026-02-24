@@ -31,7 +31,7 @@ mob/enemy/TakeAction(datum/encounter/E)
         else
             var/mob/target = pick(living_players)
             if(S && target)
-                world << "<b>The [src.name] uses [S.name] on [target.name]!</b>"
+              //  world << "<b>The [src.name] uses [S.name] on [target.name]!</b>"
                 S.Execute(src, target, E)
     
     // 3. Ensure the gauge is reset after the action is finished!

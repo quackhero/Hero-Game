@@ -10,18 +10,18 @@ datum/class
 datum/class/novice
     name = "Novice"
     stat_growths = list(
-        "max_hp" = 3, 
-        "max_mp" = 1, 
-        "strength" = 2, 
-        "resilience" = 1, 
+        "max_hp" = 3,
+        "max_mp" = 1,
+        "strength" = 2,
+        "resilience" = 1,
         "dexterity" = 1,
         "intelligence" = 1,
         "mind" = 1,
         "vitality" = 2
     )
-    
-    
+
+
     skill_tree = list(
         "2" = /datum/skill/heavy_strike,
-        "4" = /datum/skill/cure
+
     )

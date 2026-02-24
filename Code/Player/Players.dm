@@ -1,9 +1,9 @@
 mob
     var/datum/class/Primary_class
     var/current_exp = 0
-    var/max_exp = 100 
+    var/max_exp = 100
     var/level = 1
-    var/stat_points = 0 
+    var/stat_points = 0
 
     // --- NEW: INVENTORY & EQUIPMENT ---
     var/list/inventory = list()
@@ -54,7 +54,7 @@ mob
             src.mind += src.equipped_armor.mind_bonus
             src.vitality += src.equipped_armor.vitality_bonus
             src.resilience += src.equipped_armor.resilience_bonus
-            
+
         // 4. Add Accessory Stats
         if(src.equipped_accessory)
             src.max_hp += src.equipped_accessory.max_hp_bonus
@@ -70,7 +70,7 @@ mob
 
     proc/LevelUp()
         src.level++
-        src.stat_points += 2 
+        src.stat_points += 2
         src.max_exp = GetMaxExpForLevel(src.level)
         src << "<font color='#FFFF00'><b>*** LEVEL UP! You are now Level [src.level]! ***</b></font>"
 
@@ -82,16 +82,16 @@ mob
                     // Clean up the text for display (removes the word "base_")
                     var/display_name = replacetext(stat_name, "base_", "")
                     src << "<font color='#00FF00'>+ [growth_amt] [uppertext(display_name)]</font>"
-            
+
             var/lvl_str = num2text(src.level)
             if(lvl_str in src.Primary_class.skill_tree)
                 var/skill_path = src.Primary_class.skill_tree[lvl_str]
                 var/datum/skill/new_skill = new skill_path()
                 src.skills += new_skill
                 src << "<font color='#00FFFF'><b>You learned a new technique: [new_skill.name]!</b></font>"
-        
+
         src << "<b>You gained 2 Stat Points to spend!</b>"
-        
+
         src.UpdateStats() // Apply the new stats!
         src.hp = src.max_hp
         src.mp = src.max_mp
@@ -119,7 +119,7 @@ mob
         src.base_mind = 5
         src.base_vitality = 5
         src.base_resilience = 5
-        src.stat_points = 5 
+        src.stat_points = 5
 
         for(var/stat_name in src.Primary_class.stat_growths)
             var/growth_amt = src.Primary_class.stat_growths[stat_name]
@@ -129,9 +129,9 @@ mob
         src.UpdateStats() // Calculate true stats
         src.hp = src.max_hp
         src.mp = src.max_mp
-        
+
         src.skills += new /datum/skill/heavy_strike()
-        src.skills += new /datum/skill/cure()
+
 
         world << "<b>[src.name]</b> has begun their journey as a <b>[src.Primary_class.name]</b>!"
         src << "<b>Creation complete! You have [src.stat_points] unspent stat points. Check the 'Tools' tab to spend them.</b>"
@@ -139,15 +139,15 @@ mob
     proc/GainEXP(amount)
         if(amount <= 0) return
         if(src.level >= 50) return // Stop them at the level 50 cap!
-        
+
         src.current_exp += amount
         src << "<font color='#00FFFF'><b>You gained [amount] EXP!</b></font>"
-        
+
         // Loop just in case they gained enough EXP to level up multiple times at once
         while(src.current_exp >= src.max_exp && src.level < 50)
             src.current_exp -= src.max_exp // Keep the leftover EXP for the next level
             src.LevelUp()
-    
+
     proc/GetMaxExpForLevel(lvl)
         var/list/exp_table = list(
             10,     // Level 1
@@ -201,8 +201,8 @@ mob
             47500,  // Level 49
             50000   // Level 50
         )
-        
+
         // Safety check: If they somehow pass Level 50, cap their requirement
-        if(lvl > exp_table.len) return 999999 
-        
+        if(lvl > exp_table.len) return 999999
+
         return exp_table[lvl]

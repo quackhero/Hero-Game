@@ -13,6 +13,7 @@ mob
     var/resilience = 10
     var/vitality = 10
     var/sk = 10
+    var/race = "Human"
     var/combat_flags = 0
     var/turn_id = 0
     var/list/active_counters = list()
@@ -47,11 +48,22 @@ mob
     proc/CanAct(datum/skill/S = null)
         if(src.is_dead || src.hp <= src.death_threshold) return 0
         
-        // Removed the 'is_busy' check here so the engine doesn't lock itself out!
-        
-        if(S && src.mp < S.cost) 
-            src << "Not enough MP!"
-            return 0
+        if(S)
+            // 1. Check MP
+            if(src.mp < S.cost) 
+                src << "Not enough MP!"
+                return 0
+            
+            // 2. Check HP (Ensures they don't kill themselves to cast)
+            if(S.hp_cost > 0 && src.hp <= S.hp_cost)
+                src << "Not enough HP to use this!"
+                return 0
+                
+            // 3. Check Ammo
+            if(S.ammo_type && !src.HasAmmo(S.ammo_type, S.ammo_cost))
+                src << "Not enough [S.ammo_type]s equipped!"
+                return 0
+                
         return 1
 
     proc/CanTarget(mob/T)
@@ -178,3 +190,27 @@ mob
         for(var/datum/component/C in src.components)
             if(istype(C, path)) return C
         return null
+
+    proc/HasStatus(status_name)
+        for(var/datum/component/C in src.components)
+            // Checks if the component's name matches the string from the JSON
+            if(lowertext(C.name) == lowertext(status_name)) 
+                return 1
+        return 0
+
+    // --- NEW: Ammo Management Procs ---
+    proc/HasAmmo(req_name, req_amount)
+        for(var/datum/item/consumable/I in src.equipped_items)
+            if(lowertext(I.name) == lowertext(req_name))
+                if(I.amount >= req_amount) return 1
+        return 0
+
+    proc/ConsumeAmmo(req_name, req_amount)
+        for(var/datum/item/consumable/I in src.equipped_items)
+            if(lowertext(I.name) == lowertext(req_name))
+                I.amount -= req_amount
+                if(I.amount <= 0)
+                    src.equipped_items -= I
+                    if(src.vars["inventory"]) src.inventory -= I // Remove from bag too!
+                return 1
+        return 0

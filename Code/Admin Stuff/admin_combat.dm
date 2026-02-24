@@ -21,11 +21,13 @@ mob/verb
         var/mob/e1 = new /mob()
         e1.name = "Goblin A"
         e1.hp = 50
+        e1.race = "Goblin"
         e1.dexterity = 6 // (Was spd)
         e1.strength = 7  // (Was atk)
 
         var/mob/e2 = new /mob()
         e2.name = "Goblin B"
+        e2.race = "Goblin"
         e2.hp = 50
         e2.dexterity = 7 // (Was spd)
         e2.strength = 7  // (Was atk)
@@ -104,3 +106,20 @@ mob/verb/Start_Party_Encounter()
     new /datum/encounter(global_main_party, Enemies)
     
     world << "<b>Admin: Starting encounter for the Main Party!</b>"
+
+mob/verb/Give_JSON_Skill()
+    set category = "Admin"
+    
+    // Check if the factory actually loaded anything
+    if(!skill_factory.loaded_skills.len)
+        src << "No JSON skills are currently loaded!"
+        return
+        
+    // Pop up a list of all loaded skill IDs
+    var/choice = input(src, "Which skill do you want to learn?", "Give Skill") in skill_factory.loaded_skills
+    
+    if(choice)
+        // Grab the skill from the factory and give it to the player
+        var/datum/skill/S = skill_factory.loaded_skills[choice]
+        src.skills += S
+        src << "<font color='#00FFFF'><b>You learned [S.name]!</b></font>"

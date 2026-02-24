@@ -9,6 +9,7 @@ var/datum/skill_factory/skill_factory = new()
 #define TARGET_DEFLECT   8
 #define TARGET_HEAL      16
 #define TARGET_REVIVE    32
+#define TARGET_SELF      64
 
 // --- AOE Types (Mapping your Arg List) ---
 #define AOE_MARK         1  // Only affects marked
