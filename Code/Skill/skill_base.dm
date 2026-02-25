@@ -3,6 +3,9 @@ datum/skill
     var/cost = 0
     var/targeting_flags = 0 
     var/damage_type = "Physical"
+
+    var/category = "Attack" // "Attack", "Spell", "Item", etc.
+    var/trigger_category = "Any" // Filter for passive counters
     
     // --- Trigger/Counter Support ---
     var/trigger_condition = "" 

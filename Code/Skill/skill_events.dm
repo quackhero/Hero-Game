@@ -67,19 +67,32 @@ datum/skill_event/damage
                 world << "<i>[user.name] absorbs [heal] HP!</i>"
 
         // --- THE TRIGGER / COUNTER HOOK ---
-        // 1. Ensure the target is alive.
-        // 2. Ensure the user didn't just hit themselves (prevents infinite self-damage loops).
         if(target && target.hp > 0 && user != target)
+            var/counter_fired = 0
+            
+            // 1. Check PASSIVE Skills
             for(var/datum/skill/reaction in target.skills)
                 if(reaction.trigger_condition == "OnDamaged")
-                    if(prob(reaction.trigger_chance))
-                        world << "<i><font color='#FFA500'>[target.name] reacts with [reaction.name]!</font></i>"
-                        
-                        // FLIP THE SCRIPT: The target becomes the user, the attacker becomes the target!
-                        // FIXED: Added the ', 1' at the end to properly flag this as a reaction!
-                        reaction.ProcessTimeline(target, user, E, 1)
-                        
-                        break // Stop after one counter to prevent spam!
+                    // NEW: Category Filter Check!
+                    if(reaction.trigger_category == "Any" || reaction.trigger_category == S.category)
+                        if(prob(reaction.trigger_chance))
+                            world << "<i><font color='#FFA500'>[target.name] reacts with [reaction.name]!</font></i>"
+                            reaction.ProcessTimeline(target, user, E, 1)
+                            counter_fired = 1
+                            break 
+
+            // 2. Check ACTIVE Statuses (Your Components List!)
+            if(!counter_fired && target.components)
+                for(var/datum/component/status/stance in target.components)
+                    if(stance.trigger_condition == "OnDamaged" && stance.reaction_skill_id)
+                        // NEW: Category Filter Check!
+                        if(stance.trigger_category == "Any" || stance.trigger_category == S.category)
+                            if(prob(stance.trigger_chance))
+                                var/datum/skill/reaction_skill = skill_factory.loaded_skills[stance.reaction_skill_id]
+                                if(reaction_skill)
+                                    world << "<i><font color='#FFA500'>[target.name]'s [stance.name] activates!</font></i>"
+                                    reaction_skill.ProcessTimeline(target, user, E, 1)
+                                    break
 
 /**
  * Heal Event: Handles restoration
@@ -110,7 +123,7 @@ datum/skill_event/sound
  * Status Event: Handles Inflict
  */
 datum/skill_event/inflict
-    var/status_type
+    var/status_type = "" // Now a string ID
     var/chance = 100
     var/amount = 0
     var/duration = 3

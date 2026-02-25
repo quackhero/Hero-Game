@@ -42,3 +42,30 @@ mob/enemy/TakeAction(datum/encounter/E)
         S.Execute(src, target, E)
     else
         src.EndTurn()
+    
+mob/enemy/active_dummy
+    name = "Striking Dummy"
+    hp = 500
+    max_hp = 500
+    strength = 1 
+    resilience = 5
+    dexterity = 10
+    
+    // The bulletproof AI loop
+    TakeAction()
+        sleep(10) // Wait 1 second so the combat log doesn't blur together
+        
+        var/datum/encounter/E = src.current_encounter
+        if(!E) return src.EndTurn()
+            
+        var/list/enemies = E.GetEnemies(src)
+        if(!enemies || !enemies.len) return src.EndTurn()
+            
+        var/mob/target = pick(enemies)
+        var/datum/skill/attack_skill = skill_factory.loaded_skills["basic_attack"]
+        
+        if(attack_skill)
+            attack_skill.Execute(src, target, E) 
+            src.EndTurn() // Safely end the turn after punching
+        else
+            src.EndTurn()

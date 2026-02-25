@@ -1,0 +1,15 @@
+[
+    {
+        "id": "vengeful_stance",
+        "name": "Vengeful Stance",
+        "trigger_condition": "OnDamaged",
+        "trigger_chance": 100,
+        "reaction_skill_id": "vengeful_strike"
+    },
+    {
+        "id": "poisoned",
+        "name": "Poison",
+        "dot_amount": 5,
+        "dot_type": "Poison"
+    }
+]

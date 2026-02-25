@@ -168,7 +168,7 @@
 },
 {
     "id": "vengeful_strike",
-    "name": "Vengeful Strike",
+    "name": "Vengeful Strike Buff",
     "trigger_condition": "OnDamaged",
     "trigger_chance": 100,
     "timeline": [
@@ -180,5 +180,55 @@
             "text": "(I) absorbs the blow and viciously retaliates against (target)! ([dmg] Damage)"
         }
     ]
-}
+},
+{
+        "id": "assume_vengeful_stance",
+        "name": "Assume Vengeful Stance",
+        "cost": 10,
+        "target_flags": ["TARGET_SELF"],
+        "timeline": [
+            {
+                "type": "message",
+                "text": "(I) takes a defensive posture, ready to strike back!"
+            },
+            {
+                "type": "inflict",
+                "status": "vengeful_stance",
+                "duration": 1
+            }
+        ]
+    },
+    {
+        "id": "basic_attack",
+        "name": "Attack",
+        "category": "Attack",
+        "cost": 0,
+        "timeline": [
+            {
+                "type": "damage",
+                "formula": "STR",
+                "damage_type": "Physical",
+                "text": "(user) delivers a physical blow to (target)! ([dmg] Damage)"
+            }
+        ]
+    },
+    {
+        "id": "poison_dart",
+        "name": "Poison Dart",
+        "category": "Attack",
+        "cost": 5,
+        "timeline": [
+            {
+                "type": "damage",
+                "formula": "STR * 0.5",
+                "text": "(I) shoots a toxic dart at (target)! ([dmg] Damage)"
+            },
+            {
+                "type": "inflict",
+                "status": "poisoned",
+                "duration": 3,
+                "chance": 100
+            }
+        ]
+    }
 ]

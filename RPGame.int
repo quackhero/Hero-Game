@@ -2,13 +2,13 @@
 /*
 MAP_PLANE_MASTERS: 
 MAP_ZOOM: 1.000
-LAST_COMPILE_TIME: 1771971738
+LAST_COMPILE_TIME: 1772039783
 DIR: Code Code\Admin Stuff Code\Datums Code\Mobs Code\Player Code\Skill Code\systems Code\systems\Combat 
 AUTO_FILE_DIR: OFF
 MAP_ICON_TYPE: 0
 LAST_COMPILE_VERSION: 515.1647
-WINDOW: Code\Mobs\NPCS.dm;Code\Admin Stuff\admin_combat.dm;Code\Player\Player_Logic.dm;Code\Skill\skill_events.dm;Code\Skill\skill_logic.dm;Code\Mobs\Base.dm;Code\systems\Turn_Engine.dm;Code\Skill\Skill_Components.dm;Code\Mobs\Enemy_Ai.dm;Code\Skill\skill_base.dm
-FILE: Code\Skill\skill_base.dm
+WINDOW: Code\Mobs\NPCS.dm;Code\Admin Stuff\admin_combat.dm;Code\Player\Player_Logic.dm;Code\Skill\skill_events.dm;Code\Skill\skill_logic.dm;Code\Mobs\Base.dm;Code\systems\Turn_Engine.dm;Code\Skill\Skill_Components.dm;Code\Mobs\Enemy_Ai.dm;Code\Skill\skill_base.dm;Code\Datums\Status.dm
+FILE: Code\Datums\Status.dm
 MAP_INSTANCE_MODE: copy
 */
 // END_INTERNALS

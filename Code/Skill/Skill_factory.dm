@@ -23,6 +23,9 @@ datum/skill_factory
         if("hp_cost" in data) S.hp_cost = data["hp_cost"]
         if("ammo_type" in data) S.ammo_type = data["ammo_type"]
         if("ammo_cost" in data) S.ammo_cost = data["ammo_cost"]
+
+        if("category" in data) S.category = data["category"]
+        if("trigger_category" in data) S.trigger_category = data["trigger_category"]
         
         // --- NEW: The Missing Link & Targeting Behaviors ---
         if("afterlink" in data) S.afterlink = data["afterlink"]
@@ -86,7 +89,7 @@ datum/skill_factory
                 
             if("inflict")
                 var/datum/skill_event/inflict/I = new()
-                I.status_type = text2path(event_data["status"])
+                I.status_type = event_data["status"]
                 I.duration = event_data["duration"]
                 if("amount" in event_data) I.amount = event_data["amount"]
                 if("chance" in event_data) I.chance = event_data["chance"]

@@ -111,6 +111,11 @@ mob
         src.TakeAction(E)
 
     proc/TakeAction(datum/encounter/E)
+    
+        if(src.components && src.components.len)
+            for(var/datum/component/status/C in src.components)
+                C.OnTurnStart(src)
+
         if(!src.CanAct()) return
         src.defending = 0 
 
@@ -151,9 +156,18 @@ mob
 
     proc/BasicAttack(mob/target)
         if(!src.CanAct() || !src.CanTarget(target)) return src.EndTurn()
-        var/dmg = max(1, src.strength - target.resilience)
-        target.TakeDamage(dmg, src, "Physical")
-        src.EndTurn()
+        
+        // --- CE2 UPGRADE ---
+        // Route basic attacks through the JSON engine!
+        var/datum/skill/attack_skill = skill_factory.loaded_skills["basic_attack"]
+        
+        if(attack_skill)
+            attack_skill.Execute(src, target, src.current_encounter)
+        else
+            // Fallback just in case you forgot to add it to the JSON
+            var/dmg = max(1, src.strength - target.resilience)
+            target.TakeDamage(dmg, src, "Physical")
+            src.EndTurn()
     
     proc/TakeDamage(amount, mob/attacker, damage_type = "Physical", silent = 0)
         if(src.is_dead) return
@@ -175,27 +189,34 @@ mob
         world << "<b>*** [src.name] has been defeated! ***</b>"
         if(src.current_encounter) src.current_encounter.CheckStatus()
 
-    proc/ApplyStatus(path, duration, amount)
-        if(!ispath(path, /datum/component)) return
-        var/datum/component/existing = src.GetStatus(path)
+    proc/ApplyStatus(status_id, duration, amount)
+        // 1. Grab the template from the factory
+        var/datum/component/status/template = status_factory.loaded_statuses[status_id]
+        if(!template)
+            world.log << "ERROR: Tried to apply unknown status: [status_id]"
+            return
+
+        // 2. Check if they already have it
+        var/datum/component/status/existing = src.GetStatus(status_id)
         if(existing)
-            // NEW LOGIC: Let the component handle its own refresh rules!
             existing.OnRefresh(duration, amount)
         else
-            var/datum/component/new_status = new path(amount, duration)
+            // 3. Clone the template and apply it!
+            var/datum/component/status/new_status = template.Clone()
             new_status.owner = src
+            new_status.duration = duration
+            new_status.amount = amount
             src.components += new_status
+            
+            world << "<i><font color='#B19CD9'>[src.name] gains [new_status.name]!</font></i>"
 
-    proc/GetStatus(path)
-        for(var/datum/component/C in src.components)
-            if(istype(C, path)) return C
+    proc/GetStatus(status_id)
+        for(var/datum/component/status/C in src.components)
+            if(C.id == status_id) return C
         return null
 
-    proc/HasStatus(status_name)
-        for(var/datum/component/C in src.components)
-            // Checks if the component's name matches the string from the JSON
-            if(lowertext(C.name) == lowertext(status_name)) 
-                return 1
+    proc/HasStatus(status_id)
+        if(src.GetStatus(status_id)) return 1
         return 0
 
     // --- NEW: Ammo Management Procs ---
