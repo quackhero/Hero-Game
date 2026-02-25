@@ -76,6 +76,8 @@ datum/component/status
     var/dot_type = "Poison"
     var/hot_amount = 0
 
+    var/is_fresh = 1
+
     // --- THE CLONER ---
     // The factory uses this to hand a fresh copy to the player!
     proc/Clone()
@@ -112,6 +114,10 @@ datum/component/status
             world << "<i><font color='#00FF00'>[M.name] recovers [src.hot_amount] HP from [src.name]!</font></i>"
 
     OnTurnEnd(mob/M)
+        if(src.is_fresh)
+            src.is_fresh = 0 // Skip the first turn to prevent instant expiration
+            return
+
         if(src.duration > 0)
             src.duration--
             if(src.duration <= 0 && M)

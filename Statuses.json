@@ -10,6 +10,7 @@
         "id": "poisoned",
         "name": "Poison",
         "dot_amount": 5,
-        "dot_type": "Poison"
+        "dot_type": "Poison",
+        "duration": 3
     }
 ]
