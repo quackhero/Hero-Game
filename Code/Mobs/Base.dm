@@ -204,6 +204,7 @@ mob
             // 3. Clone the template and apply it!
             var/datum/component/status/new_status = template.Clone()
             new_status.owner = src
+            world << "DEBUG: [new_status.name] owner set to [src.name]"
             new_status.duration = duration
             new_status.amount = amount
             src.components += new_status
@@ -235,3 +236,8 @@ mob
                     if(src.vars["inventory"]) src.inventory -= I // Remove from bag too!
                 return 1
         return 0
+
+    proc/RemoveStatus(datum/component/status/S)
+        src.components -= S
+        world << "<i><font color='#B19CD9'>[src.name]'s [S.name] wore off!</font></i>"
+        del(S)

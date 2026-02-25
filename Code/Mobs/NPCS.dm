@@ -49,7 +49,7 @@ mob/enemy/active_dummy
     max_hp = 500
     strength = 1 
     resilience = 5
-    dexterity = 10
+    dexterity = 0
     
     // The bulletproof AI loop
     TakeAction()
@@ -66,6 +66,6 @@ mob/enemy/active_dummy
         
         if(attack_skill)
             attack_skill.Execute(src, target, E) 
-            src.EndTurn() // Safely end the turn after punching
+         // Safely end the turn after punching
         else
             src.EndTurn()
