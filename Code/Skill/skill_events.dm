@@ -39,6 +39,11 @@ datum/skill_event/damage
         if(target.defending)
             final_dmg = max(1, round(final_dmg / 2))
             world << "<i>[target.name] mitigates the attack!</i>"
+
+        // Damage Boost / Damage Break: multiply outgoing damage by attacker's status mult
+        for(var/datum/component/status/C in user.components)
+            if(C.damage_dealt_mult != 0)
+                final_dmg = round(final_dmg * C.damage_dealt_mult)
         
         var/msg = src.txt
         if(msg)
@@ -110,11 +115,16 @@ datum/skill_event/heal
         // Revive skills call Revive() explicitly; regular heals cannot resurrect.
         if(S && (S.targeting_flags & TARGET_REVIVE) && target.is_dead)
             target.Revive(amt)
+            world << "<b>[target.name] is restored for [amt] HP!</b>"
         else
             if(!target || target.is_dead) return
-            target.hp += amt
-            target.ClampStats()
-        world << "<b>[target.name] is restored for [amt] HP!</b>"
+            // Route through ApplyHeal so Zombie status converts heals to damage
+            if(hascall(target, "ApplyHeal"))
+                target.ApplyHeal(amt, user)
+            else
+                target.hp += amt
+                target.ClampStats()
+            world << "<b>[target.name] is restored for [amt] HP!</b>"
 
 /**
  * Sound Event: Handles playing audio

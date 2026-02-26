@@ -13,9 +13,7 @@ mob
     var/resilience = 10
     var/vitality = 10
     var/race = "Human"
-    var/combat_flags = 0
     var/turn_id = 0
-    var/list/active_counters = list()
     
     var/atb_gauge = 0      
     var/is_busy = 0        
@@ -34,6 +32,8 @@ mob
     
     var/death_threshold = 0 // Berserkers can set this to -50
     var/is_downed = 0
+    var/is_vanished = 0        // Set by Vanish status: mob cannot be targeted at all
+    var/is_aerial_target = 0   // Set by Ascend/Float: mob is an aerial target
 
     var/list/skills = list()          
     var/list/trigger_skills = list()
@@ -70,11 +70,37 @@ mob
         return 1
 
     proc/CanTarget(mob/T)
-        if(!T || T.is_dead) 
+        if(!T || T.is_dead)
             src << "Target is invalid!"
             return 0
         if(T.current_encounter != src.current_encounter) return 0
+        if(T.is_vanished)
+            src << "[T.name] cannot be targeted right now!"
+            return 0
         return 1
+
+    // Returns the first full-disable status component (Freeze, Petrify, Sleep, Stop, etc.)
+    proc/HasFullDisable()
+        for(var/datum/component/status/C in src.components)
+            if(C.full_disable) return C
+        return null
+
+    // Returns 1 if the mob has a status that blocks the given action type
+    proc/HasDisableType(dtype)
+        for(var/datum/component/status/C in src.components)
+            if(C.disable_type == dtype) return 1
+        return 0
+
+    // Applies healing, converting it to damage if the mob is Zombified
+    proc/ApplyHeal(amount, mob/healer)
+        if(amount <= 0) return
+        for(var/datum/component/status/C in src.components)
+            if(C.zombie_mode)
+                src << "<font color='#00AA00'><b>[src.name] is Zombified — healing deals damage instead!</b></font>"
+                src.TakeDamage(amount, healer, "True", 0)
+                return
+        src.hp += amount
+        src.ClampStats()
 
     proc/ClampStats()
         src.hp = min(src.hp, src.max_hp) // No floor, allows negative
@@ -120,6 +146,10 @@ mob
                     var/mob/targ = (S.targeting_mode == "Ref-Target") ? src.last_attacker : src
                     spawn() S.ProcessTimeline(src, targ, src.current_encounter, 1)
 
+        // Fire OnSignal on all active components (Re-Raise, etc.)
+        for(var/datum/component/C in src.components)
+            C.OnSignal(signal_id, passed_val)
+
     // ============================================================
     // 3. TURN INTERFACE
     // ============================================================
@@ -133,10 +163,19 @@ mob
                 src.EndTurn()
             return
 
-        if(src.HasStatus("stunned"))
-            world << "<i><font color='#CCCC00'>[src.name] is stunned and loses their turn!</font></i>"
-            src.EndTurn() // Instantly aborts the turn and resets the ATB gauge!
+        // Full Disable: Freeze, Petrify, Sleep, Stop, Captured, Entangled, etc.
+        var/datum/component/status/disable_status = src.HasFullDisable()
+        if(disable_status)
+            world << "<i><font color='#CCCC00'>[src.name] is [disable_status.name] and cannot act!</font></i>"
+            src.EndTurn()
             return
+
+        // Probabilistic skip: Paralysis / Tired / Fatigue
+        for(var/datum/component/status/C in src.components)
+            if(C.skip_chance > 0 && prob(C.skip_chance))
+                world << "<i><font color='#CCAA00'>[src.name] is [C.name] and loses their turn!</font></i>"
+                src.EndTurn()
+                return
 
         var/datum/encounter/E = src.current_encounter
         src.SendSignal("ON_TURN_START")
@@ -202,7 +241,32 @@ mob
         src.SendSignal("ON_TURN_END")
 
     proc/BasicAttack(mob/target)
-        if(!src.CanAct() || !src.CanTarget(target)) return src.EndTurn()
+        if(!src.CanAct()) return src.EndTurn()
+
+        // Fear: cannot use basic attacks
+        if(src.HasDisableType("attack"))
+            src << "<b>You are Feared and cannot attack!</b>"
+            src.EndTurn()
+            return
+
+        // Confusion: may redirect attack to a random ally or self
+        for(var/datum/component/status/C in src.components)
+            if(C.confusion > 0 && prob(C.confusion))
+                var/datum/encounter/CE = src.current_encounter
+                var/list/confusion_targets = CE ? CE.GetAllies(src) : list()
+                if(!confusion_targets.len) confusion_targets += src
+                target = pick(confusion_targets)
+                world << "<i><font color='#FF8800'>[src.name] is Confused and attacks [target.name]!</font></i>"
+                break
+
+        // Blind: chance for the attack to miss entirely
+        for(var/datum/component/status/C in src.components)
+            if(C.miss_chance > 0 && prob(C.miss_chance))
+                world << "<i>[src.name]'s attack missed!</i>"
+                src.EndTurn()
+                return
+
+        if(!src.CanTarget(target)) return src.EndTurn()
         
         // --- CE2 UPGRADE ---
         // Route basic attacks through the JSON engine!
@@ -219,6 +283,14 @@ mob
     proc/TakeDamage(amount, mob/attacker, damage_type = "Physical", silent = 0)
         if(src.is_dead) return
         var/final_amount = round(amount)
+
+        // Run component BeforeDamage hooks (shields, invincibility, mana shield, shatter, etc.)
+        for(var/datum/component/C in src.components)
+            if(C && (C in src.components))
+                final_amount = C.OnBeforeDamage(final_amount, damage_type, attacker)
+
+        if(final_amount <= 0) return // All damage was absorbed/negated
+
         src.hp -= final_amount
         
         if(!silent)
@@ -238,7 +310,13 @@ mob
 
     proc/HandleDeath(mob/killer)
         if(src.is_dead) return
-        src.SendSignal("SIG_DYING", killer) // Before is_dead: last chance to react (e.g. Last Stand)
+        src.SendSignal("SIG_DYING", killer) // Before is_dead: Re-Raise OnSignal restores HP here
+
+        // Re-Raise: if a component restored HP during SIG_DYING, abort death
+        if(src.hp > src.death_threshold)
+            src.is_downed = 0
+            return
+
         src.is_dead = 1
         src.atb_gauge = 0
         src.is_busy = 0

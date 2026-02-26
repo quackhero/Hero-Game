@@ -27,7 +27,6 @@
 #include "Code\Player\player_verbs.dm"
 #include "Code\Player\Players.dm"
 #include "Code\Skill\skill_base.dm"
-#include "Code\Skill\Skill_Components.dm"
 #include "Code\Skill\skill_events.dm"
 #include "Code\Skill\Skill_factory.dm"
 #include "Code\Skill\skill_logic.dm"

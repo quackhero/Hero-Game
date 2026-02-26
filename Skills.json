@@ -39,7 +39,7 @@
             },
             {
                 "type": "inflict",
-                "status": "/datum/component/dot/burn", 
+                "status": "poisoned",
                 "duration": 3,
                 "amount": 5,
                 "chance": 100

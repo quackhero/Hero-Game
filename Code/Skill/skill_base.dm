@@ -80,7 +80,13 @@ datum/skill
 
     proc/Execute(mob/user, target, datum/encounter/E)
         if(src.fizzle_chance > 0 && prob(src.fizzle_chance))
-            user.is_busy = 0 
+            user.is_busy = 0
+            user.EndTurn()
+            return
+
+        // Mute: cannot use any skill except basic_attack
+        if(src.id != "basic_attack" && hascall(user, "HasDisableType") && user.HasDisableType("skills"))
+            user << "<b>You are Muted and cannot use skills!</b>"
             user.EndTurn()
             return
 

@@ -6,17 +6,677 @@
         "trigger_chance": 100,
         "reaction_skill_id": "vengeful_strike"
     },
-    {
-        "id": "poisoned",
-        "name": "Poison",
-        "dot_amount": 5,
-        "dot_type": "Poison",
-        "duration": 3
-    },
+
     {
         "id": "attack_up",
         "name": "Attack Up",
         "stat_mod": "STR",
         "stat_amount": 10
+    },
+
+    {
+        "id": "poisoned",
+        "name": "Poison",
+        "dot_amount": 8,
+        "dot_type": "Poison",
+        "dot_cannot_kill": 1
+    },
+    {
+        "id": "poisoned_ga",
+        "name": "Poison Ga",
+        "dot_amount": 16,
+        "dot_type": "Poison",
+        "dot_cannot_kill": 1
+    },
+    {
+        "id": "poisoned_ja",
+        "name": "Poison Ja",
+        "dot_amount": 24,
+        "dot_type": "Poison",
+        "dot_cannot_kill": 1
+    },
+
+    {
+        "id": "minor_wound",
+        "name": "Minor Wound",
+        "dot_amount": 5,
+        "dot_type": "Physical"
+    },
+    {
+        "id": "wound",
+        "name": "Wound",
+        "dot_amount": 10,
+        "dot_type": "Physical",
+        "stack_double": 1
+    },
+    {
+        "id": "fatal_wound",
+        "name": "Fatal Wound",
+        "dot_amount": 20,
+        "dot_type": "Physical"
+    },
+    {
+        "id": "lethal_wound",
+        "name": "Lethal Wound",
+        "dot_amount": 40,
+        "dot_type": "Physical"
+    },
+    {
+        "id": "terminal_wound",
+        "name": "Terminal Wound",
+        "dot_amount": 80,
+        "dot_type": "Physical"
+    },
+
+    {
+        "id": "petrified",
+        "name": "Petrified",
+        "full_disable": 1,
+        "shatter_mult": 2.0,
+        "shatter_type": ""
+    },
+
+    {
+        "id": "stunned",
+        "name": "Stunned",
+        "stat_mod": "STR",
+        "stat_amount": -5
+    },
+
+    {
+        "id": "sleeping",
+        "name": "Sleep",
+        "full_disable": 1,
+        "break_on_hit": 1
+    },
+
+    {
+        "id": "blinded",
+        "name": "Blind",
+        "miss_chance": 50
+    },
+
+    {
+        "id": "muted",
+        "name": "Mute",
+        "disable_type": "skills"
+    },
+
+    {
+        "id": "feared",
+        "name": "Fear",
+        "disable_type": "attack"
+    },
+
+    {
+        "id": "deafened",
+        "name": "Deaf",
+        "disable_type": "ally_target"
+    },
+
+    {
+        "id": "restricted",
+        "name": "Restrict",
+        "disable_type": "items"
+    },
+
+    {
+        "id": "broken",
+        "name": "Break",
+        "disable_type": "w_skills"
+    },
+
+    {
+        "id": "cursed",
+        "name": "Curse",
+        "disable_type": "ultimate"
+    },
+
+    {
+        "id": "frozen",
+        "name": "Frozen",
+        "full_disable": 1,
+        "shatter_mult": 1.5,
+        "shatter_type": "Fire"
+    },
+
+    {
+        "id": "de_armor",
+        "name": "De-Armor",
+        "stat_mod": "RES",
+        "stat_amount": -10
+    },
+    {
+        "id": "de_strength",
+        "name": "De-Strength",
+        "stat_mod": "STR",
+        "stat_amount": -10
+    },
+    {
+        "id": "de_dodge",
+        "name": "De-Dodge",
+        "stat_mod": "DEX",
+        "stat_amount": -10
+    },
+    {
+        "id": "de_power",
+        "name": "De-Power",
+        "stat_mod": "INT",
+        "stat_amount": -10
+    },
+
+    {
+        "id": "en_strength",
+        "name": "En-Strength",
+        "stat_mod": "STR",
+        "stat_amount": 10
+    },
+    {
+        "id": "en_armor",
+        "name": "En-Armor",
+        "stat_mod": "RES",
+        "stat_amount": 10
+    },
+    {
+        "id": "en_dodge",
+        "name": "En-Dodge",
+        "stat_mod": "DEX",
+        "stat_amount": 10
+    },
+    {
+        "id": "en_power",
+        "name": "En-Power",
+        "stat_mod": "INT",
+        "stat_amount": 10
+    },
+
+    {
+        "id": "berserk",
+        "name": "Berserk",
+        "stat_mod": "STR",
+        "stat_amount": 20,
+        "second_stat": "RES",
+        "second_stat_percent": -1.0
+    },
+
+    {
+        "id": "provoked",
+        "name": "Provoke",
+        "provoke": 1
+    },
+    {
+        "id": "provoked_ga",
+        "name": "Provoke Ga",
+        "provoke": 1
+    },
+    {
+        "id": "provoked_ja",
+        "name": "Provoke Ja",
+        "provoke": 1
+    },
+
+    {
+        "id": "haste",
+        "name": "Haste",
+        "stat_mod": "DEX",
+        "stat_amount": 10
+    },
+    {
+        "id": "haste_ii",
+        "name": "Haste II",
+        "stat_mod": "DEX",
+        "stat_amount": 20
+    },
+    {
+        "id": "haste_iii",
+        "name": "Haste III",
+        "stat_mod": "DEX",
+        "stat_amount": 30
+    },
+    {
+        "id": "haste_iv",
+        "name": "Haste IV",
+        "stat_mod": "DEX",
+        "stat_amount": 40
+    },
+
+    {
+        "id": "charmed",
+        "name": "Charm",
+        "dodge_chance": 50
+    },
+
+    {
+        "id": "slowed",
+        "name": "Slow",
+        "stat_mod": "DEX",
+        "stat_amount": -10
+    },
+    {
+        "id": "slow_ii",
+        "name": "Slow II",
+        "stat_mod": "DEX",
+        "stat_amount": -20
+    },
+    {
+        "id": "slow_iii",
+        "name": "Slow III",
+        "stat_mod": "DEX",
+        "stat_amount": -30
+    },
+    {
+        "id": "slow_iv",
+        "name": "Slow IV",
+        "stat_mod": "DEX",
+        "stat_amount": -40
+    },
+
+    {
+        "id": "lucky",
+        "name": "Lucky",
+        "stat_mod": "STR",
+        "stat_amount": 8
+    },
+    {
+        "id": "unlucky",
+        "name": "Unlucky",
+        "stat_mod": "STR",
+        "stat_amount": -8
+    },
+
+    {
+        "id": "attack_break",
+        "name": "Attack Break",
+        "stat_mod": "STR",
+        "stat_percent": -0.5
+    },
+    {
+        "id": "guard_break",
+        "name": "Guard Break",
+        "stat_mod": "RES",
+        "stat_percent": -0.5
+    },
+    {
+        "id": "damage_break",
+        "name": "Damage Break",
+        "damage_dealt_mult": 0.5
+    },
+
+    {
+        "id": "attack_shatter",
+        "name": "Attack Shatter",
+        "stat_mod": "STR",
+        "stat_percent": -1.0
+    },
+    {
+        "id": "guard_shatter",
+        "name": "Guard Shatter",
+        "stat_mod": "RES",
+        "stat_percent": -1.0
+    },
+
+    {
+        "id": "zombified",
+        "name": "Zombie",
+        "zombie_mode": 1
+    },
+
+    {
+        "id": "minor_burn",
+        "name": "Minor Burn",
+        "dot_amount": 0.05,
+        "dot_type": "Fire",
+        "dot_is_percent": 1,
+        "dot_cannot_kill": 1
+    },
+    {
+        "id": "burned",
+        "name": "Burned",
+        "dot_amount": 0.10,
+        "dot_type": "Fire",
+        "dot_is_percent": 1,
+        "dot_cannot_kill": 1
+    },
+    {
+        "id": "scorched",
+        "name": "Scorched",
+        "dot_amount": 0.15,
+        "dot_type": "Fire",
+        "dot_is_percent": 1,
+        "dot_cannot_kill": 1
+    },
+    {
+        "id": "blazed",
+        "name": "Blazed",
+        "dot_amount": 0.20,
+        "dot_type": "Fire",
+        "dot_is_percent": 1,
+        "dot_cannot_kill": 1
+    },
+    {
+        "id": "incinerated",
+        "name": "Incinerated",
+        "dot_amount": 0.25,
+        "dot_type": "Fire",
+        "dot_is_percent": 1,
+        "dot_cannot_kill": 1
+    },
+
+    {
+        "id": "death_countdown",
+        "name": "Death",
+        "kills_on_expire": 1
+    },
+    {
+        "id": "instant_death",
+        "name": "Instant Death",
+        "kills_on_expire": 1
+    },
+
+    {
+        "id": "sapped",
+        "name": "Sap",
+        "sap_mp": 5
+    },
+
+    {
+        "id": "confused",
+        "name": "Confusion",
+        "confusion": 40
+    },
+
+    {
+        "id": "stopped",
+        "name": "Stop",
+        "full_disable": 1
+    },
+
+    {
+        "id": "time_stop",
+        "name": "Time Stop",
+        "dodge_chance": 100,
+        "dodge_once": 1
+    },
+
+    {
+        "id": "angered",
+        "name": "Anger",
+        "stat_mod": "STR",
+        "stat_amount": 15,
+        "stat_mod_2": "RES",
+        "second_stat": "RES",
+        "second_stat_amount": -5
+    },
+
+    {
+        "id": "paralyzed",
+        "name": "Paralysis",
+        "skip_chance": 30
+    },
+    {
+        "id": "fatigued",
+        "name": "Fatigue",
+        "skip_chance": 50
+    },
+
+    {
+        "id": "captured",
+        "name": "Captured",
+        "full_disable": 1,
+        "shatter_mult": 1.5,
+        "shatter_type": "Fire"
+    },
+
+    {
+        "id": "ascended",
+        "name": "Ascend",
+        "is_aerial": 1
+    },
+
+    {
+        "id": "mind_controlled",
+        "name": "Mind Control"
+    },
+
+    {
+        "id": "regen",
+        "name": "Regen",
+        "hot_mp": 2
+    },
+    {
+        "id": "regen_ega",
+        "name": "Regen Ega",
+        "hot_mp": 4
+    },
+    {
+        "id": "regen_eja",
+        "name": "Regen Eja",
+        "hot_mp": 6
+    },
+
+    {
+        "id": "replenish",
+        "name": "Replenish",
+        "hot_amount": 2
+    },
+    {
+        "id": "replenish_ga",
+        "name": "Replenish Ga",
+        "hot_amount": 4
+    },
+    {
+        "id": "replenish_ja",
+        "name": "Replenish Ja",
+        "hot_amount": 6
+    },
+
+    {
+        "id": "level_up",
+        "name": "Level Up"
+    },
+    {
+        "id": "level_down",
+        "name": "Level Down"
+    },
+
+    {
+        "id": "floating",
+        "name": "Float",
+        "is_aerial": 1
+    },
+
+    {
+        "id": "reckless",
+        "name": "Reckless"
+    },
+
+    {
+        "id": "psychic_focus",
+        "name": "Psychic Focus",
+        "stat_mod": "INT",
+        "stat_amount": 10
+    },
+
+    {
+        "id": "fire_weapon",
+        "name": "Fire Weapon",
+        "damage_dealt_mult": 1.25
+    },
+
+    {
+        "id": "greedy",
+        "name": "Greedy"
+    },
+
+    {
+        "id": "tired",
+        "name": "Tired",
+        "skip_chance": 40
+    },
+
+    {
+        "id": "reraise",
+        "name": "Re-Raise",
+        "reraise": 1
+    },
+
+    {
+        "id": "guard_boost",
+        "name": "Guard Boost",
+        "stat_mod": "RES",
+        "stat_amount": 15
+    },
+    {
+        "id": "damage_boost",
+        "name": "Damage Boost",
+        "damage_dealt_mult": 1.5
+    },
+    {
+        "id": "attack_boost",
+        "name": "Attack Boost",
+        "stat_mod": "STR",
+        "stat_amount": 10
+    },
+
+    {
+        "id": "demi",
+        "name": "Demi",
+        "dot_amount": 0.05,
+        "dot_type": "True",
+        "dot_is_percent": 1,
+        "dot_use_current": 1,
+        "dot_cannot_kill": 1
+    },
+    {
+        "id": "demi_ga",
+        "name": "Demi Ga",
+        "dot_amount": 0.10,
+        "dot_type": "True",
+        "dot_is_percent": 1,
+        "dot_use_current": 1,
+        "dot_cannot_kill": 1
+    },
+    {
+        "id": "demi_ja",
+        "name": "Demi Ja",
+        "dot_amount": 0.15,
+        "dot_type": "True",
+        "dot_is_percent": 1,
+        "dot_use_current": 1,
+        "dot_cannot_kill": 1
+    },
+
+    {
+        "id": "restoration",
+        "name": "Restoration"
+    },
+
+    {
+        "id": "reversal_status",
+        "name": "Reversal"
+    },
+
+    {
+        "id": "howl_status",
+        "name": "Howl",
+        "stat_mod": "STR",
+        "stat_amount": 10
+    },
+
+    {
+        "id": "invincible",
+        "name": "Invincibility",
+        "invincible_thresh": 9999
+    },
+
+    {
+        "id": "entangled",
+        "name": "Entangled",
+        "full_disable": 1,
+        "shatter_mult": 1.5,
+        "shatter_type": "Fire"
+    },
+
+    {
+        "id": "fire_shield",
+        "name": "Fire Shield",
+        "damage_resist_type": "Fire",
+        "damage_resist_pct": 0.5
+    },
+    {
+        "id": "ice_shield",
+        "name": "Ice Shield",
+        "damage_resist_type": "Ice",
+        "damage_resist_pct": 0.5
+    },
+    {
+        "id": "water_shield",
+        "name": "Water Shield",
+        "damage_resist_type": "Water",
+        "damage_resist_pct": 0.5
+    },
+    {
+        "id": "lightning_shield",
+        "name": "Lightning Shield",
+        "damage_resist_type": "Lightning",
+        "damage_resist_pct": 0.5
+    },
+    {
+        "id": "nova_shield",
+        "name": "Nova Shield",
+        "damage_resist_type": "Nova",
+        "damage_resist_pct": 0.5
+    },
+
+    {
+        "id": "vanished",
+        "name": "Vanished",
+        "vanish": 1
+    },
+
+    {
+        "id": "parasite",
+        "name": "Parasite",
+        "dot_amount": 0.10,
+        "dot_type": "True",
+        "dot_is_percent": 1,
+        "dot_cannot_kill": 1,
+        "dot_delayed_burst": 1
+    },
+
+    {
+        "id": "absent",
+        "name": "Absent"
+    },
+
+    {
+        "id": "mana_shield_status",
+        "name": "Mana Shield",
+        "mana_shield": 1
+    },
+
+    {
+        "id": "toxin",
+        "name": "Toxin",
+        "dot_amount": 0.08,
+        "dot_type": "Toxic",
+        "dot_is_percent": 1,
+        "dot_cannot_kill": 1
+    },
+
+    {
+        "id": "minor_status",
+        "name": "Minor",
+        "provoke_reverse": 1
+    },
+    {
+        "id": "minor_ga_status",
+        "name": "Minor Ga",
+        "provoke_reverse": 1
+    },
+    {
+        "id": "minor_ja_status",
+        "name": "Minor Ja",
+        "provoke_reverse": 1
     }
 ]

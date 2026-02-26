@@ -61,28 +61,89 @@ datum/component/leech
 // ============================================================
 datum/component/status
     var/id = "" // The JSON ID
-    
-    // --- OVERRIDES (Notice we removed "var/" here) ---
+
+    // --- OVERRIDES ---
     name = "Unknown Status"
     amount = 0
     duration = 0
     owner = null
 
-    // --- CE2 Trigger Integration (These are new, so we keep "var/") ---
+    // --- Trigger Integration ---
     var/trigger_condition = ""
     var/trigger_chance = 100
-    var/reaction_skill_id = "" 
+    var/reaction_skill_id = ""
     var/trigger_category = "Any"
 
+    // --- Damage Over Time ---
     var/dot_amount = 0
     var/dot_type = "Poison"
-    var/hot_amount = 0
+    var/dot_is_percent = 0       // If 1, dot_amount is a fraction of HP (e.g. 0.1 = 10%)
+    var/dot_use_current = 0      // If 1, % uses current HP (Demi). Otherwise max HP (Burns)
+    var/dot_cannot_kill = 0      // If 1, DoT cannot reduce HP below 1
+    var/dot_delayed_burst = 0    // If 1, damage accumulates each turn then bursts (Parasite)
+    var/dot_accumulated = 0      // Internal: stored burst damage
+    var/stack_double = 0         // If 1, stacking this status doubles dot_amount (Wound)
 
-    var/stat_mod = "" // E.g., "STR", "DEX", "RES"
-    var/stat_amount = 0 // E.g., 5 (Buff) or -5 (Debuff)
+    // --- Heal Over Time ---
+    var/hot_amount = 0           // HP restored per turn
+    var/hot_mp = 0               // MP restored per turn (Regen)
 
+    // --- Primary Stat Modification ---
+    var/stat_mod = ""            // "STR", "DEX", "RES", "INT", "MND", "VIT"
+    var/stat_amount = 0          // Flat amount (or computed from stat_percent on apply)
+    var/stat_percent = 0.0       // If nonzero, stat_amount = round(current_base_stat * stat_percent)
+
+    // --- Second Stat Modification (e.g. Berserk: STR up + RES to 0) ---
+    var/second_stat = ""
+    var/second_stat_amount = 0
+    var/second_stat_percent = 0.0
+
+    // --- Crowd Control: Full Disable (mob loses their turn) ---
+    var/full_disable = 0         // Petrify, Freeze, Sleep, Stop, Captured, Entangled
+    var/shatter_mult = 1.0       // Damage multiplier when struck (Petrify=2.0, Freeze=1.5)
+    var/shatter_type = ""        // Required damage type to shatter ("" = any, "Fire" = Freeze)
+    var/break_on_hit = 0         // Status breaks when taking any damage (Sleep)
+
+    // --- Probabilistic Turn Skip ---
+    var/skip_chance = 0          // % chance to lose turn (Paralysis=30, Tired=40, Fatigue=50)
+
+    // --- Partial Action Restrictions ---
+    var/disable_type = ""        // "skills","attack","items","ultimate","w_skills","ally_target"
+
+    // --- Blind / Miss ---
+    var/miss_chance = 0          // % chance for this mob's attacks to miss
+
+    // --- Charm / Dodge (defensive) ---
+    var/dodge_chance = 0         // % chance to negate an incoming attack
+    var/dodge_once = 0           // If 1, the status removes itself after the first successful dodge (Time Stop)
+
+    // --- Confusion ---
+    var/confusion = 0            // If > 0, this % chance redirects attacks to a random ally/self
+
+    // --- MP Drain ---
+    var/sap_mp = 0               // MP drained from owner each turn
+
+    // --- Special Mechanics ---
+    var/zombie_mode = 0          // Heals become damage instead
+    var/reraise = 0              // Auto-revive on death (handled in HandleDeath via SIG_DYING)
+    var/invincible_thresh = 0    // Blocks all damage below this value (9999 for Invincibility)
+    var/mana_shield = 0          // Routes incoming damage to MP instead of HP
+    var/kills_on_expire = 0      // If 1, triggers HandleDeath when this status expires (Death status)
+
+    // --- Damage Modifiers ---
+    var/damage_resist_type = ""  // Element for elemental shield ("Fire","Ice","Water","Lightning","Nova")
+    var/damage_resist_pct = 0.0  // Fraction of matching damage blocked (0.5 = 50%)
+    var/damage_dealt_mult = 0.0  // Multiplier applied to damage this mob deals (1.5=Boost, 0.5=Break)
+
+    // --- Targeting Flags ---
+    var/provoke = 0              // Signals enemy AI to focus this mob
+    var/provoke_reverse = 0      // Signals enemy AI to avoid this mob (Minor status)
+    var/vanish = 0               // Sets owner.is_vanished on apply/remove
+    var/is_aerial = 0            // Sets owner.is_aerial_target on apply/remove
+
+    // ============================================================
     // --- THE CLONER ---
-    // The factory uses this to hand a fresh copy to the player!
+    // ============================================================
     proc/Clone()
         var/datum/component/status/S = new()
         S.id = src.id
@@ -92,55 +153,192 @@ datum/component/status
         S.reaction_skill_id = src.reaction_skill_id
         S.trigger_category = src.trigger_category
         S.dot_amount = src.dot_amount
-        S.dot_type = src.dot_type  
+        S.dot_type = src.dot_type
+        S.dot_is_percent = src.dot_is_percent
+        S.dot_use_current = src.dot_use_current
+        S.dot_cannot_kill = src.dot_cannot_kill
+        S.dot_delayed_burst = src.dot_delayed_burst
+        S.stack_double = src.stack_double
         S.hot_amount = src.hot_amount
-
+        S.hot_mp = src.hot_mp
         S.stat_mod = src.stat_mod
         S.stat_amount = src.stat_amount
+        S.stat_percent = src.stat_percent
+        S.second_stat = src.second_stat
+        S.second_stat_amount = src.second_stat_amount
+        S.second_stat_percent = src.second_stat_percent
+        S.full_disable = src.full_disable
+        S.shatter_mult = src.shatter_mult
+        S.shatter_type = src.shatter_type
+        S.break_on_hit = src.break_on_hit
+        S.skip_chance = src.skip_chance
+        S.disable_type = src.disable_type
+        S.miss_chance = src.miss_chance
+        S.dodge_chance = src.dodge_chance
+        S.dodge_once = src.dodge_once
+        S.confusion = src.confusion
+        S.sap_mp = src.sap_mp
+        S.zombie_mode = src.zombie_mode
+        S.reraise = src.reraise
+        S.invincible_thresh = src.invincible_thresh
+        S.mana_shield = src.mana_shield
+        S.kills_on_expire = src.kills_on_expire
+        S.damage_resist_type = src.damage_resist_type
+        S.damage_resist_pct = src.damage_resist_pct
+        S.damage_dealt_mult = src.damage_dealt_mult
+        S.provoke = src.provoke
+        S.provoke_reverse = src.provoke_reverse
+        S.vanish = src.vanish
+        S.is_aerial = src.is_aerial
         return S
 
+    // ============================================================
+    // --- APPLY / REMOVE ---
+    // ============================================================
     proc/OnApply(mob/M)
-        if(!M || !src.stat_mod || src.stat_amount == 0) return
-        src.ModifyStat(M, src.stat_amount)
+        // 1. Primary stat mod (calculate from percent if needed)
+        if(src.stat_mod)
+            if(src.stat_amount == 0 && src.stat_percent != 0)
+                src.stat_amount = src.ComputeStatPct(M, src.stat_mod, src.stat_percent)
+            if(src.stat_amount != 0)
+                src.ModifyStat(M, src.stat_mod, src.stat_amount)
+
+        // 2. Second stat mod (Berserk: RES to 0)
+        if(src.second_stat)
+            if(src.second_stat_amount == 0 && src.second_stat_percent != 0)
+                src.second_stat_amount = src.ComputeStatPct(M, src.second_stat, src.second_stat_percent)
+            if(src.second_stat_amount != 0)
+                src.ModifyStat(M, src.second_stat, src.second_stat_amount)
+
+        // 3. Vanish flag
+        if(src.vanish && ("is_vanished" in M.vars))
+            M.is_vanished = 1
+
+        // 4. Aerial flag
+        if(src.is_aerial && ("is_aerial_target" in M.vars))
+            M.is_aerial_target = 1
 
     proc/OnRemove(mob/M)
-        if(!M || !src.stat_mod || src.stat_amount == 0) return
-        src.ModifyStat(M, -src.stat_amount) // Reverses the math!
+        // 1. Primary stat reversal
+        if(src.stat_mod && src.stat_amount != 0)
+            src.ModifyStat(M, src.stat_mod, -src.stat_amount)
 
-    proc/ModifyStat(mob/M, math_amt)
-        var/base_var = ""
-        switch(uppertext(src.stat_mod))
-            if("STR") base_var = "base_strength"
-            if("DEX") base_var = "base_dexterity"
-            if("RES") base_var = "base_resilience"
-            if("INT") base_var = "base_intelligence"
-            if("MND") base_var = "base_mind"
-            if("VIT") base_var = "base_vitality"
-        if(!base_var || !(base_var in M.vars)) return
-        M.vars[base_var] += math_amt
+        // 2. Second stat reversal
+        if(src.second_stat && src.second_stat_amount != 0)
+            src.ModifyStat(M, src.second_stat, -src.second_stat_amount)
+
+        // 3. Vanish flag clear
+        if(src.vanish && ("is_vanished" in M.vars))
+            M.is_vanished = 0
+
+        // 4. Aerial flag clear (only if no other aerial status remains)
+        if(src.is_aerial && ("is_aerial_target" in M.vars))
+            var/still_aerial = 0
+            for(var/datum/component/status/C in M.components)
+                if(C != src && C.is_aerial) still_aerial = 1
+            if(!still_aerial) M.is_aerial_target = 0
+
+        // 5. Death-on-expire (Death status)
+        if(src.kills_on_expire && M && !M.is_dead)
+            world << "<font color='#FF0000'><b>[M.name]'s time has run out!</b></font>"
+            M.HandleDeath(null)
+
+    // Computes a flat change as a percentage of the mob's current base stat
+    proc/ComputeStatPct(mob/M, stat, pct)
+        var/bv = src.StatToBaseVar(stat)
+        if(!bv || !(bv in M.vars)) return 0
+        return round(M.vars[bv] * pct)
+
+    proc/StatToBaseVar(stat)
+        switch(uppertext(stat))
+            if("STR") return "base_strength"
+            if("DEX") return "base_dexterity"
+            if("RES") return "base_resilience"
+            if("INT") return "base_intelligence"
+            if("MND") return "base_mind"
+            if("VIT") return "base_vitality"
+        return ""
+
+    proc/ModifyStat(mob/M, stat, math_amt)
+        var/bv = src.StatToBaseVar(stat)
+        if(!bv || !(bv in M.vars)) return
+        M.vars[bv] += math_amt
         if(hascall(M, "UpdateStats")) M.UpdateStats()
 
-    // --- OVERRIDES (Notice we removed "proc/" here) ---
+    // ============================================================
+    // --- REFRESH ---
+    // ============================================================
     OnRefresh(dur, amt)
         src.duration = max(src.duration, dur)
         src.amount = max(src.amount, amt)
+        // Wound stacking: each re-application doubles DoT damage
+        if(src.stack_double && src.dot_amount > 0)
+            src.dot_amount *= 2
+            world << "<i><font color='#CC2200'>[src.name] worsens!</font></i>"
 
+    // ============================================================
+    // --- TURN START ---
+    // ============================================================
     OnTurnStart(mob/M)
-        if(!M || M.hp <= 0) return 
+        if(!M || M.hp <= 0) return
 
         // 1. Damage Over Time
         if(src.dot_amount > 0)
-            var/dot_dmg = round(src.dot_amount)
-            world << "<i><font color='#800080'>[M.name] suffers [dot_dmg] [src.dot_type] damage from [src.name]!</font></i>"
-            M.TakeDamage(dot_dmg, null, src.dot_type, 1)
+            var/dot_dmg = 0
+            if(src.dot_is_percent)
+                var/base_hp = src.dot_use_current ? M.hp : M.max_hp
+                dot_dmg = round(base_hp * src.dot_amount)
+            else
+                dot_dmg = round(src.dot_amount)
 
-        // 2. Heal Over Time
+            // Cannot Kill: floor remaining HP at 1
+            if(src.dot_cannot_kill)
+                dot_dmg = min(dot_dmg, M.hp - 1)
+
+            if(dot_dmg > 0)
+                if(src.dot_delayed_burst)
+                    src.dot_accumulated += dot_dmg
+                    world << "<i><small>[src.name] festers in [M.name]... ([src.dot_accumulated] stored)</small></i>"
+                else
+                    world << "<i><font color='#CC4444'>[M.name] suffers [dot_dmg] [src.dot_type] damage from [src.name]!</font></i>"
+                    M.TakeDamage(dot_dmg, null, src.dot_type, 1)
+
+        // 2. Parasite burst: fires accumulated damage on the NEXT turn (when duration ticks)
+        if(src.dot_delayed_burst && src.dot_accumulated > 0 && src.duration == 1)
+            var/burst = src.dot_accumulated
+            src.dot_accumulated = 0
+            if(src.dot_cannot_kill) burst = min(burst, M.hp - 1)
+            if(burst > 0)
+                world << "<font color='#CC0000'><b>[src.name] erupts! [M.name] takes [burst] [src.dot_type] damage!</b></font>"
+                M.TakeDamage(burst, null, src.dot_type, 1)
+
+        // 3. HP Heal Over Time
         if(src.hot_amount > 0)
             var/hot_heal = round(src.hot_amount)
-            M.hp += hot_heal
-            M.ClampStats() // Ensure they don't heal over max_hp
+            if(hascall(M, "ApplyHeal"))
+                M.ApplyHeal(hot_heal, null)
+            else
+                M.hp += hot_heal
+                M.ClampStats()
             world << "<i><font color='#00FF00'>[M.name] recovers [hot_heal] HP from [src.name]!</font></i>"
 
+        // 4. MP Restore per turn (Regen)
+        if(src.hot_mp > 0)
+            var/mp_regen = round(src.hot_mp)
+            M.mp += mp_regen
+            M.ClampStats()
+            world << "<i><font color='#6699FF'>[M.name] recovers [mp_regen] MP from [src.name]!</font></i>"
+
+        // 5. MP Drain per turn (Sap)
+        if(src.sap_mp > 0)
+            var/mp_drain = min(round(src.sap_mp), M.mp)
+            if(mp_drain > 0)
+                M.mp -= mp_drain
+                world << "<i><font color='#9933CC'>[src.name] drains [mp_drain] MP from [M.name]!</font></i>"
+
+    // ============================================================
+    // --- TURN END ---
+    // ============================================================
     OnTurnEnd(mob/M)
         // Guard: component may have already been removed by RemoveStatus() earlier this tick
         if(!owner || !(src in owner.components)) return
@@ -149,3 +347,74 @@ datum/component/status
             if(src.duration <= 0 && M)
                 if(hascall(M, "RemoveStatus"))
                     call(M, "RemoveStatus")(src)
+
+    // ============================================================
+    // --- BEFORE DAMAGE (damage interception) ---
+    // ============================================================
+    OnBeforeDamage(damage, type, mob/attacker)
+        if(!owner || !(src in owner.components)) return damage
+
+        // 1. Invincibility: block damage below threshold
+        if(src.invincible_thresh > 0 && damage > 0 && damage < src.invincible_thresh)
+            owner << "<font color='#FFD700'><b>INVINCIBLE! ([damage] blocked)</b></font>"
+            return 0
+
+        // 2. Elemental Resistance Shield
+        if(src.damage_resist_pct > 0)
+            if(src.damage_resist_type == "" || src.damage_resist_type == type)
+                var/resist = round(damage * src.damage_resist_pct)
+                damage -= resist
+                owner << "<font color='#4488FF'>Resisted [resist] [type] damage!</font>"
+                return max(0, damage)
+
+        // 3. Mana Shield: route damage to MP first
+        if(src.mana_shield && ("mp" in owner.vars))
+            var/mp_absorb = min(damage, owner.mp)
+            owner.mp -= mp_absorb
+            damage -= mp_absorb
+            if(mp_absorb > 0)
+                owner << "<font color='#0044FF'>Mana Shield absorbed [mp_absorb] damage!</font>"
+            return max(0, damage)
+
+        // 4. Shatter: multiply damage, then break the disabling status
+        if(src.full_disable && src.shatter_mult > 1.0)
+            if(src.shatter_type == "" || src.shatter_type == type)
+                damage = round(damage * src.shatter_mult)
+                owner << "<font color='#FF2200'><b>CRITICAL SHATTER! [src.name] breaks!</b></font>"
+                src.full_disable = 0
+                src.shatter_mult = 1.0
+                src.break_on_hit = 0
+                if(hascall(owner, "RemoveStatus"))
+                    spawn(0) call(owner, "RemoveStatus")(src)
+                return damage
+
+        // 5. Break-on-Hit: wake up from Sleep when damaged
+        if(src.break_on_hit && damage > 0 && src.full_disable)
+            owner << "<b>[owner.name] woke up!</b>"
+            src.full_disable = 0
+            src.break_on_hit = 0
+            if(hascall(owner, "RemoveStatus"))
+                spawn(0) call(owner, "RemoveStatus")(src)
+
+        // 6. Dodge Chance (Charm / Time Stop)
+        if(src.dodge_chance > 0 && prob(src.dodge_chance))
+            owner << "<font color='#FF69B4'><b>[src.name] causes the attack to miss!</b></font>"
+            // Time Stop: consume the status after first dodge
+            if(src.dodge_once && hascall(owner, "RemoveStatus"))
+                spawn(0) call(owner, "RemoveStatus")(src)
+            return 0
+
+        return damage
+
+    // ============================================================
+    // --- SIGNAL HOOK ---
+    // ============================================================
+    OnSignal(signal_id, passed_val)
+        // Re-Raise: fires on SIG_DYING before is_dead is set
+        // HandleDeath checks HP after SIG_DYING and skips death if HP > threshold
+        if(signal_id == "SIG_DYING" && src.reraise && owner && !owner.is_dead)
+            world << "<font color='#FFD700'><b>[owner.name]'s Re-Raise activates!</b></font>"
+            owner.hp = max(1, round(owner.max_hp * 0.10))
+            owner.is_downed = 0
+            if(hascall(owner, "RemoveStatus"))
+                call(owner, "RemoveStatus")(src)

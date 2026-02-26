@@ -1,5 +1,5 @@
 // ============================================================
-// 1. THE COUNTER EVENT 
+// 1. THE COUNTER EVENT
 // ============================================================
 // This is NOT a component. It lives in the 'active_counters' list.
 datum/skill_event/counter
@@ -12,11 +12,11 @@ datum/skill_event/counter
             if(after_skill)
                 owner << "<b>Counter Triggered!</b>"
                 var/mob/target = passed_val
-                
+
                 // Fire the counter skill at the attacker
                 if(ismob(target))
                     after_skill.Execute(owner, target, owner.current_encounter)
-            
+
             // Remove the counter so it fires only once
             owner.active_counters -= src
             del(src)
@@ -29,7 +29,7 @@ datum/skill_event/counter
 // Absorbs damage until it breaks
 datum/component/shield
     var/hp = 0
-    
+
     New(amount, time)
         src.hp = amount
         src.duration = time
@@ -42,14 +42,14 @@ datum/component/shield
         var/absorb = min(damage, src.hp)
         src.hp -= absorb
         damage -= absorb
-        
+
         owner << "<font color='blue'>Shield absorbed [absorb] damage!</font>"
-        
+
         if(src.hp <= 0)
             owner << "<b>Your shield broke!</b>"
             owner.components -= src
             del(src)
-            
+
         return damage
 
 
@@ -63,7 +63,7 @@ datum/component/dot
     var/use_current_hp = 0   // If 1, uses Current HP (Demi)
     var/delayed_burst = 0    // If 1, damage waits until end (Parasite)
     var/accumulated_dmg = 0  // Stores damage for Parasite
-    
+
     // Scaling variables for Wounds
     var/increment_val = 0
     var/max_amount = 0
@@ -80,7 +80,7 @@ datum/component/dot
     OnTurnStart(mob/owner)
         // 1. Calculate Damage
         var/dmg = src.amount
-        
+
         if(src.is_percentage)
             if(src.use_current_hp)
                 dmg = round(owner.hp * src.amount) // Demi logic
@@ -110,14 +110,14 @@ datum/component/stat_mod
     var/stat_name = ""       // "ATK", "DEF", "SPD", "AP"
     var/mod_amount = 0       // Amount to add/sub (e.g., -10, +50)
     var/is_multiplier = 0    // If 1, we multiply instead (0.5 = Halve)
-    
+
     New(stat, amt, dur, mult=0)
         src.stat_name = stat
         src.mod_amount = amt
         src.duration = dur
         src.is_multiplier = mult
         src.name = "Stat Mod"
-        
+
         // Apply immediately upon creation
         if(owner) ApplyMod(owner)
 
@@ -160,20 +160,20 @@ datum/component/disable
         src.shatter_type = shat_type
         src.name = "Disable"
 
-        if(owner) 
+        if(owner)
             owner.combat_flags |= src.disable_flags
-            owner.is_busy = 1 
+            owner.is_busy = 1
 
     Del()
         if(owner)
-            owner.combat_flags &= ~src.disable_flags 
-            
+            owner.combat_flags &= ~src.disable_flags
+
             var/still_busy = 0
             for(var/datum/component/disable/D in owner.components)
                 if(D != src) still_busy = 1
-            
+
             if(!still_busy) owner.is_busy = 0
-            
+
             owner << "<b>You are no longer [src.name]!</b>"
         ..()
 
@@ -182,7 +182,7 @@ datum/component/disable
             if(src.shatter_type == "" || src.shatter_type == type)
                 damage *= src.shatter_mult
                 owner << "<font color='red'><b>CRITICAL SHATTER!</b></font>"
-                src.duration = 0 
+                src.duration = 0
                 Del()
                 return damage
 
@@ -190,5 +190,5 @@ datum/component/disable
             owner << "<b>You woke up!</b>"
             src.duration = 0
             Del()
-            
+
         return damage

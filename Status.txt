@@ -1,0 +1,83 @@
+Poison [ra/ga/ja] - Afflict poison to your enemy. NOTE* Poison does not finish off your enemy
+Minor Wound - Afflict minor wound to your enemy. NOTE* Minor Wound does half what regular wound does.
+Wound - Afflict wound to your enemy. NOTE* Wound can stack, when it does. It does double last damage.
+Fatal Wound - Afflict fatal wound to your enemy. NOTE* It does double what regular wound does.
+Lethal Wound - Afflict lethal wound to your enemy. NOTE* It does double what fatal wound does.
+Terminal Wound - Afflict terminal wound to your enemy. NOTE* It does double what lethal wound does.
+Petrify (Petrified)  - Unable to let the enemy to battle. NOTE* IF PETRFIED AND SHATTERED, DAMAGED IS INCREASED! 
+Stun - Reduces attack damage to the enemy
+Sleep - Unable to let the enemy to battle. 
+Blind - Makes the enemy occasionally miss
+Mute - Unable to let the enemy use skill
+Fear - Unable to let the enemy use normal attack
+Deaf - Unable to let the enemy support their team (prevents them from targeting allies for buffs, items, etc.)
+Restrict - Unable to let the enemy use items
+Break - Unable to let the enemy use W.Skills
+Remove Weapon / Accessory / Armor - Exactly what it says. Target's equipment is unequipped. (Players must re-equip after battle.)
+Curse - Unable to let the enemy use Ultimate skill
+Freeze (Frozen) – Unable to the enemy to battle. NOTE* IF FROZEN AND ATTACKED BY FIRE, YOU ARE DAMAGED MORE THEN USUAL!
+De-Armor - Lowers the enemy defense by 10
+De-Strength - Lowers the enemy defense by 10
+De-Dodge - Lowers the enemy speed by 10
+De-Power - Lowers the enemy AP by 10
+En-Strength - Increase your strength by 10
+En-Armor - Increase your defense by 10
+En-Dodge - Increase your speed by 10
+En-Power - Increase your AP by 10
+Berserk - Increases your attack. NOTE* THIS STATUS EFFECT MAKES YOUR DEFENSE ABSOLUTE 0
+Provoke [ra / ga / ja(?)] - Distract the enemy from your team, making you the diversion
+Haste [II / III / IV] - Improves you or your teammates time reaction
+Charm - Have a chance to negating your opponent's attack.
+Slow [II / III / IV] - Decreases your time reaction
+Lucky - Increases your attack
+Unlucky - Decreases your attack
+Attack Break - When successful, your enemy's attack is halved
+Guard /Armor Break - When successful, your enemy's defense is halved
+Damage Break - When successful, all damage done by your enemy is halved
+Attack Shatter - When successful, your enemy's attack drops to 0
+Guard / Armor Shatter - When successful, your enemy's defense drops to 0
+Zombify (Zombie) - Unable to heal yourself. NOTE* You will be damaged if you get healed
+Minor Burn - Inflicts a minor burn to your enemy. NOTE* This does 5% of the enemy's max HP every turn
+Burned - Inflicts a burn to your enemy. NOTE* This does 10% of the enemy's max HP every turn
+Scorched - Inflicts a scorching burn to your enemy. NOTE* This does 15% of the enemy's max HP every turn
+Blazed - Inflicts a blazing burn to your enemy. NOTE* This does 20% of the enemy's max HP every turn
+Incinerated - Incinerates your enemy. NOTE* This does 25% of the enemy's max HP every turn
+Death - Inflict DEATH to the enemy. Making a certain time till absolute death comes.
+Instant Death - This is exactly what it looks like. (Timer must be set to 1)
+Sap - Absorbs your enemy SK and UP
+Confusion - Confuses the enemy and occasionally hit himself or his ally
+Stop - Unable the enemy to battle
+Time Stop - Allows you to dodge one attack for duration.
+Anger - Same as the actual skill.
+Paralysis - Have a chance to skip your turn.
+Fatigue - Same as Paralysis, but higher chance.
+Captured - Same as Frozen. NOTE* If the target has used a skill that causes status effects before being Captured, the status effects will still affect the enemy party on their next turn.
+Ascend - The enemy (or you) becomes an Aerial target. NOTE* Ascending a target while they are using a skill will cause them to miss due to being too high in the air.
+Mind Control - You (or the enemy) is forced to join the other party for the duration of the effect. NOTE* This cannot be used to win battles. The enemy must be killed for the battle to end if they are the only one alive.
+Regen [ra / ega / eja]- You recover 2 SK per turn.
+Replenish [ra / ga / ja] - You recover 2 HP per turn.
+Level Up / Down - Your level will increase / decrease for the duration of the effect. NOTE* This is usually useless unless a skill is using level difference.
+Float - Same as Ascend, except the skill will not miss.
+Reckless - [Unknown Function]
+Psychic Focus - Same as the actual skill.
+Fire Weapon - Same as the actual skill.
+Greedy - Have a chance to spend rings for a turn. NOTE* Amount of rings spent ranges from 1 - 10.
+Tired - Same as Fatigue; higher chance than Paralysis, but lower chance than Fatigue.
+Re-Raise - If killed during the duration, will revive automatically. NOTE* An example of this in action is the Ring of Second Chance (Artifact).
+Guard Boost - Your defense increases.
+Damage Boost - Your overall damage increases.
+Attack Boost - Your attack increases.
+Demi [ra / ga / ja] - Enemy loses 5% of their CURRENT HP every turn.
+Restoration - [Unknown Function]
+Reversal - Same as the actual skill. NOTE* Timer will not affect this.
+Howl - Same as the actual skill.
+Invincibility - All damage that is less than 9999 will do 0 to you. NOTE* If DEF is higher than 9999 with Invincible active, damage may still do 0 to you, as long as it is lower than DEF.
+Entangled - Same as Captured.
+Fire/Ice/Water/Lightning/Nova Shield - Reduces damage from specific element by 50%. NOTE* I may be wrong; this could be used for Fire/Ice/Water Barrier instead and would instead nullify such damage.
+Vanished - You will be untargetable until next turn. NOTE* Unknown if Timer will increase number of turns you have Vanished.
+Parasite - Does 10% of enemy's max HP for every number in the Timer. Happens all at once on the next turn. (Ex. Setting the timer to 7 will cause the enemy to take 70% of their max HP as damage on the next turn.) NOTE* Does not finish off your enemy
+Revive – Revives target. (Target must be dead for this to take effect.)
+Absent - Victim cannot see their own messages.
+Mana Shield - All damage to victim goes to their SK.
+Toxin - It's like a mix of poison and burn, hard to explain. Cannot kill.
+Minor(a/ga/ja) - Opposite of provoke, makes target less likely to be hit.
