@@ -12,5 +12,11 @@
         "dot_amount": 5,
         "dot_type": "Poison",
         "duration": 3
+    },
+    {
+        "id": "attack_up",
+        "name": "Attack Up",
+        "stat_mod": "STR",
+        "stat_amount": 10
     }
 ]

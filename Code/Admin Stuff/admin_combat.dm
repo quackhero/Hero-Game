@@ -11,7 +11,7 @@ mob/verb/Party_Test_Battle()
     // 2. Setup Ally (Controlled by the AI)
     var/mob/ally = new /mob()
     ally.name = "Cleric (Ally)"
-    ally.hp = 80
+    ally.hp = 1
     ally.dexterity = 9 // Fast! (Was spd)
     ally.strength = 4  // (Was atk)
     ally.resilience = 5 // (Was def)

@@ -27,6 +27,9 @@ datum/status_factory
             if("dot_type" in status_data) S.dot_type = status_data["dot_type"]
             if("hot_amount" in status_data) S.hot_amount = status_data["hot_amount"]
 
+            if("stat_mod" in status_data) S.stat_mod = status_data["stat_mod"]
+            if("stat_amount" in status_data) S.stat_amount = status_data["stat_amount"]
+
             src.loaded_statuses[S.id] = S
             
         world << "<b>[src.loaded_statuses.len] JSON Statuses Loaded!</b>"

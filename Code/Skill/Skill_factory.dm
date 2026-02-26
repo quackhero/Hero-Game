@@ -27,11 +27,13 @@ datum/skill_factory
         if("category" in data) S.category = data["category"]
         if("trigger_category" in data) S.trigger_category = data["trigger_category"]
         
-        // --- NEW: The Missing Link & Targeting Behaviors ---
         if("afterlink" in data) S.afterlink = data["afterlink"]
         if("on_target_death" in data) S.on_target_death = data["on_target_death"]
+        
+        // --- PASSIVES & COMBO BRANCHES ---
+        if("combo_branches" in data) S.combo_branches = data["combo_branches"]
         if("trigger_condition" in data) S.trigger_condition = data["trigger_condition"]
-        if("trigger_chance" in data) S.trigger_chance = data["trigger_chance"]
+        if("trigger_chance" in data) S.trigger_chance = text2num(data["trigger_chance"])
         
         // 1. Bitflags
         if(data["target_flags"])
@@ -40,6 +42,9 @@ datum/skill_factory
                 if(flag_str == "TARGET_AOE")    S.targeting_flags |= TARGET_AOE
                 if(flag_str == "TARGET_HEAL")   S.targeting_flags |= TARGET_HEAL
                 if(flag_str == "TARGET_SELF")   S.targeting_flags |= TARGET_SELF
+                if(flag_str == "TARGET_REVIVE") S.targeting_flags |= TARGET_REVIVE
+                if(flag_str == "TARGET_DEFLECT") S.targeting_flags |= TARGET_DEFLECT
+                if(flag_str == "TARGET_AERIAL") S.targeting_flags |= TARGET_AERIAL
 
         // 2. Guardrails
         if(data["requirements"])
@@ -71,7 +76,6 @@ datum/skill_factory
                 M.txt = event_data["text"]
                 EV = M
                 
-            // --- FIXED: Merged Both Damage Blocks Together! ---
             if("damage")
                 var/datum/skill_event/damage/D = new()
                 if("text" in event_data) D.txt = event_data["text"]

@@ -230,5 +230,96 @@
                 "chance": 100
             }
         ]
+    },
+    {
+        "id": "war_cry",
+        "name": "War Cry",
+        "category": "Buff",
+        "cost": 5,
+        "target_flags": ["TARGET_SELF"],
+        "timeline": [
+            {
+                "type": "message",
+                "text": "(I) lets out a furious battle cry!"
+            },
+            {
+                "type": "inflict",
+                "status": "attack_up",
+                "duration": 3,
+                "chance": 100
+            }
+        ]
+    },
+    {
+        "id": "cleave",
+        "name": "Cleave",
+        "category": "Attack",
+        "cost": 5,
+        "target_flags": ["TARGET_AOE"],
+        "timeline": [
+            {
+                "type": "message",
+                "text": "(I) swings their weapon in a massive arc!"
+            },
+            {
+                "type": "damage",
+                "formula": "STR",
+                "text": "(E) is slashed! ([dmg] Damage)"
+            }
+        ]
+    },
+    {
+        "id": "resurrect",
+        "name": "Resurrect",
+        "category": "Spell",
+        "cost": 15,
+        "target_flags": ["TARGET_SINGLE", "TARGET_REVIVE"],
+        "requirements": {
+            "target_dead": 1
+        },
+        "timeline": [
+            {
+                "type": "message",
+                "text": "(I) casts a holy light over (target)'s fallen body!"
+            },
+            {
+                "type": "heal",
+                "formula": "50"
+            }
+        ]
+    },
+{
+        "id": "rising_uppercut",
+        "name": "Rising Uppercut",
+        "category": "Attack",
+        "cost": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            { "type": "message", "text": "(I) launches (target) into the air!" },
+            { "type": "damage", "formula": "STR * 1.5" }
+        ],
+        "combo_branches": ["meteor_strike", "impact_legdrop"]
+    },
+    {
+        "id": "meteor_strike",
+        "name": "Meteor Strike",
+        "category": "Attack",
+        "cost": 10,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            { "type": "message", "text": "(I) leaps up and spikes (target) back into the dirt!" },
+            { "type": "damage", "formula": "STR * 2.5" }
+        ]
+    },
+    {
+        "id": "impact_legdrop",
+        "name": "Impact Legdrop",
+        "category": "Attack",
+        "cost": 0,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            { "type": "message", "text": "(I) flips and drops a leg onto (target)!" },
+            { "type": "damage", "formula": "STR * 1.0" }
+        ]
     }
 ]

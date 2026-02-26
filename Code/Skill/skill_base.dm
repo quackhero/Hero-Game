@@ -19,6 +19,8 @@ datum/skill
     var/fizzle_chance = 0
     var/final_attack = 0
     var/afterlink = ""
+
+    var/list/combo_branches = null
     
     var/list/req_target_name = null 
     var/list/req_target_race = null 
@@ -42,6 +44,7 @@ datum/skill
     proc/IsValidTarget(mob/user, mob/target)
         if(!target) return 0
         if(!src.can_target_dead && target.hp <= 0) return 0
+        if((src.targeting_flags & TARGET_REVIVE) && !(src.targeting_flags & TARGET_HEAL) && !target.is_dead) return 0
         if(src.req_target_name && !(target.name in src.req_target_name)) return 0
         if(src.req_target_race && !(target.vars["race"] in src.req_target_race)) return 0
         if(src.req_target_hp != 0)
@@ -80,7 +83,7 @@ datum/skill
         src.PayCost(user)
         src.ProcessTimeline(user, target, E)
 
-    // --- FIXED: Added the is_reaction flag here! ---
+    // --- FIXED: Indented properly inside datum/skill ---
     proc/ProcessTimeline(mob/user, target, datum/encounter/E, is_reaction = 0)
         spawn(0)
             for(var/datum/skill_event/EV in src.event_timeline)
@@ -91,7 +94,8 @@ datum/skill
                 // --- The Target Death Check ---
                 if(!islist(target)) 
                     var/mob/T = target
-                    if(T && T.hp <= 0) // The target is dead!
+                    // Bypass death check if the skill can target dead bodies
+                    if(T && T.hp <= 0 && !src.can_target_dead) 
                         if(src.on_target_death == "STOP")
                             break // End the timeline immediately
                             
@@ -106,13 +110,15 @@ datum/skill
                             else
                                 break // No enemies left to retarget, end combat/skill early
                                 
-                        // If it's "CONTINUE", it bypasses these checks and naturally falls through to hit the body.
-
-                // --- Run the Event ---
+                // --- Run the Event (FIXED formatting to remove empty else warning) ---
                 if(islist(target))
-                    if(EV.is_global) EV.Run(user, target[1], src, E)
-                    else { for(var/mob/T in target) EV.Run(user, T, src, E) }
-                else EV.Run(user, target, src, E)
+                    if(EV.is_global) 
+                        EV.Run(user, target[1], src, E)
+                    else 
+                        for(var/mob/T in target) 
+                            EV.Run(user, T, src, E)
+                else 
+                    EV.Run(user, target, src, E)
 
             if(src.final_attack)
                 world << "<b>[user.name] sacrifices themselves!</b>"
@@ -120,9 +126,21 @@ datum/skill
                 user.ClampStats()
 
             // --- THE REACTION EXIT ---
-            // If this timeline was a counter-attack, quietly stop here. No turn-ending!
             if(is_reaction)
                 return
+
+            // --- INTERACTIVE COMBO BRANCHES ---
+            if(src.combo_branches && src.combo_branches.len > 0)
+                if(ismob(user) && user:client)
+                    // 1. Remember the target(s)
+                    if(islist(target)) user:active_combo_targets = target
+                    else user:active_combo_targets = list(target)
+                    
+                    // 2. Open the prompt menu
+                    user:UpdateBattleMenu(E, "Combo_Select", src)
+                    
+                    // 3. HALT EXECUTION! Do not call EndTurn() yet!
+                    return
 
             // --- Skill Chaining (afterlink) ---
             if(src.afterlink)
@@ -133,6 +151,11 @@ datum/skill
                     return 
                 else
                     world.log << "ERROR: Skill [src.name] tried to afterlink to '[src.afterlink]', but it doesn't exist!"
+            // --- Interactive Combo Branches ---
+            if(src.combo_branches && src.combo_branches.len > 0)
+                if(ismob(user) && user.client)
+                    user.UpdateBattleMenu(E, "Combo_Select", src, null, target)
+                    return // We halt execution here! The HTML menu will resume it!
 
             // If there is no afterlink, OR the afterlink failed to load, end the turn safely.
             user.is_busy = 0

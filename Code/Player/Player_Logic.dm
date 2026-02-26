@@ -15,8 +15,6 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
     </style></head><body topmargin="0" leftmargin="0" rightmargin="0">
     "}
 
-    // Notice we completely removed html += "<div class='header'>Menu</div>" 
-
     if(menu_state == "Main")
         html += "<div class='section-title'>==Commands==</div>"
         html += "<a href='?src=\ref[src];action=menu_attack'>Attack</a><br>"
@@ -46,15 +44,14 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
 
     else if(menu_state == "Target_Skill" && pending_skill)
         html += "<div class='section-title'>==Target ([pending_skill.name])==</div>"
-        var/list/valid_targets = (pending_skill.targeting_flags & 16) ? E.GetAllies(src) : E.GetEnemies(src)
         
-        if(pending_skill.targeting_flags & 2) // AOE
-            html += "<a href='?src=\ref[src];action=do_skill;skill_ref=\ref[pending_skill];target=AOE'>-All Valid Targets-</a><br>"
-        else
-            for(var/mob/T in valid_targets)
-                // --- NEW: Verify the target meets the JSON filters! ---
-                if(pending_skill.IsValidTarget(src, T))
-                    html += "<a href='?src=\ref[src];action=do_skill;skill_ref=\ref[pending_skill];target=\ref[T]'>-[T.name]-</a><br>"
+        // FIXED: Now checks if it is a HEAL or a REVIVE skill!
+        var/list/valid_targets = (pending_skill.targeting_flags & (TARGET_HEAL | TARGET_REVIVE)) ? E.GetAllies(src) : E.GetEnemies(src)
+        
+        for(var/mob/T in valid_targets)
+            if(pending_skill.IsValidTarget(src, T))
+                html += "<a href='?src=\ref[src];action=do_skill;skill_ref=\ref[pending_skill];target=\ref[T]'>-[T.name]-</a><br>"
+                
         html += "<br><a href='?src=\ref[src];action=menu_main'>-Cancel-</a><br>"
 
     else if(menu_state == "Target_Item" && pending_item)
@@ -63,9 +60,24 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
             html += "<a href='?src=\ref[src];action=do_item;item_ref=\ref[pending_item];target=\ref[T]'>-[T.name]-</a><br>"
         html += "<br><a href='?src=\ref[src];action=menu_main'>-Cancel-</a><br>"
 
+    // --- NEW: THE COMBO MENU ---
+    else if(menu_state == "Combo_Select" && pending_skill)
+        html += "<div class='section-title'>==Combo Finish!==</div>"
+        
+        var/target_name = (src.active_combo_targets.len > 1) ? "Multiple Targets" : src.active_combo_targets[1]:name
+        html += "<span class='stat-text'>Juggling: [target_name]</span><br><br>"
+        
+        for(var/branch_id in pending_skill.combo_branches)
+            var/datum/skill/branch_skill = skill_factory.loaded_skills[branch_id]
+            if(branch_skill)
+                html += "<a href='?src=\ref[src];action=do_combo;skill_id=[branch_id]'>-[branch_skill.name]- (Cost: [branch_skill.cost])</a><br>"
+                
+        html += "<br><a href='?src=\ref[src];action=end_combo'>-End Combo-</a><br>"
+
     html += "</body></html>"
     
     src << browse(html, "window=battle_menu;size=250x450;can_close=0;can_resize=0")
+
 
 // The override for player turns
 mob/TakeAction(datum/encounter/E)
@@ -84,6 +96,7 @@ mob/TakeAction(datum/encounter/E)
             src.defending = 1
             world << "<i>[src.name] hesitates and defaults to defending!</i>"
             src.EndTurn()
+
 
 // --- THE CLICK CATCHER ---
 mob/Topic(href, href_list)
@@ -169,7 +182,6 @@ mob/Topic(href, href_list)
     // ==========================================
     // COMBAT MENU LOGIC 
     // ==========================================
-    // We put this check down here so it doesn't block the out-of-combat menu!
     if(!src.is_busy || !src.current_encounter) return 
     
     var/datum/encounter/E = src.current_encounter
@@ -182,12 +194,36 @@ mob/Topic(href, href_list)
         var/idx = text2num(href_list["skill_idx"])
         if(idx <= src.equipped_skills.len)
             var/datum/skill/S = src.equipped_skills[idx]
+            
             if(src.mp >= S.cost)
+                // 1. SELF CAST (Bypass Menu)
                 if(S.targeting_flags & TARGET_SELF)
                     src << browse(null, "window=battle_menu") 
                     src.is_busy = 0
                     src.turn_id++
                     S.Execute(src, src, E)
+                    
+                // 2. AOE CAST (Bypass Menu & Grab All Valid Targets)
+                else if(S.targeting_flags & TARGET_AOE)
+                    src << browse(null, "window=battle_menu") 
+                    src.is_busy = 0
+                    src.turn_id++
+                    
+                    // FIXED: Now properly checks for HEAL or REVIVE so it knows to grab Allies
+                    var/list/potential_targets = (S.targeting_flags & (TARGET_HEAL | TARGET_REVIVE)) ? E.GetAllies(src) : E.GetEnemies(src)
+                    var/list/valid_targets = list()
+                    
+                    for(var/mob/M in potential_targets)
+                        if(S.IsValidTarget(src, M))
+                            valid_targets += M
+                            
+                    if(!valid_targets.len)
+                        src << "<i>There are no valid targets to hit!</i>"
+                        src.EndTurn()
+                    else
+                        S.Execute(src, valid_targets, E)
+                        
+                // 3. SINGLE TARGET (Open Target Selection Menu)
                 else
                     src.UpdateBattleMenu(E, "Target_Skill", S)
             else
@@ -217,17 +253,37 @@ mob/Topic(href, href_list)
     else if(action == "do_skill")
         var/datum/skill/S = locate(href_list["skill_ref"])
         var/target_data = href_list["target"]
+        var/mob/T = locate(target_data)
         
+        if(T) 
+            src << browse(null, "window=battle_menu")
+            src.is_busy = 0
+            src.turn_id++
+            S.Execute(src, T, E)
+
+    // --- NEW: COMBO ACTIONS ---
+    else if(action == "do_combo")
+        var/skill_id = href_list["skill_id"]
+        var/datum/skill/S = skill_factory.loaded_skills[skill_id]
+        
+        if(S && src.active_combo_targets)
+            if(src.mp >= S.cost)
+                src << browse(null, "window=battle_menu")
+                
+                // Grab the target(s) we stored
+                var/combo_targets = (src.active_combo_targets.len == 1) ? src.active_combo_targets[1] : src.active_combo_targets
+                src.active_combo_targets = null // Clear memory
+                
+                // Execute the branch! 
+                S.Execute(src, combo_targets, E) 
+            else
+                src << "Not enough MP to finish the combo!"
+
+    else if(action == "end_combo")
         src << browse(null, "window=battle_menu")
+        src.active_combo_targets = null
         src.is_busy = 0
-        src.turn_id++
-        
-        if(target_data == "AOE")
-            var/list/valid = (S.targeting_flags & 16) ? E.GetAllies(src) : E.GetEnemies(src)
-            S.Execute(src, valid, E)
-        else
-            var/mob/T = locate(target_data)
-            if(T) S.Execute(src, T, E)
+        src.EndTurn() // They chose to drop the combo
 
     else if(action == "do_item")
         var/datum/item/consumable/I = locate(href_list["item_ref"])
@@ -240,6 +296,7 @@ mob/Topic(href, href_list)
             if(I.Use(src, T, E))
                 src.equipped_items -= I // Consume the item!
             src.EndTurn()
+
 
 mob/proc/UpdateMainMenu(menu_state = "Main", target_slot = null, target_idx = 0)
     var/html = {"

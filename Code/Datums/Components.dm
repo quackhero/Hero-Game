@@ -78,6 +78,9 @@ datum/component/status
 
     // var/is_fresh = 1
 
+    var/stat_mod = "" // E.g., "STR", "DEX", "RES"
+    var/stat_amount = 0 // E.g., 5 (Buff) or -5 (Debuff)
+
     // --- THE CLONER ---
     // The factory uses this to hand a fresh copy to the player!
     proc/Clone()
@@ -91,7 +94,27 @@ datum/component/status
         S.dot_amount = src.dot_amount
         S.dot_type = src.dot_type  
         S.hot_amount = src.hot_amount
+
+        S.stat_mod = src.stat_mod
+        S.stat_amount = src.stat_amount
         return S
+
+    proc/OnApply(mob/M)
+        if(!M || !src.stat_mod || src.stat_amount == 0) return
+        src.ModifyStat(M, src.stat_amount)
+
+    proc/OnRemove(mob/M)
+        if(!M || !src.stat_mod || src.stat_amount == 0) return
+        src.ModifyStat(M, -src.stat_amount) // Reverses the math!
+
+    proc/ModifyStat(mob/M, math_amt)
+        switch(uppertext(src.stat_mod))
+            if("STR") M.strength += math_amt
+            if("DEX") M.dexterity += math_amt
+            if("RES") M.resilience += math_amt
+            if("INT") M.intelligence += math_amt
+            if("MND") M.mind += math_amt
+            if("VIT") M.vitality += math_amt
 
     // --- OVERRIDES (Notice we removed "proc/" here) ---
     OnRefresh(dur, amt)
@@ -114,7 +137,7 @@ datum/component/status
             world << "<i><font color='#00FF00'>[M.name] recovers [src.hot_amount] HP from [src.name]!</font></i>"
 
     OnTurnEnd(mob/M)
-        world << "DEBUG: [src.name] fresh=[src.is_fresh] duration=[src.duration]"
+       // world << "DEBUG: [src.name] fresh=[src.is_fresh] duration=[src.duration]"
 
         if(src.duration > 0)
             src.duration--

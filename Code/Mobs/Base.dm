@@ -23,7 +23,9 @@ mob
     var/is_dead = 0
     var/defending = 0
     var/max_skill_slots = 4
-    var/list/equipped_skills = list() 
+    var/list/equipped_skills = list()
+
+    var/list/active_combo_targets = null // Remembers who we are combo-ing!
 
     mob/enemy
         var/base_exp = 50
@@ -77,6 +79,13 @@ mob
         src.hp = min(src.hp, src.max_hp) // No floor, allows negative
         src.mp = max(0, min(src.mp, src.max_mp))
         
+        // --- NEW: RESURRECTION CHECK ---
+        if(src.hp > src.death_threshold && src.is_dead)
+            src.is_dead = 0
+            src.is_downed = 0
+            world << "<i><font color='#00FF00'>[src.name] has been revived!</font></i>"
+            
+        // --- (Leave the death checks exactly as they are) ---
         if(src.hp <= 0 && !src.is_downed)
             src.is_downed = 1
             src.SendSignal("SIG_DOWNED")
@@ -106,6 +115,12 @@ mob
             if(src.hp <= src.death_threshold)
                 src.EndTurn()
             return
+
+        if(src.HasStatus("stunned"))
+            world << "<i><font color='#CCCC00'>[src.name] is stunned and loses their turn!</font></i>"
+            src.EndTurn() // Instantly aborts the turn and resets the ATB gauge!
+            return
+
         var/datum/encounter/E = src.current_encounter
         src.SendSignal("ON_TURN_START")
         src.TakeAction(E)
@@ -208,6 +223,8 @@ mob
             new_status.duration = duration
             new_status.amount = amount
             src.components += new_status
+
+            new_status.OnApply(src) // Apply the status effects immediately
             
             world << "<i><font color='#B19CD9'>[src.name] gains [new_status.name]!</font></i>"
 
@@ -239,5 +256,6 @@ mob
 
     proc/RemoveStatus(datum/component/status/S)
         src.components -= S
+        S.OnRemove(src)
         world << "<i><font color='#B19CD9'>[src.name]'s [S.name] wore off!</font></i>"
         del(S)
