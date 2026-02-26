@@ -147,7 +147,7 @@ datum/encounter
         var/M = 1 + ((P - 1) ** 0.75)
         var/exp_player = round((total_enemy_exp * M) / P)
         
-        // The Zero Floor check
-        if(exp_player < 200) exp_player = 0
+        // Ensure EXP is never negative
+        if(exp_player < 1) exp_player = 0
 
         return exp_player

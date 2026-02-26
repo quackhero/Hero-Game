@@ -76,8 +76,6 @@ datum/component/status
     var/dot_type = "Poison"
     var/hot_amount = 0
 
-    // var/is_fresh = 1
-
     var/stat_mod = "" // E.g., "STR", "DEX", "RES"
     var/stat_amount = 0 // E.g., 5 (Buff) or -5 (Debuff)
 
@@ -108,13 +106,17 @@ datum/component/status
         src.ModifyStat(M, -src.stat_amount) // Reverses the math!
 
     proc/ModifyStat(mob/M, math_amt)
+        var/base_var = ""
         switch(uppertext(src.stat_mod))
-            if("STR") M.strength += math_amt
-            if("DEX") M.dexterity += math_amt
-            if("RES") M.resilience += math_amt
-            if("INT") M.intelligence += math_amt
-            if("MND") M.mind += math_amt
-            if("VIT") M.vitality += math_amt
+            if("STR") base_var = "base_strength"
+            if("DEX") base_var = "base_dexterity"
+            if("RES") base_var = "base_resilience"
+            if("INT") base_var = "base_intelligence"
+            if("MND") base_var = "base_mind"
+            if("VIT") base_var = "base_vitality"
+        if(!base_var || !(base_var in M.vars)) return
+        M.vars[base_var] += math_amt
+        if(hascall(M, "UpdateStats")) M.UpdateStats()
 
     // --- OVERRIDES (Notice we removed "proc/" here) ---
     OnRefresh(dur, amt)
@@ -137,8 +139,6 @@ datum/component/status
             world << "<i><font color='#00FF00'>[M.name] recovers [src.hot_amount] HP from [src.name]!</font></i>"
 
     OnTurnEnd(mob/M)
-       // world << "DEBUG: [src.name] fresh=[src.is_fresh] duration=[src.duration]"
-
         if(src.duration > 0)
             src.duration--
             if(src.duration <= 0 && M)

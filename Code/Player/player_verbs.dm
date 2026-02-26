@@ -16,8 +16,7 @@ mob
                 src << "You have no stat points to spend."
                 return
             
-            // Changed to match the new base_ variable names
-            var/list/options = list("base_max_hp", "base_max_mp", "base_atk", "base_def", "base_spd", "base_ap", "Cancel")
+            var/list/options = list("base_max_hp", "base_max_mp", "base_strength", "base_resilience", "base_dexterity", "base_intelligence", "base_mind", "base_vitality", "Cancel")
             
             var/choice = input(src, "You have [src.stat_points] points. Which stat would you like to increase by 1?", "Stat Allocation") in options
             if(choice == "Cancel") return

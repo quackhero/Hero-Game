@@ -1,4 +1,3 @@
-var/datum/skill_parser/skill_parser = new()
 var/datum/skill_factory/skill_factory = new()
 
 // --- Targeting Bitflags ---

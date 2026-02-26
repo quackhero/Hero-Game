@@ -194,7 +194,10 @@ mob
         
         if(!silent)
             var/hp_info = (src.hp <= 0) ? " ([src.hp] HP)" : ""
-            world << "<b>[attacker.name]</b> attacks <b>[src.name]</b>! ([final_amount] Damage)[hp_info]"
+            if(attacker)
+                world << "<b>[attacker.name]</b> attacks <b>[src.name]</b>! ([final_amount] Damage)[hp_info]"
+            else
+                world << "<b>[src.name]</b> takes [final_amount] damage![hp_info]"
             
         src.SendSignal("SIG_DAMAGED", attacker)
         src.ClampStats()
@@ -222,7 +225,6 @@ mob
             // 3. Clone the template and apply it!
             var/datum/component/status/new_status = template.Clone()
             new_status.owner = src
-            world << "DEBUG: [new_status.name] owner set to [src.name]"
             new_status.duration = duration
             new_status.amount = amount
             src.components += new_status

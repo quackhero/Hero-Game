@@ -1,7 +1,3 @@
-/**
- * CLASS DATUMS
- * Defines the auto-stat growths and skill trees for classes/jobs.
- */
 datum/class
     var/name = "Class"
     var/list/stat_growths = list()
@@ -10,18 +6,16 @@ datum/class
 datum/class/novice
     name = "Novice"
     stat_growths = list(
-        "max_hp" = 3,
-        "max_mp" = 1,
-        "strength" = 2,
-        "resilience" = 1,
-        "dexterity" = 1,
-        "intelligence" = 1,
-        "mind" = 1,
-        "vitality" = 2
+        "base_max_hp"     = 3,
+        "base_max_mp"     = 1,
+        "base_strength"   = 2,
+        "base_resilience" = 1,
+        "base_dexterity"  = 1,
+        "base_intelligence" = 1,
+        "base_mind"       = 1,
+        "base_vitality"   = 2
     )
 
-
     skill_tree = list(
-        "2" = /datum/skill/heavy_strike,
-
+        "2" = /datum/skill/heavy_strike
     )
