@@ -61,9 +61,9 @@ datum/encounter
     proc/CheckStatus()
         var/p_alive = 0
         var/e_alive = 0
-        for(var/mob/M in src.players) if(!M.is_dead) p_alive++
-        for(var/mob/M in src.enemies) if(!M.is_dead) e_alive++
-        
+        for(var/mob/M in src.players) if(!M.is_dead && M.hp > M.death_threshold) p_alive++
+        for(var/mob/M in src.enemies) if(!M.is_dead && M.hp > M.death_threshold) e_alive++
+
         if(e_alive <= 0) src.EndBattle("Victory")
         else if(p_alive <= 0) src.EndBattle("Defeat")
 

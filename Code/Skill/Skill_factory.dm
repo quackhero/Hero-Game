@@ -17,6 +17,7 @@ datum/skill_factory
 
     proc/BuildSkill(list/data)
         var/datum/skill/S = new()
+        S.id   = data["id"]
         S.name = data["name"]
         S.cost = data["cost"]
 

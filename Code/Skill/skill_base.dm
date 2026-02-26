@@ -1,4 +1,5 @@
 datum/skill
+    var/id   = "" // JSON factory key (e.g. "basic_attack"). Empty = hardcoded DM skill.
     var/name = ""
     var/cost = 0
     var/targeting_flags = 0 
@@ -138,11 +139,21 @@ datum/skill
                     // 1. Remember the target(s)
                     if(islist(target)) user:active_combo_targets = target
                     else user:active_combo_targets = list(target)
-                    
+
                     // 2. Open the prompt menu
                     user:UpdateBattleMenu(E, "Combo_Select", src)
-                    
-                    // 3. HALT EXECUTION! Do not call EndTurn() yet!
+
+                    // 3. Spawn a safety timeout — if the player doesn't pick a branch
+                    //    within 10 seconds, auto-end their turn to prevent soft-locks.
+                    var/combo_snapshot = user.turn_id
+                    spawn(100)
+                        if(user && user.turn_id == combo_snapshot && user.is_busy && user.active_combo_targets)
+                            world << "<i>[user.name]'s combo window has closed!</i>"
+                            user << browse(null, "window=battle_menu")
+                            user.active_combo_targets = null
+                            user.EndTurn()
+
+                    // 4. HALT EXECUTION! Do not call EndTurn() yet!
                     return
 
             // --- Skill Chaining (afterlink) ---

@@ -111,7 +111,10 @@ datum/skill_parser
             var/total = CalculateMath(divs[1])
             for(var/i=2, i<=divs.len, i++)
                 var/val = CalculateMath(divs[i])
-                if(val != 0) total /= val
+                if(val == 0)
+                    world.log << "WARNING: Division by zero in skill formula: [t]"
+                    return 0
+                total /= val
             return total
 
         // 6. Final fallback: Convert what's left to a number

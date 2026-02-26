@@ -12,7 +12,6 @@ mob
     var/mind = 10
     var/resilience = 10
     var/vitality = 10
-    var/sk = 10
     var/race = "Human"
     var/combat_flags = 0
     var/turn_id = 0
@@ -78,20 +77,22 @@ mob
     proc/ClampStats()
         src.hp = min(src.hp, src.max_hp) // No floor, allows negative
         src.mp = max(0, min(src.mp, src.max_mp))
-        
-        // --- NEW: RESURRECTION CHECK ---
-        if(src.hp > src.death_threshold && src.is_dead)
-            src.is_dead = 0
-            src.is_downed = 0
-            world << "<i><font color='#00FF00'>[src.name] has been revived!</font></i>"
-            
-        // --- (Leave the death checks exactly as they are) ---
+
         if(src.hp <= 0 && !src.is_downed)
             src.is_downed = 1
             src.SendSignal("SIG_DOWNED")
 
         if(src.hp <= src.death_threshold && !src.is_dead)
             src.HandleDeath(src.last_attacker)
+
+    // Call this explicitly from revive skills — never runs automatically.
+    proc/Revive(heal_amount = 1)
+        if(!src.is_dead) return
+        src.is_dead = 0
+        src.is_downed = 0
+        src.hp = max(heal_amount, 1)
+        src.ClampStats()
+        world << "<i><font color='#00FF00'>[src.name] has been revived!</font></i>"
 
     proc/SendSignal(signal_id, passed_val = 0)
         if(signal_id == "SIG_DAMAGED" && ismob(passed_val))
@@ -189,7 +190,7 @@ mob
     
     proc/TakeDamage(amount, mob/attacker, damage_type = "Physical", silent = 0)
         if(src.is_dead) return
-        var/final_amount = amount // Simplified for now
+        var/final_amount = round(amount)
         src.hp -= final_amount
         
         if(!silent)

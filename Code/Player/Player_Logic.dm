@@ -69,7 +69,8 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
     else if(menu_state == "Combo_Select" && pending_skill)
         html += "<div class='section-title'>==Combo Finish!==</div>"
         
-        var/target_name = (src.active_combo_targets.len > 1) ? "Multiple Targets" : src.active_combo_targets[1]:name
+        var/mob/combo_t = src.active_combo_targets[1]
+        var/target_name = (src.active_combo_targets.len > 1) ? "Multiple Targets" : (combo_t ? combo_t.name : "Unknown")
         html += "<span class='stat-text'>Juggling: [target_name]</span><br><br>"
         
         for(var/branch_id in pending_skill.combo_branches)

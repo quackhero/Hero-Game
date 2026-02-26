@@ -24,12 +24,14 @@ datum/component
 
     // Runs at the end of the mob's turn (Tick down duration)
     proc/OnTurnEnd(mob/M)
+        // Guard: component may have already been removed by RemoveStatus() earlier this tick
+        if(!owner || !(src in owner.components)) return
         if(src.duration > 0)
             src.duration--
             if(src.duration <= 0)
                 // Auto-delete when time is up
                 if(M && hascall(M, "RemoveStatus"))
-                    call(M, "RemoveStatus")(src) // <--- FIXED HERE
+                    call(M, "RemoveStatus")(src)
                 else
                     if(owner) owner.components -= src
                     del(src)
@@ -128,19 +130,22 @@ datum/component/status
 
         // 1. Damage Over Time
         if(src.dot_amount > 0)
-            world << "<i><font color='#800080'>[M.name] suffers [src.dot_amount] [src.dot_type] damage from [src.name]!</font></i>"
-            // We pass 'null' for the attacker since the status itself is hurting them
-            M.TakeDamage(src.dot_amount, null, src.dot_type, 1) 
+            var/dot_dmg = round(src.dot_amount)
+            world << "<i><font color='#800080'>[M.name] suffers [dot_dmg] [src.dot_type] damage from [src.name]!</font></i>"
+            M.TakeDamage(dot_dmg, null, src.dot_type, 1)
 
         // 2. Heal Over Time
         if(src.hot_amount > 0)
-            M.hp += src.hot_amount
+            var/hot_heal = round(src.hot_amount)
+            M.hp += hot_heal
             M.ClampStats() // Ensure they don't heal over max_hp
-            world << "<i><font color='#00FF00'>[M.name] recovers [src.hot_amount] HP from [src.name]!</font></i>"
+            world << "<i><font color='#00FF00'>[M.name] recovers [hot_heal] HP from [src.name]!</font></i>"
 
     OnTurnEnd(mob/M)
+        // Guard: component may have already been removed by RemoveStatus() earlier this tick
+        if(!owner || !(src in owner.components)) return
         if(src.duration > 0)
             src.duration--
             if(src.duration <= 0 && M)
                 if(hascall(M, "RemoveStatus"))
-                    call(M, "RemoveStatus")(src) // <--- FIXED HERE
+                    call(M, "RemoveStatus")(src)

@@ -34,7 +34,7 @@ datum/skill_event/damage
 
         var/base_dmg = parser.Evaluate(src.formula, user, target)
         var/res = (src.bypass == -1) ? 0 : max(0, target.resilience - src.bypass)
-        var/final_dmg = max(1, base_dmg - res)
+        var/final_dmg = round(max(1, base_dmg - res))
 
         if(target.defending)
             final_dmg = max(1, round(final_dmg / 2))
@@ -106,9 +106,14 @@ datum/skill_event/heal
     var/formula = "0"
 
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
-        var/amt = parser.Evaluate(src.formula, user, target)
-        target.hp += amt
-        target.ClampStats()
+        var/amt = round(parser.Evaluate(src.formula, user, target))
+        // Revive skills call Revive() explicitly; regular heals cannot resurrect.
+        if(S && (S.targeting_flags & TARGET_REVIVE) && target.is_dead)
+            target.Revive(amt)
+        else
+            if(!target || target.is_dead) return
+            target.hp += amt
+            target.ClampStats()
         world << "<b>[target.name] is restored for [amt] HP!</b>"
 
 /**
