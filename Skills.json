@@ -321,5 +321,58 @@
             { "type": "message", "text": "(I) flips and drops a leg onto (target)!" },
             { "type": "damage", "formula": "STR * 1.0" }
         ]
+    },
+    {
+        "id": "toxicity",
+        "name": "Toxicity",
+        "category": "Spell",
+        "cost": 8,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {
+                "type": "condition",
+                "formula": "HAS_STATUS(poisoned)",
+                "if_true": [
+                    { "type": "message", "text": "The poison ignites! (I) detonates (target)!" },
+                    { "type": "damage", "formula": "50", "damage_type": "True" }
+                ],
+                "if_false": [
+                    { "type": "message", "text": "(I) injects (target) with venom!" },
+                    { "type": "damage", "formula": "10", "damage_type": "True" },
+                    { "type": "inflict", "status": "poisoned", "duration": 3 }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "warriors_body",
+        "name": "Warrior's Body",
+        "is_passive": 1,
+        "passive_stat_mods": {
+            "base_strength": 5,
+            "base_vitality": 3
+        }
+    },
+    {
+        "id": "regeneration",
+        "name": "Regeneration",
+        "is_passive": 1,
+        "trigger_condition": "ON_TURN_START",
+        "trigger_chance": 100,
+        "timeline": [
+            { "type": "heal", "formula": "VIT * 0.1" }
+        ]
+    },
+    {
+        "id": "counter_strike",
+        "name": "Counter Strike",
+        "is_passive": 1,
+        "trigger_condition": "OnDamaged",
+        "trigger_chance": 50,
+        "targeting_mode": "Ref-Target",
+        "timeline": [
+            { "type": "message", "text": "(I) counters!" },
+            { "type": "damage", "formula": "STR", "damage_type": "Physical", "text": "(I) retaliates against (target)! ([dmg] Damage)" }
+        ]
     }
 ]

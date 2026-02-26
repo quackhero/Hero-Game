@@ -24,9 +24,14 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
         if(!src.equipped_skills.len)
             html += "<span style='font-size: 16px; font-style: italic;'>None</span><br>"
         else
+            var/any_active = 0
             for(var/i = 1 to src.equipped_skills.len)
                 var/datum/skill/S = src.equipped_skills[i]
+                if(S.is_passive) continue // Passives are hidden during battle
+                any_active = 1
                 html += "<a href='?src=\ref[src];action=menu_target_skill;skill_idx=[i]'>[S.name] (Cost: [S.cost])</a><br>"
+            if(!any_active)
+                html += "<span style='font-size: 16px; font-style: italic;'>None</span><br>"
 
         html += "<div class='section-title'>==Items==</div>"
         if(!src.equipped_items.len)
@@ -152,13 +157,15 @@ mob/Topic(href, href_list)
         if(S && (S in src.skills))
             if(idx <= src.equipped_skills.len) src.equipped_skills[idx] = S // Swap it
             else src.equipped_skills += S // Add it
+        src.UpdateStats() // Recalculate stats in case a passive was equipped
         src.UpdateMainMenu("Main")
         return
-        
+
     else if(action == "do_camp_unequip_skill")
         var/idx = text2num(href_list["slot_idx"])
         if(idx <= src.equipped_skills.len)
             src.equipped_skills -= src.equipped_skills[idx] // Cleanly removes it
+        src.UpdateStats() // Recalculate stats in case a passive was removed
         src.UpdateMainMenu("Main")
         return
         
@@ -329,7 +336,8 @@ mob/proc/UpdateMainMenu(menu_state = "Main", target_slot = null, target_idx = 0)
         for(var/i = 1 to src.max_skill_slots)
             if(i <= src.equipped_skills.len)
                 var/datum/skill/S = src.equipped_skills[i]
-                html += "<a href='?src=\ref[src];action=camp_skill;slot_idx=[i]'>Slot [i]: [S.name]</a><br>"
+                var/passive_tag = S.is_passive ? " \[Passive\]" : ""
+                html += "<a href='?src=\ref[src];action=camp_skill;slot_idx=[i]'>Slot [i]: [S.name][passive_tag]</a><br>"
             else
                 html += "<a href='?src=\ref[src];action=camp_skill;slot_idx=[i]'>Slot [i]: -Empty-</a><br>"
 
@@ -360,7 +368,8 @@ mob/proc/UpdateMainMenu(menu_state = "Main", target_slot = null, target_idx = 0)
         for(var/datum/skill/S in src.skills)
             if(!(S in src.equipped_skills)) // Don't show skills already equipped
                 found = 1
-                html += "<a href='?src=\ref[src];action=do_camp_equip_skill;slot_idx=[target_idx];skill_ref=\ref[S]'>[S.name]</a><br>"
+                var/passive_tag = S.is_passive ? " \[Passive\]" : ""
+                html += "<a href='?src=\ref[src];action=do_camp_equip_skill;slot_idx=[target_idx];skill_ref=\ref[S]'>[S.name][passive_tag]</a><br>"
         if(!found) html += "<span class='stat-text'>No available skills.</span><br>"
         html += "<br><a href='?src=\ref[src];action=camp_main'>-Cancel-</a>"
 

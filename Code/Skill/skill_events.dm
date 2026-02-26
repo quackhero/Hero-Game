@@ -69,9 +69,10 @@ datum/skill_event/damage
         // --- THE TRIGGER / COUNTER HOOK ---
         if(target && target.hp > 0 && user != target)
             var/counter_fired = 0
-            
-            // 1. Check PASSIVE Skills
-            for(var/datum/skill/reaction in target.skills)
+
+            // 1. Check PASSIVE Skills (only equipped passives with OnDamaged trigger)
+            for(var/datum/skill/reaction in target.equipped_skills)
+                if(!reaction.is_passive) continue
                 if(reaction.trigger_condition == "OnDamaged")
                     // NEW: Category Filter Check!
                     if(reaction.trigger_category == "Any" || reaction.trigger_category == S.category)
@@ -168,12 +169,17 @@ datum/skill_event/stat_mod
  * Conditional Branch Event: Branching Logic
  */
 datum/skill_event/condition
-    var/formula = ""     
-    var/list/true_events = list() 
+    var/formula = ""
+    var/list/true_events = list()
+    var/list/false_events = list()
 
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
         var/mob/actual_target = target ? target : user
         if(parser.Evaluate(src.formula, user, actual_target))
             for(var/datum/skill_event/EV in src.true_events)
+                EV.Run(user, target, S, E)
+                if(EV.delay > 0) sleep(EV.delay)
+        else
+            for(var/datum/skill_event/EV in src.false_events)
                 EV.Run(user, target, S, E)
                 if(EV.delay > 0) sleep(EV.delay)

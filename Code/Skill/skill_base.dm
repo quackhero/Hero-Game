@@ -20,6 +20,9 @@ datum/skill
     var/final_attack = 0
     var/afterlink = ""
 
+    var/is_passive = 0
+    var/list/passive_stat_mods = null
+
     var/list/combo_branches = null
     
     var/list/req_target_name = null 

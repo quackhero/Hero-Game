@@ -103,6 +103,14 @@ mob
                     var/mob/targ = (S.targeting_mode == "Ref-Target") ? src.last_attacker : src
                     spawn() S.Execute(src, targ, src.current_encounter, passed_val)
 
+        // Fire equipped passive skills that match this signal
+        for(var/datum/skill/S in src.equipped_skills)
+            if(!S.is_passive) continue
+            if(S.trigger_condition == signal_id)
+                if(prob(S.trigger_chance))
+                    var/mob/targ = (S.targeting_mode == "Ref-Target") ? src.last_attacker : src
+                    spawn() S.ProcessTimeline(src, targ, src.current_encounter, 1)
+
     // ============================================================
     // 3. TURN INTERFACE
     // ============================================================

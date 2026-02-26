@@ -31,6 +31,8 @@ datum/skill_factory
         if("on_target_death" in data) S.on_target_death = data["on_target_death"]
         
         // --- PASSIVES & COMBO BRANCHES ---
+        if("is_passive" in data) S.is_passive = data["is_passive"]
+        if("passive_stat_mods" in data) S.passive_stat_mods = data["passive_stat_mods"]
         if("combo_branches" in data) S.combo_branches = data["combo_branches"]
         if("trigger_condition" in data) S.trigger_condition = data["trigger_condition"]
         if("trigger_chance" in data) S.trigger_chance = text2num(data["trigger_chance"])
@@ -110,12 +112,16 @@ datum/skill_factory
             if("condition")
                 var/datum/skill_event/condition/C = new()
                 C.formula = event_data["formula"]
-                
-                // If the condition has an "if_true" list, build those events too!
+
                 if(event_data["if_true"])
                     for(var/list/sub_event in event_data["if_true"])
                         var/datum/skill_event/SUB = src.BuildEvent(sub_event)
                         if(SUB) C.true_events += SUB
+
+                if(event_data["if_false"])
+                    for(var/list/sub_event in event_data["if_false"])
+                        var/datum/skill_event/SUB = src.BuildEvent(sub_event)
+                        if(SUB) C.false_events += SUB
                 EV = C
 
         if(EV && "delay" in event_data) 

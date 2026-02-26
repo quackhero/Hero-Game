@@ -66,6 +66,13 @@ mob
             src.vitality += src.equipped_accessory.vitality_bonus
             src.resilience += src.equipped_accessory.resilience_bonus
 
+        // 5. Apply Passive Skill Stat Mods
+        for(var/datum/skill/S in src.equipped_skills)
+            if(!S.is_passive || !S.passive_stat_mods) continue
+            for(var/stat_name in S.passive_stat_mods)
+                if(stat_name in src.vars)
+                    src.vars[stat_name] += S.passive_stat_mods[stat_name]
+
         src.ClampStats()
 
     proc/LevelUp()

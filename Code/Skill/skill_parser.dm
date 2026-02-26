@@ -10,25 +10,31 @@ datum/skill_parser
     
     proc/Evaluate(formula, mob/user, mob/target)
         if(!formula || formula == "0") return 0
-        
+
         // If it's already a simple number, just return it
         if(isnum(formula)) return formula
         if(isnum(text2num(formula))) return text2num(formula)
 
         var/processed = formula
-        
-        // --- STEP A: Replace User Stats ---
-        if(user)
-            processed = replacetext(processed, "STR", "[user.strength]")
-            processed = replacetext(processed, "RES", "[user.resilience]")
-            processed = replacetext(processed, "DEX", "[user.dexterity]")
-            processed = replacetext(processed, "INT", "[user.intelligence]")
-            processed = replacetext(processed, "MND", "[user.mind]")
-            processed = replacetext(processed, "VIT", "[user.vitality]")
-            processed = replacetext(processed, "HP",  "[user.hp]")
-            processed = replacetext(processed, "MP",  "[user.mp]")
 
-        // --- STEP B: Replace Target Stats ---
+        // --- STEP 0: Resolve status checks (USER_HAS_STATUS before HAS_STATUS — it's a substring) ---
+        while(findtext(processed, "USER_HAS_STATUS("))
+            var/start = findtext(processed, "USER_HAS_STATUS(")
+            var/paren_close = findtext(processed, ")", start + 15)
+            if(!paren_close) break
+            var/status_id = copytext(processed, start + 16, paren_close)
+            var/result = (user && hascall(user, "HasStatus") && user.HasStatus(status_id)) ? "1" : "0"
+            processed = copytext(processed, 1, start) + result + copytext(processed, paren_close + 1)
+
+        while(findtext(processed, "HAS_STATUS("))
+            var/start = findtext(processed, "HAS_STATUS(")
+            var/paren_close = findtext(processed, ")", start + 10)
+            if(!paren_close) break
+            var/status_id = copytext(processed, start + 11, paren_close)
+            var/result = (target && hascall(target, "HasStatus") && target.HasStatus(status_id)) ? "1" : "0"
+            processed = copytext(processed, 1, start) + result + copytext(processed, paren_close + 1)
+
+        // --- STEP A: Replace Target Stats (before user stats to avoid partial matches) ---
         if(target)
             processed = replacetext(processed, "STR(E)", "[target.strength]")
             processed = replacetext(processed, "RES(E)", "[target.resilience]")
@@ -39,7 +45,38 @@ datum/skill_parser
             processed = replacetext(processed, "HP(E)",  "[target.hp]")
             processed = replacetext(processed, "MP(E)",  "[target.mp]")
 
-        // --- STEP C: Calculate the Result ---
+        // --- STEP B: Replace User Stats ---
+        if(user)
+            processed = replacetext(processed, "STR", "[user.strength]")
+            processed = replacetext(processed, "RES", "[user.resilience]")
+            processed = replacetext(processed, "DEX", "[user.dexterity]")
+            processed = replacetext(processed, "INT", "[user.intelligence]")
+            processed = replacetext(processed, "MND", "[user.mind]")
+            processed = replacetext(processed, "VIT", "[user.vitality]")
+            processed = replacetext(processed, "HP",  "[user.hp]")
+            processed = replacetext(processed, "MP",  "[user.mp]")
+
+        // --- STEP C: Handle comparison operators (multi-char ops checked before single-char) ---
+        if(findtext(processed, "<="))
+            var/list/parts = splittext(processed, "<=")
+            return CalculateMath(parts[1]) <= CalculateMath(parts[2]) ? 1 : 0
+        if(findtext(processed, ">="))
+            var/list/parts = splittext(processed, ">=")
+            return CalculateMath(parts[1]) >= CalculateMath(parts[2]) ? 1 : 0
+        if(findtext(processed, "=="))
+            var/list/parts = splittext(processed, "==")
+            return CalculateMath(parts[1]) == CalculateMath(parts[2]) ? 1 : 0
+        if(findtext(processed, "!="))
+            var/list/parts = splittext(processed, "!=")
+            return CalculateMath(parts[1]) != CalculateMath(parts[2]) ? 1 : 0
+        if(findtext(processed, "<"))
+            var/list/parts = splittext(processed, "<")
+            return CalculateMath(parts[1]) < CalculateMath(parts[2]) ? 1 : 0
+        if(findtext(processed, ">"))
+            var/list/parts = splittext(processed, ">")
+            return CalculateMath(parts[1]) > CalculateMath(parts[2]) ? 1 : 0
+
+        // --- STEP D: Calculate the Result ---
         return CalculateMath(processed)
 
     // A simple parser that handles + - * / 
