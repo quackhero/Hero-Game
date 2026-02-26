@@ -134,11 +134,6 @@ mob
         src.TakeAction(E)
 
     proc/TakeAction(datum/encounter/E)
-    
-        if(src.components && src.components.len)
-            for(var/datum/component/status/C in src.components)
-                C.OnTurnStart(src)
-
         if(!src.CanAct()) return
         src.defending = 0 
 

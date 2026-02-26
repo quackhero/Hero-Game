@@ -148,17 +148,12 @@ datum/skill
             // --- Skill Chaining (afterlink) ---
             if(src.afterlink)
                 var/datum/skill/next_skill = skill_factory.loaded_skills[src.afterlink]
-                
+
                 if(next_skill)
                     next_skill.ProcessTimeline(user, target, E)
-                    return 
+                    return
                 else
                     world.log << "ERROR: Skill [src.name] tried to afterlink to '[src.afterlink]', but it doesn't exist!"
-            // --- Interactive Combo Branches ---
-            if(src.combo_branches && src.combo_branches.len > 0)
-                if(ismob(user) && user.client)
-                    user.UpdateBattleMenu(E, "Combo_Select", src, null, target)
-                    return // We halt execution here! The HTML menu will resume it!
 
             // If there is no afterlink, OR the afterlink failed to load, end the turn safely.
             user.is_busy = 0

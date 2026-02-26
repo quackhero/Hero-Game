@@ -35,6 +35,10 @@ datum/skill_event/damage
         var/base_dmg = parser.Evaluate(src.formula, user, target)
         var/res = (src.bypass == -1) ? 0 : max(0, target.resilience - src.bypass)
         var/final_dmg = max(1, base_dmg - res)
+
+        if(target.defending)
+            final_dmg = max(1, round(final_dmg / 2))
+            world << "<i>[target.name] mitigates the attack!</i>"
         
         var/msg = src.txt
         if(msg)

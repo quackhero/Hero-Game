@@ -67,11 +67,14 @@ mob
             src.resilience += src.equipped_accessory.resilience_bonus
 
         // 5. Apply Passive Skill Stat Mods
+        // Keys like "base_strength" map to the derived var "strength" — strip "base_" prefix.
+        // Modifying base_* here would compound every UpdateStats call.
         for(var/datum/skill/S in src.equipped_skills)
             if(!S.is_passive || !S.passive_stat_mods) continue
             for(var/stat_name in S.passive_stat_mods)
-                if(stat_name in src.vars)
-                    src.vars[stat_name] += S.passive_stat_mods[stat_name]
+                var/derived = replacetext(stat_name, "base_", "")
+                if(derived in src.vars)
+                    src.vars[derived] += S.passive_stat_mods[stat_name]
 
         src.ClampStats()
 
