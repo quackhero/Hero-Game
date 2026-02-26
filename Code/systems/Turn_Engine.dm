@@ -13,13 +13,17 @@ datum/encounter
         // --- THE CLEAN SLATE INITIALIZATION ---
         for(var/mob/M in src.all_participants)
             M.current_encounter = src
-            M.atb_gauge = 0 
+            M.atb_gauge = 0
             M.is_busy = 0 // Guarantees nobody enters combat locked out!
 
             if(M.hp < 1)
                 M.hp = 1
             if(M.is_dead)
                 M.is_dead = 0
+
+            // Reset once-per-battle trigger tracking
+            if(M.temp_triggers_used) M.temp_triggers_used.Cut()
+            else M.temp_triggers_used = list()
             
         src.Start()
 

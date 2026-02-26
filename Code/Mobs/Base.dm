@@ -40,6 +40,8 @@ mob
     var/list/components = list()      
 
     var/mob/last_attacker
+    var/mob/last_target           // The last mob this mob attacked/hit
+    var/list/temp_triggers_used   // Tracks trigger_once skills fired this battle
     var/datum/encounter/current_encounter
 
     // ============================================================
@@ -98,17 +100,23 @@ mob
         if(signal_id == "SIG_DAMAGED" && ismob(passed_val))
             src.last_attacker = passed_val
 
+        if(!src.temp_triggers_used) src.temp_triggers_used = list()
+
         for(var/datum/skill/S in src.trigger_skills)
             if(S.trigger_condition == signal_id)
+                if(S.trigger_once && S.id && (S.id in src.temp_triggers_used)) continue
                 if(prob(S.trigger_chance))
+                    if(S.trigger_once && S.id) src.temp_triggers_used += S.id
                     var/mob/targ = (S.targeting_mode == "Ref-Target") ? src.last_attacker : src
-                    spawn() S.Execute(src, targ, src.current_encounter, passed_val)
+                    spawn() S.Execute(src, targ, src.current_encounter)
 
         // Fire equipped passive skills that match this signal
         for(var/datum/skill/S in src.equipped_skills)
             if(!S.is_passive) continue
             if(S.trigger_condition == signal_id)
+                if(S.trigger_once && S.id && (S.id in src.temp_triggers_used)) continue
                 if(prob(S.trigger_chance))
+                    if(S.trigger_once && S.id) src.temp_triggers_used += S.id
                     var/mob/targ = (S.targeting_mode == "Ref-Target") ? src.last_attacker : src
                     spawn() S.ProcessTimeline(src, targ, src.current_encounter, 1)
 
@@ -132,6 +140,24 @@ mob
 
         var/datum/encounter/E = src.current_encounter
         src.SendSignal("ON_TURN_START")
+
+        // --- HP-based turn-start signals ---
+        if(src.max_hp > 0)
+            var/hp_pct = (src.hp / src.max_hp) * 100
+            if(hp_pct < 30)
+                src.SendSignal("SIG_HURT")
+            if(src.hp >= src.max_hp)
+                src.SendSignal("SIG_FULL_HP") // Use trigger_once=1 on skill for the "temp" variant
+
+        // --- Alone signal: fires when all other allies are incapacitated ---
+        if(E)
+            var/allies_alive = 0
+            for(var/mob/A in E.GetAllies(src))
+                if(A != src && !A.is_dead && A.hp > A.death_threshold)
+                    allies_alive++
+            if(!allies_alive)
+                src.SendSignal("SIG_ALONE")
+
         src.TakeAction(E)
 
     proc/TakeAction(datum/encounter/E)
@@ -153,8 +179,10 @@ mob
                     if("Guard")
                         src.defending = 1
                         world << "<i>[src.name] braces for impact!</i>"
+                        src.SendSignal("SIG_WAIT")
                         src.EndTurn()
                     if("Pass")
+                        src.SendSignal("SIG_WAIT")
                         src.EndTurn()
         else
             // AI Simple Logic
@@ -201,14 +229,23 @@ mob
                 world << "<b>[src.name]</b> takes [final_amount] damage![hp_info]"
             
         src.SendSignal("SIG_DAMAGED", attacker)
+
+        if(attacker && attacker != src)
+            attacker.last_target = src
+            attacker.SendSignal("SIG_DEALT_DAMAGE", final_amount)
+
         src.ClampStats()
 
     proc/HandleDeath(mob/killer)
         if(src.is_dead) return
+        src.SendSignal("SIG_DYING", killer) // Before is_dead: last chance to react (e.g. Last Stand)
         src.is_dead = 1
         src.atb_gauge = 0
         src.is_busy = 0
+        src.SendSignal("SIG_DEATH", killer) // After is_dead: death confirmation
         world << "<b>*** [src.name] has been defeated! ***</b>"
+        if(killer && killer != src)
+            killer.SendSignal("SIG_KILL", src) // Fires on the killer, passing the defeated mob
         if(src.current_encounter) src.current_encounter.CheckStatus()
 
     proc/ApplyStatus(status_id, duration, amount)
@@ -231,8 +268,9 @@ mob
             src.components += new_status
 
             new_status.OnApply(src) // Apply the status effects immediately
-            
+
             world << "<i><font color='#B19CD9'>[src.name] gains [new_status.name]!</font></i>"
+            src.SendSignal("SIG_STATUS_APPLIED", status_id)
 
     proc/GetStatus(status_id)
         for(var/datum/component/status/C in src.components)
@@ -261,7 +299,9 @@ mob
         return 0
 
     proc/RemoveStatus(datum/component/status/S)
+        var/sid = S.id // Save before del()
         src.components -= S
         S.OnRemove(src)
         world << "<i><font color='#B19CD9'>[src.name]'s [S.name] wore off!</font></i>"
         del(S)
+        src.SendSignal("SIG_STATUS_REMOVED", sid)

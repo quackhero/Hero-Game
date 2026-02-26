@@ -247,7 +247,8 @@ mob/Topic(href, href_list)
         src << browse(null, "window=battle_menu")
         src.defending = 1
         world << "<i>[src.name] braces for impact!</i>"
-        src.turn_id++ 
+        src.turn_id++
+        src.SendSignal("SIG_WAIT")
         src.EndTurn()
 
     else if(action == "do_attack")

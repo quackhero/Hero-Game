@@ -22,6 +22,7 @@ datum/skill
     var/afterlink = ""
 
     var/is_passive = 0
+    var/trigger_once = 0      // If 1, can only fire once per battle (tracked via temp_triggers_used)
     var/list/passive_stat_mods = null
 
     var/list/combo_branches = null

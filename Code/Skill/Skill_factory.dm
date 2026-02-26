@@ -33,6 +33,8 @@ datum/skill_factory
         
         // --- PASSIVES & COMBO BRANCHES ---
         if("is_passive" in data) S.is_passive = data["is_passive"]
+        if("trigger_once" in data) S.trigger_once = data["trigger_once"]
+        if("targeting_mode" in data) S.targeting_mode = data["targeting_mode"]
         if("passive_stat_mods" in data) S.passive_stat_mods = data["passive_stat_mods"]
         if("combo_branches" in data) S.combo_branches = data["combo_branches"]
         if("trigger_condition" in data) S.trigger_condition = data["trigger_condition"]
