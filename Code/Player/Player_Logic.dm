@@ -43,20 +43,22 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
 
     else if(menu_state == "Target_Attack")
         html += "<div class='section-title'>==Target (Attack)==</div>"
+        var/datum/skill/atk_skill = skill_factory.loaded_skills["basic_attack"]
         for(var/mob/T in E.GetEnemies(src))
-            html += "<a href='?src=\ref[src];action=do_attack;target=\ref[T]'>-[T.name]-</a><br>"
+            if(src.CanTarget(T, atk_skill, 1)) // silent=1: no error spam in the menu
+                html += "<a href='?src=\ref[src];action=do_attack;target=\ref[T]'>-[T.name]-</a><br>"
         html += "<br><a href='?src=\ref[src];action=menu_main'>-Cancel-</a><br>"
 
     else if(menu_state == "Target_Skill" && pending_skill)
         html += "<div class='section-title'>==Target ([pending_skill.name])==</div>"
-        
-        // FIXED: Now checks if it is a HEAL or a REVIVE skill!
+
         var/list/valid_targets = (pending_skill.targeting_flags & (TARGET_HEAL | TARGET_REVIVE)) ? E.GetAllies(src) : E.GetEnemies(src)
-        
+
         for(var/mob/T in valid_targets)
-            if(pending_skill.IsValidTarget(src, T))
+            // Both positional reachability AND skill-specific requirements must pass.
+            if(src.CanTarget(T, pending_skill, 1) && pending_skill.IsValidTarget(src, T))
                 html += "<a href='?src=\ref[src];action=do_skill;skill_ref=\ref[pending_skill];target=\ref[T]'>-[T.name]-</a><br>"
-                
+
         html += "<br><a href='?src=\ref[src];action=menu_main'>-Cancel-</a><br>"
 
     else if(menu_state == "Target_Item" && pending_item)
@@ -217,12 +219,12 @@ mob/Topic(href, href_list)
                     src.is_busy = 0
                     src.turn_id++
                     
-                    // FIXED: Now properly checks for HEAL or REVIVE so it knows to grab Allies
                     var/list/potential_targets = (S.targeting_flags & (TARGET_HEAL | TARGET_REVIVE)) ? E.GetAllies(src) : E.GetEnemies(src)
                     var/list/valid_targets = list()
-                    
+
                     for(var/mob/M in potential_targets)
-                        if(S.IsValidTarget(src, M))
+                        // Positional reachability check (silent) + skill requirements
+                        if(src.CanTarget(M, S, 1) && S.IsValidTarget(src, M))
                             valid_targets += M
                             
                     if(!valid_targets.len)
@@ -253,9 +255,10 @@ mob/Topic(href, href_list)
 
     else if(action == "do_attack")
         var/mob/T = locate(href_list["target"])
-        if(T && src.CanTarget(T))
+        var/datum/skill/atk = skill_factory.loaded_skills["basic_attack"]
+        if(T && src.CanTarget(T, atk))
             src << browse(null, "window=battle_menu")
-            src.turn_id++ 
+            src.turn_id++
             src.is_busy = 0
             src.BasicAttack(T)
 
@@ -263,8 +266,8 @@ mob/Topic(href, href_list)
         var/datum/skill/S = locate(href_list["skill_ref"])
         var/target_data = href_list["target"]
         var/mob/T = locate(target_data)
-        
-        if(T) 
+
+        if(S && T && src.CanTarget(T, S))
             src << browse(null, "window=battle_menu")
             src.is_busy = 0
             src.turn_id++

@@ -105,8 +105,12 @@ mob/proc/AIUseSkill(datum/skill/S, list/living_enemies, list/living_allies, datu
                 S.Execute(src, aoe_targets, E)
                 return 1
         else
-            if(living_enemies.len)
-                S.Execute(src, living_enemies, E)
+            // Filter the AOE target list by positional reachability
+            var/list/aoe_valid = list()
+            for(var/mob/M in living_enemies)
+                if(src.CanTarget(M, S, 1)) aoe_valid += M
+            if(aoe_valid.len)
+                S.Execute(src, aoe_valid, E)
                 return 1
         return 0
 
@@ -132,18 +136,16 @@ mob/proc/AIUseSkill(datum/skill/S, list/living_enemies, list/living_allies, datu
             return 1
         return 0
 
-    // Default: single-target offensive — pick a random living enemy
+    // Default: single-target offensive — build a list of positionally reachable valid targets
     if(!living_enemies.len) return 0
-    var/mob/target = pick(living_enemies)
-    if(S.IsValidTarget(src, target))
-        S.Execute(src, target, E)
-        return 1
-
-    // Last resort: scan all enemies for any valid target
+    var/list/reachable = list()
     for(var/mob/M in living_enemies)
-        if(S.IsValidTarget(src, M))
-            S.Execute(src, M, E)
-            return 1
+        if(src.CanTarget(M, S, 1) && S.IsValidTarget(src, M))
+            reachable += M
+
+    if(reachable.len)
+        S.Execute(src, pick(reachable), E)
+        return 1
 
     return 0 // No valid target could be found
 

@@ -20,6 +20,14 @@ var/datum/skill_factory/skill_factory = new()
 #define SKILL_UNINTERRUPT_STD  1
 #define SKILL_UNINTERRUPT_DEATH 2
 
+// --- Positional State Bitflags (skill/proc/position_flags) ---
+// Define which positional states a skill can target.
+// Default (0) is treated as POS_GROUND only.
+#define POS_GROUND    1   // Skill hits Grounded targets
+#define POS_AERIAL    2   // Skill hits Airborne targets
+#define POS_BURROWED  4   // Skill hits Burrowed targets
+#define POS_ANY       7   // Skill hits all positional states
+
 // --- ATB Engine ---
 #define ATB_GAUGE_MAX 100
 

@@ -40,7 +40,7 @@ datum/skill_factory
         if("trigger_condition" in data) S.trigger_condition = data["trigger_condition"]
         if("trigger_chance" in data) S.trigger_chance = text2num(data["trigger_chance"])
         
-        // 1. Bitflags
+        // 1. Targeting bitflags
         if(data["target_flags"])
             for(var/flag_str in data["target_flags"])
                 if(flag_str == "TARGET_SINGLE") S.targeting_flags |= TARGET_SINGLE
@@ -50,6 +50,18 @@ datum/skill_factory
                 if(flag_str == "TARGET_REVIVE") S.targeting_flags |= TARGET_REVIVE
                 if(flag_str == "TARGET_DEFLECT") S.targeting_flags |= TARGET_DEFLECT
                 if(flag_str == "TARGET_AERIAL") S.targeting_flags |= TARGET_AERIAL
+
+        // 1b. Positional flags — which positional states this skill can target.
+        // Default (unset) = POS_GROUND only. Example JSON: "pos_flags": ["POS_AERIAL", "POS_GROUND"]
+        if(data["pos_flags"])
+            for(var/flag_str in data["pos_flags"])
+                if(flag_str == "POS_GROUND")   S.position_flags |= POS_GROUND
+                if(flag_str == "POS_AERIAL")   S.position_flags |= POS_AERIAL
+                if(flag_str == "POS_BURROWED") S.position_flags |= POS_BURROWED
+                if(flag_str == "POS_ANY")      S.position_flags |= POS_ANY
+
+        // 1c. Uninterruptible flag from JSON
+        if("uninterrupt_level" in data) S.uninterrupt_level = data["uninterrupt_level"]
 
         // 2. Guardrails
         if(data["requirements"])

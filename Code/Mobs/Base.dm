@@ -34,6 +34,9 @@ mob
     var/is_downed = 0
     var/is_vanished = 0        // Set by Vanish status: mob cannot be targeted at all
     var/is_aerial_target = 0   // Set by Ascend/Float: mob is an aerial target
+    var/is_burrowed = 0        // Set by Dig/Burrow status: mob is underground
+
+    var/channel_start_state = "" // Positional state stored when channeling begins
 
     var/list/skills = list()          
     var/list/trigger_skills = list()
@@ -69,14 +72,41 @@ mob
                 
         return 1
 
-    proc/CanTarget(mob/T)
+    // Returns "Airborne", "Burrowed", or "Grounded" based on active flags.
+    proc/GetPositionalState()
+        if(src.is_aerial_target) return "Airborne"
+        if(src.is_burrowed) return "Burrowed"
+        return "Grounded"
+
+    // Optional skill param enables positional filtering.
+    // Pass silent=1 when building UI target lists to suppress error messages.
+    proc/CanTarget(mob/T, datum/skill/S = null, silent = 0)
         if(!T || T.is_dead)
-            src << "Target is invalid!"
+            if(!silent) src << "Target is invalid!"
             return 0
         if(T.current_encounter != src.current_encounter) return 0
         if(T.is_vanished)
-            src << "[T.name] cannot be targeted right now!"
+            if(!silent) src << "[T.name] cannot be targeted right now!"
             return 0
+
+        // --- Positional state check ---
+        // Grounded targets can always be reached by any skill (default).
+        // Airborne targets require: caster is also Airborne, OR skill has POS_AERIAL.
+        // Burrowed targets require: caster is also Burrowed, OR skill has POS_BURROWED.
+        var/target_state = T.GetPositionalState()
+        if(target_state == "Airborne")
+            if(!src.is_aerial_target)
+                var/skill_pos = S ? S.position_flags : POS_GROUND
+                if(!(skill_pos & POS_AERIAL))
+                    if(!silent) src << "[T.name] is airborne and cannot be reached!"
+                    return 0
+        else if(target_state == "Burrowed")
+            if(!src.is_burrowed)
+                var/skill_pos = S ? S.position_flags : POS_GROUND
+                if(!(skill_pos & POS_BURROWED))
+                    if(!silent) src << "[T.name] is burrowed underground!"
+                    return 0
+
         return 1
 
     // Returns the first full-disable status component (Freeze, Petrify, Sleep, Stop, etc.)
@@ -266,12 +296,10 @@ mob
                 src.EndTurn()
                 return
 
-        if(!src.CanTarget(target)) return src.EndTurn()
-        
-        // --- CE2 UPGRADE ---
-        // Route basic attacks through the JSON engine!
+        // Route basic attacks through the JSON engine so we can pass the skill to CanTarget.
         var/datum/skill/attack_skill = skill_factory.loaded_skills["basic_attack"]
-        
+        if(!src.CanTarget(target, attack_skill)) return src.EndTurn()
+
         if(attack_skill)
             attack_skill.Execute(src, target, src.current_encounter)
         else

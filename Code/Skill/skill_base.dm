@@ -36,6 +36,11 @@ datum/skill
     var/list/event_timeline = list()
     var/uninterrupt_level = 0
 
+    // Positional targeting: which states this skill can reach.
+    // 0 (default) is treated as POS_GROUND only.
+    // Use POS_AERIAL, POS_BURROWED, or POS_ANY for broader coverage.
+    var/position_flags = 0
+
     var/on_target_death = "STOP"
 
     // --- Filter Logic ---
@@ -94,41 +99,74 @@ datum/skill
         src.PayCost(user)
         src.ProcessTimeline(user, target, E)
 
-    // --- FIXED: Indented properly inside datum/skill ---
     proc/ProcessTimeline(mob/user, target, datum/encounter/E, is_reaction = 0)
+        // Capture the caster's positional state at the moment the skill begins.
+        // Used to detect state changes during channeling (delays between events).
+        var/cast_state = hascall(user, "GetPositionalState") ? user.GetPositionalState() : ""
+
         spawn(0)
             for(var/datum/skill_event/EV in src.event_timeline)
-                if(user.hp <= 0) break 
-                
-                if(EV.delay > 0) sleep(EV.delay)
-                
-                // --- The Target Death Check ---
-                if(!islist(target)) 
+                if(user.hp <= 0) break
+
+                if(EV.delay > 0)
+                    sleep(EV.delay)
+
+                    // --- Channeling Interrupt Check ---
+                    // Only fires after an event with delay > 0, since that is the only window
+                    // in which the caster's state could have changed between events.
+                    if(cast_state && hascall(user, "GetPositionalState"))
+                        var/current_state = user.GetPositionalState()
+                        if(current_state != cast_state)
+                            if(src.uninterrupt_level == SKILL_UNINTERRUPT_NONE)
+                                // Interruptible skill: abort the remaining timeline.
+                                world << "<i><font color='#FFAA00'>[user.name]'s [src.name] was interrupted by a positional state change!</font></i>"
+                                user.is_busy = 0
+                                if(hascall(user, "EndTurn")) user.EndTurn()
+                                return
+
+                            else
+                                // Uninterruptible: skill still fires, but targeting is re-evaluated
+                                // against the caster's new state. Update cast_state so subsequent
+                                // delay checks compare from the new baseline.
+                                cast_state = current_state
+                                // Rebuild AOE target list from the full encounter pool so that
+                                // targets newly reachable from the caster's new state are included,
+                                // not just remaining targets from the original list.
+                                if(islist(target) && E)
+                                    var/list/pool = (src.targeting_flags & (TARGET_HEAL | TARGET_REVIVE)) ? E.GetAllies(user) : E.GetEnemies(user)
+                                    var/list/rebuilt = list()
+                                    for(var/mob/M in pool)
+                                        if(!M.is_dead && M.hp > M.death_threshold)
+                                            if(user.CanTarget(M, src, 1) && src.IsValidTarget(user, M))
+                                                rebuilt += M
+                                    target = rebuilt
+
+                // --- Target Death Check ---
+                if(!islist(target))
                     var/mob/T = target
-                    // Bypass death check if the skill can target dead bodies
-                    if(T && T.hp <= 0 && !src.can_target_dead) 
+                    if(T && T.hp <= 0 && !src.can_target_dead)
                         if(src.on_target_death == "STOP")
-                            break // End the timeline immediately
-                            
+                            break
+
                         else if(src.on_target_death == "RETARGET")
                             var/list/alive_enemies = list()
                             for(var/mob/enemy in E.GetEnemies(user))
                                 if(enemy.hp > 0) alive_enemies += enemy
-                                
+
                             if(alive_enemies.len > 0)
                                 target = pick(alive_enemies)
                                 world << "<i>[user.name] redirects to [(target:name)]!</i>"
                             else
-                                break // No enemies left to retarget, end combat/skill early
-                                
-                // --- Run the Event (FIXED formatting to remove empty else warning) ---
+                                break
+
+                // --- Run the Event ---
                 if(islist(target))
-                    if(EV.is_global) 
+                    if(EV.is_global)
                         EV.Run(user, target[1], src, E)
-                    else 
-                        for(var/mob/T in target) 
+                    else
+                        for(var/mob/T in target)
                             EV.Run(user, T, src, E)
-                else 
+                else
                     EV.Run(user, target, src, E)
 
             if(src.final_attack)

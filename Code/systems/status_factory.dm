@@ -75,6 +75,7 @@ datum/status_factory
             if("provoke_reverse" in status_data) S.provoke_reverse = status_data["provoke_reverse"]
             if("vanish" in status_data) S.vanish = status_data["vanish"]
             if("is_aerial" in status_data) S.is_aerial = status_data["is_aerial"]
+            if("is_burrowed" in status_data) S.is_burrowed = status_data["is_burrowed"]
 
             src.loaded_statuses[S.id] = S
             

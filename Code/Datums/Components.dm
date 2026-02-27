@@ -140,6 +140,7 @@ datum/component/status
     var/provoke_reverse = 0      // Signals enemy AI to avoid this mob (Minor status)
     var/vanish = 0               // Sets owner.is_vanished on apply/remove
     var/is_aerial = 0            // Sets owner.is_aerial_target on apply/remove
+    var/is_burrowed = 0          // Sets owner.is_burrowed on apply/remove
 
     // ============================================================
     // --- THE CLONER ---
@@ -190,6 +191,7 @@ datum/component/status
         S.provoke_reverse = src.provoke_reverse
         S.vanish = src.vanish
         S.is_aerial = src.is_aerial
+        S.is_burrowed = src.is_burrowed
         return S
 
     // ============================================================
@@ -214,9 +216,27 @@ datum/component/status
         if(src.vanish && ("is_vanished" in M.vars))
             M.is_vanished = 1
 
-        // 4. Aerial flag
+        // 4. Aerial flag — mutually exclusive with Burrowed
         if(src.is_aerial && ("is_aerial_target" in M.vars))
+            // Remove any active Burrowed statuses first (states are mutually exclusive)
+            if("is_burrowed" in M.vars && M.is_burrowed)
+                for(var/datum/component/status/C in M.components)
+                    if(C != src && C.is_burrowed)
+                        if(hascall(M, "RemoveStatus"))
+                            call(M, "RemoveStatus")(C)
+                        break
             M.is_aerial_target = 1
+
+        // 5. Burrowed flag — mutually exclusive with Aerial
+        if(src.is_burrowed && ("is_burrowed" in M.vars))
+            // Remove any active Aerial statuses first (states are mutually exclusive)
+            if(M.is_aerial_target)
+                for(var/datum/component/status/C in M.components)
+                    if(C != src && C.is_aerial)
+                        if(hascall(M, "RemoveStatus"))
+                            call(M, "RemoveStatus")(C)
+                        break
+            M.is_burrowed = 1
 
     proc/OnRemove(mob/M)
         // 1. Primary stat reversal
@@ -237,6 +257,13 @@ datum/component/status
             for(var/datum/component/status/C in M.components)
                 if(C != src && C.is_aerial) still_aerial = 1
             if(!still_aerial) M.is_aerial_target = 0
+
+        // 4b. Burrowed flag clear (only if no other burrowed status remains)
+        if(src.is_burrowed && ("is_burrowed" in M.vars))
+            var/still_burrowed = 0
+            for(var/datum/component/status/C in M.components)
+                if(C != src && C.is_burrowed) still_burrowed = 1
+            if(!still_burrowed) M.is_burrowed = 0
 
         // 5. Death-on-expire (Death status)
         if(src.kills_on_expire && M && !M.is_dead)
