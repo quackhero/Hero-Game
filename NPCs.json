@@ -1,0 +1,163 @@
+[
+    {
+        "id": "goblin_scout",
+        "name": "Goblin Scout",
+        "race": "Goblin",
+        "attribute": "Earth",
+        "target_type": "Ground",
+
+        "stats": {
+            "max_hp": 30,
+            "max_mp": 10,
+            "strength": 8,
+            "dexterity": 12,
+            "intelligence": 3,
+            "mind": 3,
+            "vitality": 5,
+            "resilience": 4
+        },
+
+        "level": 2,
+        "gil": 15,
+        "exp": 20,
+        "difficulty": 0,
+        "hero_status": 0,
+
+        "skills": ["basic_attack"],
+
+        "equipment": {
+            "weapon": "",
+            "armor": "",
+            "accessory": ""
+        },
+
+        "items": [],
+
+        "attack_messages": [
+            "(I) lunges at (target) with a rusty dagger!",
+            "(I) slashes wildly at (target)!"
+        ],
+
+        "drops": {
+            "health_potion": 50
+        },
+
+        "barks": {
+            "war_cry": ["A goblin scout hisses menacingly!"],
+            "taunt": ["The goblin cackles!", "The goblin makes a rude gesture!"],
+            "death": ["The goblin lets out a pitiful squeal!"],
+            "kill": [],
+            "hurt": ["The goblin yelps in pain!"],
+            "win": ["The goblin dances on your corpse!"]
+        },
+
+        "opportunities": [],
+        "finisher_opportunities": []
+    },
+    {
+        "id": "stone_golem",
+        "name": "Stone Golem",
+        "race": "Construct",
+        "attribute": "Earth",
+        "target_type": "Ground",
+
+        "stats": {
+            "max_hp": 200,
+            "max_mp": 0,
+            "strength": 25,
+            "dexterity": 3,
+            "intelligence": 0,
+            "mind": 5,
+            "vitality": 15,
+            "resilience": 20
+        },
+
+        "level": 8,
+        "gil": 50,
+        "exp": 80,
+        "difficulty": 4,
+        "hero_status": 0,
+
+        "skills": ["basic_attack"],
+
+        "equipment": {
+            "weapon": "",
+            "armor": "",
+            "accessory": ""
+        },
+
+        "items": [],
+
+        "attack_messages": [
+            "(I) slams a massive fist into (target)!",
+            "(I) hurls a boulder at (target)!"
+        ],
+
+        "drops": {},
+
+        "barks": {
+            "war_cry": ["The Stone Golem awakens with a thunderous rumble!"],
+            "taunt": ["The golem's eyes glow with an ominous light..."],
+            "death": ["The golem crumbles into rubble!", "Cracks spread across the golem's body as it collapses!"],
+            "kill": ["The golem grinds its victim into the earth!"],
+            "hurt": ["A chunk of stone breaks off the golem!"],
+            "win": []
+        },
+
+        "opportunities": [],
+        "finisher_opportunities": []
+    },
+    {
+        "id": "sky_serpent",
+        "name": "Sky Serpent",
+        "race": "Beast",
+        "attribute": "Wind",
+        "target_type": "Air",
+
+        "stats": {
+            "max_hp": 80,
+            "max_mp": 30,
+            "strength": 15,
+            "dexterity": 20,
+            "intelligence": 10,
+            "mind": 8,
+            "vitality": 8,
+            "resilience": 6
+        },
+
+        "level": 5,
+        "gil": 35,
+        "exp": 45,
+        "difficulty": 2,
+        "hero_status": 0,
+
+        "skills": ["basic_attack"],
+
+        "equipment": {
+            "weapon": "",
+            "armor": "",
+            "accessory": ""
+        },
+
+        "items": [],
+
+        "attack_messages": [
+            "(I) dives at (target) from above!",
+            "(I) coils around (target) and squeezes!"
+        ],
+
+        "drops": {},
+
+        "barks": {
+            "war_cry": ["The Sky Serpent shrieks from the clouds!"],
+            "taunt": [],
+            "death": ["The serpent spirals lifelessly to the ground!"],
+            "kill": [],
+            "hurt": ["The serpent recoils, hissing in fury!"],
+            "win": []
+        },
+
+        "opportunities": [],
+        "finisher_opportunities": []
+    }
+]

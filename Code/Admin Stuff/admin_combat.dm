@@ -341,6 +341,56 @@ mob/verb/Debug_Kill_Target()
     if(!T) return
     T.TakeDamage(99999, src, "True", 0)
 
+// ============================================================
+// JSON NPC ADMIN VERBS
+// ============================================================
+
+// Spawns a JSON NPC at your location. Useful for visual inspection / world placement.
+mob/verb/Spawn_JSON_Enemy()
+    set category = "Admin"
+    if(!npc_factory.loaded_npcs.len)
+        src << "No JSON NPCs loaded!"
+        return
+    var/choice = input(src, "Spawn which NPC?", "Spawn NPC") in npc_factory.loaded_npcs
+    if(!choice) return
+    var/mob/enemy/E = npc_factory.SpawnNPC(choice)
+    if(E)
+        E.loc = src.loc
+        src << "<b>Spawned: [E.name] (Lv.[E.level], Diff:[E.ai_difficulty])</b>"
+
+// Starts a battle against one or more copies of a JSON NPC. Auto-restores you first.
+mob/verb/JSON_Enemy_Battle()
+    set category = "Admin"
+    if(src.current_encounter)
+        src << "Already in battle!"
+        return
+    if(!npc_factory.loaded_npcs.len)
+        src << "No JSON NPCs loaded!"
+        return
+
+    var/choice = input(src, "Fight which NPC?", "JSON Battle") in npc_factory.loaded_npcs
+    if(!choice) return
+    var/ecount = input(src, "How many? (1-4)", "Enemy Count") in list("1", "2", "3", "4")
+
+    src.hp = src.max_hp
+    src.mp = src.max_mp
+    src.is_dead = 0
+    src.is_downed = 0
+    src.is_busy = 0
+
+    var/list/enemy_list = list()
+    for(var/i = 1 to text2num(ecount))
+        var/mob/enemy/E = npc_factory.SpawnNPC(choice)
+        if(E) enemy_list += E
+
+    if(!enemy_list.len)
+        src << "Failed to spawn enemies!"
+        return
+
+    new /datum/encounter(list(src), enemy_list)
+    src << "<b>JSON Battle: [ecount]x [choice] started!</b>"
+
+
 // Print a full debug snapshot of your current state to chat.
 // Use at any point to verify stats, active statuses, position, and encounter state.
 mob/verb/Debug_View_State()

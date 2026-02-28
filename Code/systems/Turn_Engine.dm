@@ -9,7 +9,7 @@ datum/encounter
         src.players = P
         src.enemies = E
         src.all_participants = P + E
-        
+
         // --- THE CLEAN SLATE INITIALIZATION ---
         for(var/mob/M in src.all_participants)
             M.current_encounter = src
@@ -24,14 +24,17 @@ datum/encounter
             // Reset once-per-battle trigger tracking
             if(M.temp_triggers_used) M.temp_triggers_used.Cut()
             else M.temp_triggers_used = list()
-            
+
         src.Start()
 
     proc/Start()
         src.is_active = 1
         world << "<b>*** BATTLE START ***</b>"
+        // War cries from enemies at encounter start
+        for(var/mob/enemy/E in src.enemies)
+            if(hascall(E, "Bark")) E.Bark("war_cry")
         src.CombatLoop()
-        
+
 
     proc/CombatLoop()
         spawn(0)
@@ -41,7 +44,7 @@ datum/encounter
                     if(M.is_dead || M.hp <= M.death_threshold || M.is_busy) continue
 
                     M.atb_gauge += (M.dexterity + 1)
-                    
+
                     if(M.atb_gauge >= ATB_GAUGE_MAX)
                         M.atb_gauge = ATB_GAUGE_MAX
                         world << "<small>*** [M.name] is ready! ***</small>"
@@ -74,60 +77,85 @@ datum/encounter
     proc/EndBattle(result)
         src.is_active = 0
         world << "<b>Combat Result: [result]</b>"
-        
+
         if(result == "Victory")
             // 1. Give EXP
             var/exp_reward = CalculateRewardEXP(src.players, src.enemies)
             for(var/mob/M in src.players)
                 M.GainEXP(exp_reward)
-                
-            // 2. Roll for Loot
-            var/list/dropped_items = list() 
+
+            // 1b. Give Gil
+            var/total_gil = 0
             for(var/mob/enemy/E in src.enemies)
-                if(E.loot_table)
-                    for(var/item_path in E.loot_table)
-                        var/drop_chance = E.loot_table[item_path]
-                        
-                        // prob() is BYOND's built-in percentage dice roll!
-                        if(prob(drop_chance)) 
-                            // If it dropped, add it to the count!
-                            if(item_path in dropped_items)
-                                dropped_items[item_path] += 1
-                            else
-                                dropped_items[item_path] = 1
+                if("gil_reward" in E.vars)
+                    total_gil += E:gil_reward
+            if(total_gil > 0)
+                for(var/mob/M in src.players)
+                    M.gil += total_gil
+                    M << "<font color='#FFD700'><b>Received [total_gil] Gil!</b></font>"
+
+            // 2. Roll for Loot
+            // drop_key may be a string item ID (JSON NPC) or a type path (legacy hardcoded enemy)
+            var/list/dropped_items = list()
+            for(var/mob/enemy/E in src.enemies)
+                if(!E.loot_table || !E.loot_table.len) continue
+                for(var/drop_key in E.loot_table)
+                    var/drop_chance = E.loot_table[drop_key]
+                    if(prob(drop_chance))
+                        if(drop_key in dropped_items)
+                            dropped_items[drop_key] += 1
+                        else
+                            dropped_items[drop_key] = 1
 
             // 3. Distribute the Loot to Players
             if(dropped_items.len > 0)
                 for(var/mob/M in src.players)
-                    for(var/item_path in dropped_items)
-                        var/amount = dropped_items[item_path]
-                        
-                        // Spawn a temporary item just to read its proper name
-                        var/datum/item/temp = new item_path()
-                        var/i_name = temp.name
-                        
-                        // Print the grouped message! 
-                        if(amount > 1)
-                            M << "<font color='#00FF00'><b>[M.name] has received [i_name]s x[amount]</b></font>"
+                    for(var/drop_key in dropped_items)
+                        var/amount = dropped_items[drop_key]
+
+                        // JSON string ID → factory clone; legacy type path → new()
+                        var/datum/item/temp
+                        if(istext(drop_key))
+                            temp = item_factory.MakeItem(drop_key)
                         else
-                            M << "<font color='#00FF00'><b>[M.name] has received [i_name] x1</b></font>"
-                            
-                        // Actually put the datums in the player's inventory
+                            temp = new drop_key()
+
+                        if(!temp) continue
+                        var/i_name = temp.name
+
+                        if(amount > 1)
+                            M << "<font color='#00FF00'><b>[M.name] received [i_name] x[amount]</b></font>"
+                        else
+                            M << "<font color='#00FF00'><b>[M.name] received [i_name] x1</b></font>"
+
                         for(var/i = 1 to amount)
-                            M.inventory += new item_path()
-                            
+                            var/datum/item/loot
+                            if(istext(drop_key))
+                                loot = item_factory.MakeItem(drop_key)
+                            else
+                                loot = new drop_key()
+                            if(loot) M.inventory += loot
+
+                        // Clean up the temp item used just for the name lookup
+                        if(istext(drop_key)) del(temp)
+
+        if(result == "Defeat")
+            // Survivors taunt the fallen party
+            for(var/mob/enemy/E in src.enemies)
+                if(!E.is_dead && hascall(E, "Bark")) E.Bark("win")
+
         // --- CONSOLIDATED CLEANUP LOOP ---
         for(var/mob/M in src.all_participants)
             M.atb_gauge = 0
             M.is_busy = 0
             M.current_encounter = null
-            if(M.client) 
+            if(M.client)
                 M << browse(null, "window=battle_menu")
 
     proc/CalculateRewardEXP(list/mob/party, list/mob/enemies)
         if(!party || !party.len || !enemies || !enemies.len) return 0
         var/P = party.len
-        
+
         var/total_party_level = 0
         for(var/mob/M in party) total_party_level += M.level
         var/L_p = round(total_party_level / P)
@@ -137,20 +165,20 @@ datum/encounter
 
         for(var/mob/enemy/E in enemies)
             var/L_e = E.level
-            var/B = E.base_exp 
+            var/B = E.base_exp
             var/exp_from_enemy = 0
 
             // The Anti-Grind Check
-            if(L_p > (L_e + 15)) 
+            if(L_p > (L_e + 15))
                 exp_from_enemy = B * 0.002
-            else 
+            else
                 exp_from_enemy = max(B + (L_e - L_p) - f_Lp_suppression_penalty, 0)
-                
+
             total_enemy_exp += exp_from_enemy
 
         var/M = 1 + ((P - 1) ** 0.75)
         var/exp_player = round((total_enemy_exp * M) / P)
-        
+
         // Ensure EXP is never negative
         if(exp_player < 1) exp_player = 0
 

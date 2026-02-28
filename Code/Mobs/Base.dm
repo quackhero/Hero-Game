@@ -314,6 +314,15 @@ mob
                 msg = replacetext(msg, "(E)",      target.name)
                 world << "<b>[msg]</b>"
 
+        // --- NPC Attack Message (fallback when no equipped weapon or weapon has no messages) ---
+        else if(("attack_messages" in src.vars) && src:attack_messages && length(src:attack_messages))
+            var/msg = pick(src:attack_messages)
+            msg = replacetext(msg, "(I)",      src.name)
+            msg = replacetext(msg, "(user)",   src.name)
+            msg = replacetext(msg, "(target)", target.name)
+            msg = replacetext(msg, "(E)",      target.name)
+            world << "<b>[msg]</b>"
+
         if(attack_skill)
             attack_skill.Execute(src, target, src.current_encounter)
         else
@@ -344,6 +353,9 @@ mob
             
         src.SendSignal("SIG_DAMAGED", attacker)
 
+        if(final_amount >= (src.max_hp * 0.25))
+            if(hascall(src, "Bark")) src:Bark("hurt")
+
         if(attacker && attacker != src)
             attacker.last_target = src
             attacker.SendSignal("SIG_DEALT_DAMAGE", final_amount)
@@ -364,8 +376,10 @@ mob
         src.is_busy = 0
         src.SendSignal("SIG_DEATH", killer) // After is_dead: death confirmation
         world << "<b>*** [src.name] has been defeated! ***</b>"
+        if(hascall(src, "Bark")) src:Bark("death")
         if(killer && killer != src)
             killer.SendSignal("SIG_KILL", src) // Fires on the killer, passing the defeated mob
+            if(hascall(killer, "Bark")) killer:Bark("kill")
         if(src.current_encounter) src.current_encounter.CheckStatus()
 
     proc/ApplyStatus(status_id, duration, amount)

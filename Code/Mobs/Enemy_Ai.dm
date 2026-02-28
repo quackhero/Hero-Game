@@ -3,9 +3,12 @@
 // Any mob can call src.UniversalAI(E) from their TakeAction().
 // Decision priority (highest to lowest):
 //   1. Emergency item use  (HP < 30% → hp_restore, MP empty → mp_restore)
-//   2. Defend              (5% flat chance)
-//   3. Skill               (35% if usable skills exist)
+//   2. Defend              (chance varies by ai_difficulty tier)
+//   3. Skill               (chance varies by ai_difficulty tier)
 //   4. Basic attack        (fallback / most common)
+//
+// ai_difficulty tiers (0=Weak, 2=Aggressive, 4=Brutal, 5=Merciless, 6=Leader, 7=Ultimate)
+// are set by the NPC factory from the JSON "difficulty" field.
 // ============================================================
 
 mob/proc/UniversalAI(datum/encounter/E)
@@ -62,25 +65,75 @@ mob/proc/UniversalAI(datum/encounter/E)
         if(S.ammo_type && !src.HasAmmo(S.ammo_type, S.ammo_cost)) continue
         usable_skills += S
 
-    // --- 4. Roll for action type ---
+    // --- 4. Difficulty-aware roll ---
+    // Read ai_difficulty via colon operator since UniversalAI is mob/proc
+    // but ai_difficulty is declared on mob/enemy.
+    var/diff = 0
+    if("ai_difficulty" in src.vars) diff = src:ai_difficulty
+
+    var/defend_chance = 5
+    var/skill_chance  = 35
+
+    switch(diff)
+        if(0)   // Weak: rarely uses skills, may defend often
+            defend_chance = 8
+            skill_chance  = 20
+        if(2)   // Aggressive: attacks frequently, uses skills more
+            defend_chance = 2
+            skill_chance  = 45
+        if(4)   // Brutal: high skill usage, smarter targeting
+            defend_chance = 0
+            skill_chance  = 60
+        if(5)   // Merciless: very high skill usage, never defends
+            defend_chance = 0
+            skill_chance  = 70
+        if(6)   // Leader: boss-like, heal/support focus
+            defend_chance = 0
+            skill_chance  = 75
+        if(7)   // Ultimate: raid-boss tier, near-optimal every turn
+            defend_chance = 0
+            skill_chance  = 80
+
     var/roll = rand(1, 100)
 
-    if(roll <= 5)
-        // Defend (rare)
+    if(roll <= defend_chance)
+        // Defend (rare at low difficulty, never at high)
         src.defending = 1
         world << "<i>[src.name] braces for impact!</i>"
         src.EndTurn()
         return
 
-    if(roll <= 40 && usable_skills.len)
-        // Attempt to use a skill; falls through to basic attack if no valid target found
-        var/datum/skill/S = pick(usable_skills)
-        if(src.AIUseSkill(S, living_enemies, living_allies, E))
+    if(roll <= defend_chance + skill_chance && usable_skills.len)
+        // Attempt to use a skill; falls through to basic attack if no valid target found.
+        var/datum/skill/S
+
+        if(diff >= 7)
+            // Ultimate: pick the most expensive (presumably strongest) skill
+            var/best_cost = -1
+            for(var/datum/skill/candidate in usable_skills)
+                if(candidate.cost > best_cost)
+                    best_cost = candidate.cost
+                    S = candidate
+        else
+            S = pick(usable_skills)
+
+        if(S && src.AIUseSkill(S, living_enemies, living_allies, E))
             return
         // Skill found no valid target — fall through to basic attack
 
-    // Basic attack (most common outcome)
-    var/mob/target = pick(living_enemies)
+    // --- 5. Basic attack ---
+    var/mob/target
+    if(diff >= 4 && living_enemies.len)
+        // Brutal+: focus the enemy with lowest HP percentage
+        var/lowest_pct = 999
+        for(var/mob/M in living_enemies)
+            var/pct = (M.hp / max(1, M.max_hp)) * 100
+            if(pct < lowest_pct)
+                lowest_pct = pct
+                target = M
+    else
+        target = pick(living_enemies)
+
     src.BasicAttack(target)
 
 
@@ -170,9 +223,10 @@ mob/proc/AIBuildReviveList(list/living_allies, datum/encounter/E, datum/skill/S)
 
 
 // ============================================================
-// ENEMY TakeAction — calls the universal AI
+// ENEMY TakeAction — calls the universal AI, with taunt barks
 // ============================================================
 
 mob/enemy/TakeAction(datum/encounter/E)
     sleep(5) // Brief pause so the log doesn't blur together
+    if(prob(25)) src.Bark("taunt")  // 25% chance to taunt on their turn
     src.UniversalAI(E)

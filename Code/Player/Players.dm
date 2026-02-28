@@ -4,6 +4,7 @@ mob
     var/max_exp = 100
     var/level = 1
     var/stat_points = 0
+    var/gil = 0
 
     // --- NEW: INVENTORY & EQUIPMENT ---
     var/list/inventory = list()

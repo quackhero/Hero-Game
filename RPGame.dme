@@ -33,6 +33,7 @@
 #include "Code\Skill\skill_parser.dm"
 #include "Code\systems\Communication.dm"
 #include "Code\systems\item_factory.dm"
+#include "Code\systems\npc_factory.dm"
 #include "Code\systems\Saving.dm"
 #include "Code\systems\status_factory.dm"
 #include "Code\systems\Turn_Engine.dm"
