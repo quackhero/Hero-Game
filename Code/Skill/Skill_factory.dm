@@ -73,6 +73,7 @@ datum/skill_factory
             if("req_target_hp" in reqs) S.req_target_hp = reqs["req_target_hp"]
             if("req_target_status" in reqs) S.req_target_status = reqs["req_target_status"]
             if("req_user_status" in reqs) S.req_user_status = reqs["req_user_status"]
+            if("req_weapon_type" in reqs) S.req_weapon_type = reqs["req_weapon_type"]
 
         // 3. Build the Timeline using the new BuildEvent proc
         if(data["timeline"])
@@ -106,6 +107,7 @@ datum/skill_factory
             if("heal")
                 var/datum/skill_event/heal/H = new()
                 H.formula = event_data["formula"]
+                if("heal_mp" in event_data) H.heal_mp = event_data["heal_mp"]
                 EV = H
                 
             if("inflict")

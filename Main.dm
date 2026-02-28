@@ -11,6 +11,7 @@ world
 		..()
 		skill_factory.LoadAllSkills()
 		status_factory.LoadAllStatuses()
+		item_factory.LoadAllItems()
 // Make objects move 8 pixels per tick when walking
 
 mob

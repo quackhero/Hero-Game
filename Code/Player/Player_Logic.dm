@@ -27,7 +27,12 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
             var/any_active = 0
             for(var/i = 1 to src.equipped_skills.len)
                 var/datum/skill/S = src.equipped_skills[i]
-                if(S.is_passive) continue // Passives are hidden during battle
+                if(S.is_passive) continue  // Passives are hidden during battle
+                // Hide skills that require a weapon type the player doesn't have equipped
+                if(S.req_weapon_type)
+                    var/datum/item/equipment/W = src.equipped_weapon
+                    var/wtype = W ? (W:weapon_type) : ""
+                    if(wtype != S.req_weapon_type) continue
                 any_active = 1
                 html += "<a href='?src=\ref[src];action=menu_target_skill;skill_idx=[i]'>[S.name] (Cost: [S.cost])</a><br>"
             if(!any_active)
@@ -37,9 +42,14 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
         if(!src.equipped_items.len)
             html += "<span style='font-size: 16px; font-style: italic;'>None</span><br>"
         else
+            var/any_usable = 0
             for(var/i = 1 to src.equipped_items.len)
                 var/datum/item/I = src.equipped_items[i]
+                if(I.item_type == "Ammo") continue  // Ammo is consumed by skills, not used directly
+                any_usable = 1
                 html += "<a href='?src=\ref[src];action=menu_target_item;item_idx=[i]'>[I.name]</a><br>"
+            if(!any_usable)
+                html += "<span style='font-size: 16px; font-style: italic;'>None</span><br>"
 
     else if(menu_state == "Target_Attack")
         html += "<div class='section-title'>==Target (Attack)==</div>"
@@ -63,8 +73,13 @@ mob/proc/UpdateBattleMenu(datum/encounter/E, menu_state = "Main", datum/skill/pe
 
     else if(menu_state == "Target_Item" && pending_item)
         html += "<div class='section-title'>==Target ([pending_item.name])==</div>"
-        for(var/mob/T in E.GetAllies(src))
-            html += "<a href='?src=\ref[src];action=do_item;item_ref=\ref[pending_item];target=\ref[T]'>-[T.name]-</a><br>"
+        // Determine the target pool based on the item's target_type.
+        // Use colon operator since pending_item is typed as datum/item base.
+        var/ttype = pending_item:target_type
+        var/list/item_pool = (ttype == "enemy_single") ? E.GetEnemies(src) : E.GetAllies(src)
+        for(var/mob/T in item_pool)
+            if(!T.is_dead) // Only show living targets
+                html += "<a href='?src=\ref[src];action=do_item;item_ref=\ref[pending_item];target=\ref[T]'>-[T.name]-</a><br>"
         html += "<br><a href='?src=\ref[src];action=menu_main'>-Cancel-</a><br>"
 
     // --- NEW: THE COMBO MENU ---
@@ -242,7 +257,34 @@ mob/Topic(href, href_list)
     else if(action == "menu_target_item")
         var/idx = text2num(href_list["item_idx"])
         if(idx <= src.equipped_items.len)
-            src.UpdateBattleMenu(E, "Target_Item", null, src.equipped_items[idx])
+            var/datum/item/I = src.equipped_items[idx]
+            var/ttype = I:target_type  // colon: runtime access, null-safe
+
+            if(ttype == "self")
+                // Self-target: skip menu, use immediately on the caster
+                src << browse(null, "window=battle_menu")
+                src.is_busy = 0
+                src.turn_id++
+                if(I.Use(src, src, E))
+                    src.equipped_items -= I
+                src.EndTurn()
+
+            else if(ttype == "ally_aoe" || ttype == "enemy_aoe")
+                // AOE: skip menu, use on every valid target in the pool
+                src << browse(null, "window=battle_menu")
+                src.is_busy = 0
+                src.turn_id++
+                var/list/aoe_pool = (ttype == "ally_aoe") ? E.GetAllies(src) : E.GetEnemies(src)
+                var/used = 0
+                for(var/mob/T in aoe_pool)
+                    if(!T.is_dead)
+                        if(I.Use(src, T, E)) used = 1
+                if(used) src.equipped_items -= I
+                src.EndTurn()
+
+            else
+                // Single target (ally or enemy): show targeting menu
+                src.UpdateBattleMenu(E, "Target_Item", null, I)
 
     // Actions
     else if(action == "guard")

@@ -23,6 +23,15 @@ mob
 
     // --- THE MATH ENGINE ---
     proc/UpdateStats()
+        // 0. Remove any skills previously granted by gear so we start clean.
+        //    This handles unequip: the old skill is removed before we re-add from
+        //    whatever is currently equipped.
+        if(src.gear_granted_skills)
+            for(var/datum/skill/GS in src.gear_granted_skills)
+                src.skills        -= GS
+                src.equipped_skills -= GS
+        src.gear_granted_skills = list()
+
         // 1. Reset to naked stats
         src.max_hp = src.base_max_hp
         src.max_mp = src.base_max_mp
@@ -65,6 +74,25 @@ mob
             src.mind += src.equipped_accessory.mind_bonus
             src.vitality += src.equipped_accessory.vitality_bonus
             src.resilience += src.equipped_accessory.resilience_bonus
+
+        // 4b. Grant skills/passives from equipped gear.
+        //     Only adds a skill to gear_granted_skills if it isn't already in src.skills
+        //     (i.e. the player learned it through some other means); this prevents
+        //     double-adding and ensures unequip only removes what the gear itself provided.
+        var/list/gear_pieces = list()
+        if(src.equipped_weapon)    gear_pieces += src.equipped_weapon
+        if(src.equipped_armor)     gear_pieces += src.equipped_armor
+        if(src.equipped_accessory) gear_pieces += src.equipped_accessory
+
+        for(var/datum/item/equipment/G in gear_pieces)
+            var/list/grant_ids = list()
+            if(G.granted_skill_ids)   grant_ids += G.granted_skill_ids
+            if(G.granted_passive_ids) grant_ids += G.granted_passive_ids
+            for(var/sid in grant_ids)
+                var/datum/skill/GS = skill_factory.loaded_skills[sid]
+                if(GS && !(GS in src.skills))
+                    src.skills += GS
+                    src.gear_granted_skills += GS
 
         // 5. Apply Passive Skill Stat Mods
         // Keys like "base_strength" map to the derived var "strength" — strip "base_" prefix.

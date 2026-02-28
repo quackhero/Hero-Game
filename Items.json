@@ -1,0 +1,154 @@
+[
+    {
+        "id": "iron_sword",
+        "name": "Iron Sword",
+        "item_type": "Weapon",
+        "weapon_type": "Sword",
+        "desc": "A standard, reliable blade.",
+        "stat_bonuses": {
+            "strength": 5,
+            "dexterity": 1
+        },
+        "attack_messages": [
+            "(I) slashes at (target)!",
+            "(I) cleaves into (target)!",
+            "(I) drives their blade into (target)!"
+        ],
+        "buy_price": 100
+    },
+    {
+        "id": "iron_dagger",
+        "name": "Iron Dagger",
+        "item_type": "Weapon",
+        "weapon_type": "Dagger",
+        "desc": "A quick, lightweight blade.",
+        "stat_bonuses": {
+            "dexterity": 4,
+            "strength": 2
+        },
+        "attack_messages": [
+            "(I) stabs at (target)!",
+            "(I) flicks their dagger at (target)!"
+        ],
+        "buy_price": 80
+    },
+    {
+        "id": "leather_armor",
+        "name": "Leather Armor",
+        "item_type": "Armor",
+        "desc": "Light but sturdy protection.",
+        "stat_bonuses": {
+            "vitality": 3,
+            "resilience": 2
+        },
+        "buy_price": 80
+    },
+    {
+        "id": "iron_shield",
+        "name": "Iron Shield",
+        "item_type": "Accessory",
+        "desc": "A solid shield that bolsters endurance.",
+        "stat_bonuses": {
+            "resilience": 4,
+            "vitality": 2
+        },
+        "buy_price": 90
+    },
+    {
+        "id": "health_potion",
+        "name": "Health Potion",
+        "item_type": "Consumable",
+        "desc": "Restores 50 HP.",
+        "ai_category": "hp_restore",
+        "target_type": "ally_single",
+        "use_effect": "heal",
+        "formula": "50",
+        "buy_price": 25
+    },
+    {
+        "id": "mega_potion",
+        "name": "Mega Potion",
+        "item_type": "Consumable",
+        "desc": "Restores 150 HP to all allies.",
+        "ai_category": "hp_restore",
+        "target_type": "ally_aoe",
+        "use_effect": "heal",
+        "formula": "150",
+        "buy_price": 120
+    },
+    {
+        "id": "ether",
+        "name": "Ether",
+        "item_type": "Consumable",
+        "desc": "Restores 50 MP.",
+        "ai_category": "mp_restore",
+        "target_type": "ally_single",
+        "use_effect": "heal_mp",
+        "formula": "50",
+        "buy_price": 30
+    },
+    {
+        "id": "antidote",
+        "name": "Antidote",
+        "item_type": "Consumable",
+        "desc": "Cures Poison.",
+        "ai_category": "status_clear",
+        "target_type": "ally_single",
+        "use_effect": "cure",
+        "cures": ["poisoned"],
+        "buy_price": 15
+    },
+    {
+        "id": "fire_bomb",
+        "name": "Fire Bomb",
+        "item_type": "Consumable",
+        "desc": "Hurls a bomb that deals Fire damage to all enemies.",
+        "ai_category": "offensive",
+        "target_type": "enemy_aoe",
+        "use_effect": "damage",
+        "formula": "30",
+        "damage_type": "Fire",
+        "buy_price": 50
+    },
+    {
+        "id": "smoke_bomb",
+        "name": "Smoke Bomb",
+        "item_type": "Consumable",
+        "desc": "Blinds a single enemy.",
+        "ai_category": "offensive",
+        "target_type": "enemy_single",
+        "timeline": [
+            { "type": "message", "text": "(I) hurls a Smoke Bomb at (target)!" },
+            { "type": "inflict", "status": "blind", "duration": 3, "chance": 100 }
+        ],
+        "buy_price": 35
+    },
+    {
+        "id": "elixir",
+        "name": "Elixir",
+        "item_type": "Consumable",
+        "desc": "Fully restores HP and MP of one ally.",
+        "ai_category": "hp_restore",
+        "target_type": "ally_single",
+        "timeline": [
+            { "type": "message", "text": "(I) uses an Elixir on (target)!" },
+            { "type": "heal",    "formula": "9999" },
+            { "type": "heal",    "formula": "9999", "heal_mp": 1 }
+        ],
+        "buy_price": 500
+    },
+    {
+        "id": "sniper_bullet",
+        "name": "Sniper Bullet",
+        "item_type": "Ammo",
+        "desc": "Precision ammunition for sniper-class skills.",
+        "buy_price": 10
+    },
+    {
+        "id": "arrow",
+        "name": "Arrow",
+        "item_type": "Ammo",
+        "desc": "Standard arrows for bow skills.",
+        "buy_price": 5
+    }
+]

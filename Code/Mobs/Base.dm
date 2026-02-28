@@ -38,9 +38,10 @@ mob
 
     var/channel_start_state = "" // Positional state stored when channeling begins
 
-    var/list/skills = list()          
+    var/list/skills = list()
     var/list/trigger_skills = list()
-    var/list/components = list()      
+    var/list/components = list()
+    var/list/gear_granted_skills = list() // Skills/passives added by equipped gear (managed by UpdateStats)      
 
     var/mob/last_attacker
     var/mob/last_target           // The last mob this mob attacked/hit
@@ -299,6 +300,19 @@ mob
         // Route basic attacks through the JSON engine so we can pass the skill to CanTarget.
         var/datum/skill/attack_skill = skill_factory.loaded_skills["basic_attack"]
         if(!src.CanTarget(target, attack_skill)) return src.EndTurn()
+
+        // --- Weapon Attack Message ---
+        // If the equipped weapon defines attack_messages, pick one at random and display
+        // it as flavor text before the skill's own damage events fire.
+        if("equipped_weapon" in src.vars && src.equipped_weapon)
+            var/datum/item/equipment/W = src.equipped_weapon
+            if(W.attack_messages && W.attack_messages.len > 0)
+                var/msg = pick(W.attack_messages)
+                msg = replacetext(msg, "(I)",      src.name)
+                msg = replacetext(msg, "(user)",   src.name)
+                msg = replacetext(msg, "(target)", target.name)
+                msg = replacetext(msg, "(E)",      target.name)
+                world << "<b>[msg]</b>"
 
         if(attack_skill)
             attack_skill.Execute(src, target, src.current_encounter)

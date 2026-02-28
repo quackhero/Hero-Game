@@ -142,6 +142,12 @@ datum/component/status
     var/is_aerial = 0            // Sets owner.is_aerial_target on apply/remove
     var/is_burrowed = 0          // Sets owner.is_burrowed on apply/remove
 
+    // --- Skill Granting ---
+    var/list/granted_skill_ids = null     // Active skill IDs added to mob.skills while this status is active
+    var/list/granted_passive_ids = null   // Passive skill IDs added to mob.equipped_skills while active
+    var/list/status_granted_skills = null // Internal: tracks what was actually added (for cleanup on remove)
+    var/lock_position = 0                 // If 1, this mob's positional state cannot be changed by other statuses
+
     // ============================================================
     // --- THE CLONER ---
     // ============================================================
@@ -192,6 +198,10 @@ datum/component/status
         S.vanish = src.vanish
         S.is_aerial = src.is_aerial
         S.is_burrowed = src.is_burrowed
+        S.granted_skill_ids = src.granted_skill_ids ? src.granted_skill_ids.Copy() : null
+        S.granted_passive_ids = src.granted_passive_ids ? src.granted_passive_ids.Copy() : null
+        S.lock_position = src.lock_position
+        // Note: status_granted_skills is instance state — not copied from the template
         return S
 
     // ============================================================
@@ -218,25 +228,61 @@ datum/component/status
 
         // 4. Aerial flag — mutually exclusive with Burrowed
         if(src.is_aerial && ("is_aerial_target" in M.vars))
-            // Remove any active Burrowed statuses first (states are mutually exclusive)
-            if("is_burrowed" in M.vars && M.is_burrowed)
-                for(var/datum/component/status/C in M.components)
-                    if(C != src && C.is_burrowed)
-                        if(hascall(M, "RemoveStatus"))
-                            call(M, "RemoveStatus")(C)
-                        break
-            M.is_aerial_target = 1
+            // Check if any active status locks this mob's positional state
+            var/pos_locked_aerial = 0
+            for(var/datum/component/status/LC in M.components)
+                if(LC != src && LC.lock_position) { pos_locked_aerial = 1; break }
+            if(pos_locked_aerial)
+                world << "<font color='#AAAAFF'><b>[M.name]'s position is locked — aerial state blocked!</b></font>"
+            else
+                // Remove any active Burrowed statuses first (states are mutually exclusive)
+                if("is_burrowed" in M.vars && M.is_burrowed)
+                    for(var/datum/component/status/C in M.components)
+                        if(C != src && C.is_burrowed)
+                            if(hascall(M, "RemoveStatus"))
+                                call(M, "RemoveStatus")(C)
+                            break
+                M.is_aerial_target = 1
 
         // 5. Burrowed flag — mutually exclusive with Aerial
         if(src.is_burrowed && ("is_burrowed" in M.vars))
-            // Remove any active Aerial statuses first (states are mutually exclusive)
-            if(M.is_aerial_target)
-                for(var/datum/component/status/C in M.components)
-                    if(C != src && C.is_aerial)
-                        if(hascall(M, "RemoveStatus"))
-                            call(M, "RemoveStatus")(C)
-                        break
-            M.is_burrowed = 1
+            // Check if any active status locks this mob's positional state
+            var/pos_locked_burrowed = 0
+            for(var/datum/component/status/LC in M.components)
+                if(LC != src && LC.lock_position) { pos_locked_burrowed = 1; break }
+            if(pos_locked_burrowed)
+                world << "<font color='#AAAAFF'><b>[M.name]'s position is locked — burrowed state blocked!</b></font>"
+            else
+                // Remove any active Aerial statuses first (states are mutually exclusive)
+                if(M.is_aerial_target)
+                    for(var/datum/component/status/C in M.components)
+                        if(C != src && C.is_aerial)
+                            if(hascall(M, "RemoveStatus"))
+                                call(M, "RemoveStatus")(C)
+                            break
+                M.is_burrowed = 1
+
+        // 6. Grant active skills and passives while this status is active
+        if(src.granted_skill_ids || src.granted_passive_ids)
+            src.status_granted_skills = list()
+            var/list/active_ids = src.granted_skill_ids ? src.granted_skill_ids : list()
+            var/list/passive_ids = src.granted_passive_ids ? src.granted_passive_ids : list()
+
+            for(var/sid in active_ids)
+                var/datum/skill/GS = skill_factory.loaded_skills[sid]
+                if(!GS) continue
+                if(!(GS in M.skills))
+                    M.skills += GS
+                    M.equipped_skills += GS
+                    src.status_granted_skills += GS
+
+            for(var/sid in passive_ids)
+                var/datum/skill/GS = skill_factory.loaded_skills[sid]
+                if(!GS) continue
+                if(!(GS in M.equipped_skills))
+                    M.skills += GS
+                    M.equipped_skills += GS
+                    src.status_granted_skills += GS
 
     proc/OnRemove(mob/M)
         // 1. Primary stat reversal
@@ -269,6 +315,13 @@ datum/component/status
         if(src.kills_on_expire && M && !M.is_dead)
             world << "<font color='#FF0000'><b>[M.name]'s time has run out!</b></font>"
             M.HandleDeath(null)
+
+        // 6. Remove skills/passives that were granted by this status
+        if(src.status_granted_skills)
+            for(var/datum/skill/GS in src.status_granted_skills)
+                M.skills -= GS
+                M.equipped_skills -= GS
+            src.status_granted_skills = null
 
     // Computes a flat change as a percentage of the mob's current base stat
     proc/ComputeStatPct(mob/M, stat, pct)

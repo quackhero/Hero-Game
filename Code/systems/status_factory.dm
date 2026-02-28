@@ -77,6 +77,11 @@ datum/status_factory
             if("is_aerial" in status_data) S.is_aerial = status_data["is_aerial"]
             if("is_burrowed" in status_data) S.is_burrowed = status_data["is_burrowed"]
 
+            // --- Skill Granting ---
+            if("granted_skills" in status_data) S.granted_skill_ids = status_data["granted_skills"]
+            if("granted_passives" in status_data) S.granted_passive_ids = status_data["granted_passives"]
+            if("lock_position" in status_data) S.lock_position = status_data["lock_position"]
+
             src.loaded_statuses[S.id] = S
             
         world << "<b>[src.loaded_statuses.len] JSON Statuses Loaded!</b>"

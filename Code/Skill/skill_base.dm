@@ -27,11 +27,12 @@ datum/skill
 
     var/list/combo_branches = null
     
-    var/list/req_target_name = null 
-    var/list/req_target_race = null 
-    var/req_target_hp = 0           
-    var/list/req_target_status = null 
-    var/list/req_user_status = null   
+    var/list/req_target_name = null
+    var/list/req_target_race = null
+    var/req_target_hp = 0
+    var/list/req_target_status = null
+    var/list/req_user_status = null
+    var/req_weapon_type = ""  // e.g. "Sword" — if set, user must have this weapon type equipped
 
     var/list/event_timeline = list()
     var/uninterrupt_level = 0
@@ -94,6 +95,15 @@ datum/skill
             user << "<b>You are Muted and cannot use skills!</b>"
             user.EndTurn()
             return
+
+        // Weapon type requirement: block the skill if the user doesn't have the right weapon
+        if(src.req_weapon_type)
+            var/equipped_w = ("equipped_weapon" in user.vars) ? user.equipped_weapon : null
+            var/wtype = equipped_w ? (equipped_w:weapon_type) : ""
+            if(wtype != src.req_weapon_type)
+                user << "<b>[src.name] requires a [src.req_weapon_type] equipped!</b>"
+                user.EndTurn()
+                return
 
         user.is_busy = 1
         src.PayCost(user)

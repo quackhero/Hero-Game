@@ -106,12 +106,24 @@ datum/skill_event/damage
 
 /**
  * Heal Event: Handles restoration
+ * Set heal_mp = 1 to restore MP instead of HP (used by items like Ether).
  */
 datum/skill_event/heal
     var/formula = "0"
+    var/heal_mp = 0   // If 1, restores MP instead of HP
 
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
         var/amt = round(parser.Evaluate(src.formula, user, target))
+
+        // --- MP restore path ---
+        if(src.heal_mp)
+            if(!target || target.is_dead) return
+            target.mp += amt
+            target.ClampStats()
+            world << "<b>[target.name] recovers [amt] MP!</b>"
+            return
+
+        // --- HP restore path ---
         // Revive skills call Revive() explicitly; regular heals cannot resurrect.
         if(S && (S.targeting_flags & TARGET_REVIVE) && target.is_dead)
             target.Revive(amt)

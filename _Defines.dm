@@ -1,4 +1,5 @@
 var/datum/skill_factory/skill_factory = new()
+var/datum/item_factory/item_factory = new()
 
 // --- Targeting Bitflags ---
 // These allow Target, AOE, Aerial, and Deflect to be used in tandem.
