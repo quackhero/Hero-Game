@@ -81,6 +81,9 @@ datum/skill_parser
 
     // A simple parser that handles + - * / 
     proc/CalculateMath(t)
+        // 0. Guard: empty token (e.g. leading "-" splits into ["", "5"]) → 0
+        if(!t || t == "") return 0
+
         // 1. Remove spaces for easier parsing
         t = replacetext(t, " ", "")
         
