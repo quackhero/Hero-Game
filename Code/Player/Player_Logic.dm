@@ -220,20 +220,20 @@ mob/Topic(href, href_list)
         if(idx <= src.equipped_skills.len)
             var/datum/skill/S = src.equipped_skills[idx]
             
-            if(src.mp >= S.cost)
+            if(src.CanAct(S))
                 // 1. SELF CAST (Bypass Menu)
                 if(S.targeting_flags & TARGET_SELF)
-                    src << browse(null, "window=battle_menu") 
+                    src << browse(null, "window=battle_menu")
                     src.is_busy = 0
                     src.turn_id++
                     S.Execute(src, src, E)
-                    
+
                 // 2. AOE CAST (Bypass Menu & Grab All Valid Targets)
                 else if(S.targeting_flags & TARGET_AOE)
-                    src << browse(null, "window=battle_menu") 
+                    src << browse(null, "window=battle_menu")
                     src.is_busy = 0
                     src.turn_id++
-                    
+
                     var/list/potential_targets = (S.targeting_flags & (TARGET_HEAL | TARGET_REVIVE)) ? E.GetAllies(src) : E.GetEnemies(src)
                     var/list/valid_targets = list()
 
@@ -241,18 +241,16 @@ mob/Topic(href, href_list)
                         // Positional reachability check (silent) + skill requirements
                         if(src.CanTarget(M, S, 1) && S.IsValidTarget(src, M))
                             valid_targets += M
-                            
+
                     if(!valid_targets.len)
                         src << "<i>There are no valid targets to hit!</i>"
                         src.EndTurn()
                     else
                         S.Execute(src, valid_targets, E)
-                        
+
                 // 3. SINGLE TARGET (Open Target Selection Menu)
                 else
                     src.UpdateBattleMenu(E, "Target_Skill", S)
-            else
-                src << "Not enough MP!"
 
     else if(action == "menu_target_item")
         var/idx = text2num(href_list["item_idx"])
@@ -303,6 +301,9 @@ mob/Topic(href, href_list)
             src.turn_id++
             src.is_busy = 0
             src.BasicAttack(T)
+        else
+            // Target became invalid (died between click and server processing) — reopen target list
+            src.UpdateBattleMenu(E, "Target_Attack")
 
     else if(action == "do_skill")
         var/datum/skill/S = locate(href_list["skill_ref"])

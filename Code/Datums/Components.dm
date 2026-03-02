@@ -360,7 +360,7 @@ datum/component/status
     // --- TURN START ---
     // ============================================================
     OnTurnStart(mob/M)
-        if(!M || M.hp <= 0) return
+        if(!M || M.hp <= M.death_threshold) return
 
         // 1. Damage Over Time
         if(src.dot_amount > 0)

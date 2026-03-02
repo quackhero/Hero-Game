@@ -113,31 +113,29 @@ datum/encounter
                     for(var/drop_key in dropped_items)
                         var/amount = dropped_items[drop_key]
 
+                        // Create the first instance — used for name display AND added to inventory
                         // JSON string ID → factory clone; legacy type path → new()
-                        var/datum/item/temp
+                        var/datum/item/first
                         if(istext(drop_key))
-                            temp = item_factory.MakeItem(drop_key)
+                            first = item_factory.MakeItem(drop_key)
                         else
-                            temp = new drop_key()
+                            first = new drop_key()
 
-                        if(!temp) continue
-                        var/i_name = temp.name
+                        if(!first) continue
 
                         if(amount > 1)
-                            M << "<font color='#00FF00'><b>[M.name] received [i_name] x[amount]</b></font>"
+                            M << "<font color='#00FF00'><b>[M.name] received [first.name] x[amount]</b></font>"
                         else
-                            M << "<font color='#00FF00'><b>[M.name] received [i_name] x1</b></font>"
+                            M << "<font color='#00FF00'><b>[M.name] received [first.name] x1</b></font>"
 
-                        for(var/i = 1 to amount)
+                        M.inventory += first  // Reuse the first item instead of discarding it
+                        for(var/i = 2 to amount)
                             var/datum/item/loot
                             if(istext(drop_key))
                                 loot = item_factory.MakeItem(drop_key)
                             else
                                 loot = new drop_key()
                             if(loot) M.inventory += loot
-
-                        // Clean up the temp item used just for the name lookup
-                        if(istext(drop_key)) del(temp)
 
         if(result == "Defeat")
             // Survivors taunt the fallen party
@@ -176,8 +174,8 @@ datum/encounter
 
             total_enemy_exp += exp_from_enemy
 
-        var/M = 1 + ((P - 1) ** 0.75)
-        var/exp_player = round((total_enemy_exp * M) / P)
+        var/party_mult = 1 + ((P - 1) ** 0.75)
+        var/exp_player = round((total_enemy_exp * party_mult) / P)
 
         // Ensure EXP is never negative
         if(exp_player < 1) exp_player = 0

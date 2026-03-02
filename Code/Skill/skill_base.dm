@@ -54,7 +54,7 @@ datum/skill
 
     proc/IsValidTarget(mob/user, mob/target)
         if(!target) return 0
-        if(!src.can_target_dead && target.hp <= 0) return 0
+        if(!src.can_target_dead && target.hp <= target.death_threshold) return 0
         if((src.targeting_flags & TARGET_REVIVE) && !(src.targeting_flags & TARGET_HEAL) && !target.is_dead) return 0
         if(src.req_target_name && !(target.name in src.req_target_name)) return 0
         if(src.req_target_race && !(target.vars["race"] in src.req_target_race)) return 0
@@ -116,7 +116,7 @@ datum/skill
 
         spawn(0)
             for(var/datum/skill_event/EV in src.event_timeline)
-                if(user.hp <= 0) break
+                if(user.hp <= user.death_threshold) break
 
                 if(EV.delay > 0)
                     sleep(EV.delay)
@@ -154,7 +154,7 @@ datum/skill
                 // --- Target Death Check ---
                 if(!islist(target))
                     var/mob/T = target
-                    if(T && T.hp <= 0 && !src.can_target_dead)
+                    if(T && T.hp <= T.death_threshold && !src.can_target_dead)
                         if(src.on_target_death == "STOP")
                             break
 
