@@ -32,9 +32,12 @@ datum/item_factory
             E.item_type = itype
 
             if("weapon_type" in data)    E.weapon_type        = data["weapon_type"]
+            if("damage_type" in data)    E.damage_type        = data["damage_type"]
+            if("elemental_tag" in data)  E.elemental_tag      = data["elemental_tag"]
             if("attack_messages" in data) E.attack_messages   = data["attack_messages"]
             if("granted_skills" in data)  E.granted_skill_ids  = data["granted_skills"]
             if("granted_passives" in data) E.granted_passive_ids = data["granted_passives"]
+            if("damage_affinities" in data) E.damage_affinities = data["damage_affinities"]
 
             if("stat_bonuses" in data)
                 var/list/bonuses = data["stat_bonuses"]
@@ -121,9 +124,12 @@ datum/item_factory
             E.item_type       = T.item_type
             E.buy_price       = T.buy_price
             E.weapon_type         = T.weapon_type
+            E.damage_type         = T.damage_type
+            E.elemental_tag       = T.elemental_tag
             E.attack_messages     = T.attack_messages     // list ref — read-only
             E.granted_skill_ids   = T.granted_skill_ids   // list ref — read-only
             E.granted_passive_ids = T.granted_passive_ids // list ref — read-only
+            E.damage_affinities   = T.damage_affinities   // list ref — read-only
             E.strength_bonus      = T.strength_bonus
             E.dexterity_bonus     = T.dexterity_bonus
             E.intelligence_bonus  = T.intelligence_bonus

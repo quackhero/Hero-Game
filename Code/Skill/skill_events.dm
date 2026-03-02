@@ -28,23 +28,29 @@ datum/skill_event/damage
 
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
         if(!target) return
+
+        // For basic attacks, use the weapon's computed damage type (subtype + elemental tag)
+        // stored on the caster mob. Falls back to the event's own damage_type for all other skills,
+        // keeping full backwards compatibility with hardcoded "Physical", "Fire", etc.
+        var/eff_type = src.damage_type
+        if(S && S.id == "basic_attack" && ("override_attack_damage_type" in user.vars) && user.override_attack_damage_type != "")
+            eff_type = user.override_attack_damage_type
+
         if(src.hitrate < 100 && !prob(src.hitrate))
             world << "<i>[user.name] missed [target.name]!</i>"
-            return 
+            return
 
         var/base_dmg = parser.Evaluate(src.formula, user, target)
-        var/res = (src.bypass == -1) ? 0 : max(0, target.resilience - src.bypass)
-        var/final_dmg = round(max(1, base_dmg - res))
 
-        if(target.defending)
-            final_dmg = max(1, round(final_dmg / 2))
-            world << "<i>[target.name] mitigates the attack!</i>"
-
-        // Damage Boost / Damage Break: multiply outgoing damage by attacker's status mult
+        // Damage Boost / Damage Break: multiply outgoing damage by attacker's status mult.
+        // Applied before the pipeline so the multiplier compounds with elemental modifiers.
         for(var/datum/component/status/C in user.components)
             if(C.damage_dealt_mult != 0)
-                final_dmg = round(final_dmg * C.damage_dealt_mult)
-        
+                base_dmg = round(base_dmg * C.damage_dealt_mult)
+
+        // Show the skill's flavor message.
+        // Uses base_dmg (pre-pipeline) for any (dmg) placeholder — the final resolved
+        // damage and elemental context are shown by TakeDamage.
         var/msg = src.txt
         if(msg)
             // 1. Names
@@ -53,26 +59,29 @@ datum/skill_event/damage
             msg = replacetext(msg, "(E)", target.name)
             msg = replacetext(msg, "(enemy)", target.name)
             msg = replacetext(msg, "(target)", target.name)
-            
-            // 2. Damage (Notice the backslash \ before the bracket!)
-            msg = replacetext(msg, "\[dmg]", "[final_dmg]")
-            msg = replacetext(msg, "(dmg)", "[final_dmg]")
-            
+
+            // 2. Damage
+            msg = replacetext(msg, "\[dmg]", "[base_dmg]")
+            msg = replacetext(msg, "(dmg)", "[base_dmg]")
+
             // 3. Type
-            msg = replacetext(msg, "\[type]", src.damage_type)
-            msg = replacetext(msg, "(type)", src.damage_type)
-            
+            msg = replacetext(msg, "\[type]", eff_type)
+            msg = replacetext(msg, "(type)", eff_type)
+
             world << "<b>[msg]</b>"
         else
-            world << "<b>[user.name]</b> deals <b>[final_dmg] [src.damage_type]</b> damage to <b>[target.name]</b>!"
+            world << "<b>[user.name]</b> uses <b>[eff_type]</b> on <b>[target.name]</b>!"
 
-        target.TakeDamage(final_dmg, user, src.damage_type, 1) // 1 = Silent
+        // Resilience, elemental cycle, affinity, and defending are all resolved
+        // inside TakeDamage via DamageContext.ResolveDamage(). Pass bypass through
+        // so skills that ignore resilience (bypass=-1) still work correctly.
+        var/actual_dmg = target.TakeDamage(base_dmg, user, eff_type, 1, src.bypass)
 
-        if(src.leech > 0)
-            var/heal = round(final_dmg * src.leech)
+        if(src.leech > 0 && actual_dmg > 0)
+            var/heal = round(actual_dmg * src.leech)
             if(heal > 0)
                 user.hp += heal
-                user.ClampStats() 
+                user.ClampStats()
                 world << "<i>[user.name] absorbs [heal] HP!</i>"
 
         // --- THE TRIGGER / COUNTER HOOK ---

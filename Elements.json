@@ -1,0 +1,50 @@
+[
+    {
+        "id": "Fire",
+        "strong_against": ["Ice"],
+        "weak_against": ["Water"],
+        "color": "#FF4400"
+    },
+    {
+        "id": "Ice",
+        "strong_against": ["Wind"],
+        "weak_against": ["Fire"],
+        "color": "#88CCFF"
+    },
+    {
+        "id": "Wind",
+        "strong_against": ["Earth"],
+        "weak_against": ["Ice"],
+        "color": "#AAFFAA"
+    },
+    {
+        "id": "Earth",
+        "strong_against": ["Lightning"],
+        "weak_against": ["Wind"],
+        "color": "#AA7744"
+    },
+    {
+        "id": "Lightning",
+        "strong_against": ["Water"],
+        "weak_against": ["Earth"],
+        "color": "#FFFF00"
+    },
+    {
+        "id": "Water",
+        "strong_against": ["Fire"],
+        "weak_against": ["Lightning"],
+        "color": "#0088FF"
+    },
+    {
+        "id": "Light",
+        "strong_against": ["Dark"],
+        "weak_against": ["Dark"],
+        "color": "#FFFFCC"
+    },
+    {
+        "id": "Dark",
+        "strong_against": ["Light"],
+        "weak_against": ["Light"],
+        "color": "#9900CC"
+    }
+]

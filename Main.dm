@@ -9,6 +9,7 @@ world
 	view = 6		// show up to 6 tiles outward from center (13x13 view)
 	New()
 		..()
+		element_factory.LoadAllElements() // Must be before anything that calls TakeDamage
 		skill_factory.LoadAllSkills()
 		status_factory.LoadAllStatuses()
 		item_factory.LoadAllItems()

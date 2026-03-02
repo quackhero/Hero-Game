@@ -440,8 +440,10 @@ datum/component/status
             return 0
 
         // 2. Elemental Resistance Shield
+        // findtext() handles dual-type strings like "Slashing Fire" — a "Slashing" resist
+        // fires against "Slashing Fire" damage without requiring an exact match.
         if(src.damage_resist_pct > 0)
-            if(src.damage_resist_type == "" || src.damage_resist_type == type)
+            if(src.damage_resist_type == "" || findtext(type, src.damage_resist_type))
                 var/resist = round(damage * src.damage_resist_pct)
                 damage -= resist
                 owner << "<font color='#4488FF'>Resisted [resist] [type] damage!</font>"
@@ -458,7 +460,7 @@ datum/component/status
 
         // 4. Shatter: multiply damage, then break the disabling status
         if(src.full_disable && src.shatter_mult > 1.0)
-            if(src.shatter_type == "" || src.shatter_type == type)
+            if(src.shatter_type == "" || findtext(type, src.shatter_type))
                 damage = round(damage * src.shatter_mult)
                 owner << "<font color='#FF2200'><b>CRITICAL SHATTER! [src.name] breaks!</b></font>"
                 src.full_disable = 0
@@ -498,3 +500,49 @@ datum/component/status
             owner.is_downed = 0
             if(hascall(owner, "RemoveStatus"))
                 call(owner, "RemoveStatus")(src)
+
+// ============================================================
+// AFFINITY COMPONENT
+// Represents a typed damage affinity (Resist / Null / Absorb)
+// on a mob. Created by UpdateStats() for armour pieces,
+// and can also be added by passives or status effects.
+//
+// "source" is used to identify which affinities to remove
+// during UpdateStats() so gear changes apply cleanly.
+// ============================================================
+datum/component/affinity
+    var/physical_type  = ""     // "Slashing", "Piercing", "Blunt", "" = any physical
+    var/elemental_type = ""     // "Fire", "Ice", etc. "" = any elemental
+    var/affinity_type  = "Resist" // "Resist" | "Null" | "Absorb"
+    var/resist_pct     = 0.0    // Used by Resist: positive = reduction, negative = vulnerability
+    var/source         = ""     // "armor" | "passive" | "status"
+
+    // Called by DamageContext.ResolveDamage() for each affinity on the defender.
+    // Modifies DC.final_damage and sets DC.was_nulled, DC.was_absorbed, DC.hit_resist.
+    proc/Apply(datum/damage_context/DC)
+        // --- Match check ---
+        // If neither type field is set, this affinity applies to all non-true damage.
+        // Otherwise at least one typed field must match the incoming damage type.
+        var/applies = 0
+        if(src.physical_type == "" && src.elemental_type == "")
+            applies = 1
+        else
+            if(src.physical_type != "" && DC.physical_type != "")
+                if(findtext(DC.physical_type, src.physical_type)) applies = 1
+            if(src.elemental_type != "" && DC.elemental_type != "")
+                if(findtext(DC.elemental_type, src.elemental_type)) applies = 1
+        if(!applies) return
+
+        // --- Apply the affinity ---
+        switch(src.affinity_type)
+            if("Null")
+                DC.final_damage = 0
+                DC.was_nulled = 1
+            if("Absorb")
+                DC.was_absorbed = 1
+            if("Resist")
+                // Diminishing returns: multiply remaining damage by (1 - pct).
+                // Negative pct (vulnerability) multiplies damage above 1.0 automatically.
+                DC.final_damage *= (1.0 - src.resist_pct)
+                if(src.resist_pct > 0)
+                    DC.hit_resist = 1

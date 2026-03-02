@@ -24,14 +24,23 @@ mob
 
     // --- THE MATH ENGINE ---
     proc/UpdateStats()
-        // 0. Remove any skills previously granted by gear so we start clean.
-        //    This handles unequip: the old skill is removed before we re-add from
-        //    whatever is currently equipped.
+        // 0a. Remove any skills previously granted by gear so we start clean.
+        //     This handles unequip: the old skill is removed before we re-add from
+        //     whatever is currently equipped.
         if(src.gear_granted_skills)
             for(var/datum/skill/GS in src.gear_granted_skills)
                 src.skills        -= GS
                 src.equipped_skills -= GS
         src.gear_granted_skills = list()
+
+        // 0b. Remove all armour-sourced affinity components so we can re-add them
+        //     fresh from whatever gear is currently equipped.
+        var/list/old_affinities = list()
+        for(var/datum/component/affinity/A in src.components)
+            if(A.source == "armor") old_affinities += A
+        for(var/datum/component/affinity/A in old_affinities)
+            src.components -= A
+            del(A)
 
         // 1. Reset to naked stats
         src.max_hp = src.base_max_hp
@@ -94,6 +103,22 @@ mob
                 if(GS && !(GS in src.skills))
                     src.skills += GS
                     src.gear_granted_skills += GS
+
+        // 5a. Build datum/component/affinity instances from each gear piece's
+        //     damage_affinities list. These are removed and re-added every time
+        //     UpdateStats() runs so equip/unequip changes take effect immediately.
+        var/list/phys_types = list("Slashing", "Piercing", "Blunt", "Physical")
+        for(var/datum/item/equipment/G in gear_pieces)
+            if(!G.damage_affinities || !G.damage_affinities.len) continue
+            for(var/dtype in G.damage_affinities)
+                var/pct = G.damage_affinities[dtype]
+                var/datum/component/affinity/A = new()
+                A.source       = "armor"
+                A.affinity_type = "Resist"   // negative pct auto-becomes vulnerability in Apply()
+                A.resist_pct   = pct
+                if(dtype in phys_types) A.physical_type  = dtype
+                else                    A.elemental_type = dtype
+                src.components += A
 
         // 5. Apply Passive Skill Stat Mods
         // Keys like "base_strength" map to the derived var "strength" — strip "base_" prefix.

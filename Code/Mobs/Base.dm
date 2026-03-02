@@ -13,6 +13,7 @@ mob
     var/resilience = 10
     var/vitality = 10
     var/race = "Human"
+    var/attribute = ""     // Elemental identity used by the damage pipeline ("Fire","Ice", etc.)
     var/turn_id = 0
     
     var/atb_gauge = 0      
@@ -37,6 +38,7 @@ mob
     var/is_burrowed = 0        // Set by Dig/Burrow status: mob is underground
 
     var/channel_start_state = "" // Positional state stored when channeling begins
+    var/override_attack_damage_type = "" // Computed by BasicAttack; read by the damage event to apply weapon subtype/element
 
     var/list/skills = list()
     var/list/trigger_skills = list()
@@ -323,44 +325,143 @@ mob
             msg = replacetext(msg, "(E)",      target.name)
             world << "<b>[msg]</b>"
 
+        // Compute the effective damage type from the equipped weapon.
+        // Combines physical subtype + elemental tag into a single string, e.g. "Slashing Fire".
+        // Stored on the mob so the damage event can read it without changing the event system.
+        var/weapon_dmg_type = "Physical"
+        if("equipped_weapon" in src.vars && src.equipped_weapon)
+            var/datum/item/equipment/W = src.equipped_weapon
+            var/wdt = (W.damage_type && W.damage_type != "") ? W.damage_type : "Physical"
+            weapon_dmg_type = wdt
+            if(W.elemental_tag && W.elemental_tag != "")
+                weapon_dmg_type = "[wdt] [W.elemental_tag]"
+        src.override_attack_damage_type = weapon_dmg_type
+
         if(attack_skill)
             attack_skill.Execute(src, target, src.current_encounter)
         else
             // Fallback just in case you forgot to add it to the JSON
             var/dmg = max(1, src.strength - target.resilience)
-            target.TakeDamage(dmg, src, "Physical")
+            target.TakeDamage(dmg, src, weapon_dmg_type)
             src.EndTurn()
     
-    proc/TakeDamage(amount, mob/attacker, damage_type = "Physical", silent = 0)
-        if(src.is_dead) return
+    // ============================================================
+    // TakeDamage — full damage pipeline entry point
+    //
+    // Parameters:
+    //   amount      — raw incoming damage (before resilience, elemental, affinity)
+    //   attacker    — the mob dealing the damage (null for environmental/DoT)
+    //   damage_type — string describing damage: "Physical", "Fire", "Slashing Fire",
+    //                 "True" (bypasses everything), etc.
+    //   silent      — if 1, suppress the standard "takes X damage" message.
+    //                 Elemental context messages (WEAK/RESIST/NULL/ABSORB) always show.
+    //   bypass      — passed to DamageContext; -1 ignores resilience entirely,
+    //                 > 0 reduces effective resilience by that amount.
+    //
+    // Returns the final HP damage applied (0 if nulled or absorbed).
+    // ============================================================
+    proc/TakeDamage(amount, mob/attacker, damage_type = "Physical", silent = 0, bypass = 0)
+        if(src.is_dead) return 0
         var/final_amount = round(amount)
 
-        // Run component BeforeDamage hooks (shields, invincibility, mana shield, shatter, etc.)
+        // ---- Phase 1: Legacy OnBeforeDamage hooks ----
+        // Handles shields, invincibility, mana shield, shatter, break-on-hit, and
+        // the old damage_resist_type/damage_resist_pct fields on status components.
+        // These run before the new pipeline so existing statuses remain fully functional.
         for(var/datum/component/C in src.components)
             if(C && (C in src.components))
                 final_amount = C.OnBeforeDamage(final_amount, damage_type, attacker)
 
-        if(final_amount <= 0) return // All damage was absorbed/negated
+        if(final_amount <= 0) return 0  // All damage absorbed/negated by legacy hooks
 
-        src.hp -= final_amount
-        
-        if(!silent)
+        // ---- Phase 2: Parse damage_type into physical and elemental tokens ----
+        // "Slashing Fire" → physical="Slashing", elemental="Fire"
+        // "Fire"          → physical="", elemental="Fire"
+        // "Slashing"      → physical="Slashing", elemental=""
+        // "Physical"      → physical="Physical", elemental=""
+        // "True"          → is_true_damage=1 (handled inside ResolveDamage)
+        var/parsed_physical  = ""
+        var/parsed_elemental = ""
+        var/list/phys_set = list("Slashing", "Piercing", "Blunt", "Physical")
+        if(damage_type != "True")
+            var/list/tokens = splittext(damage_type, " ")
+            for(var/tok in tokens)
+                if(tok in phys_set)
+                    parsed_physical = tok
+                else
+                    parsed_elemental = tok
+
+        // ---- Phase 3: Build DamageContext and run the full pipeline ----
+        var/datum/damage_context/DC = new()
+        DC.attacker      = attacker
+        DC.defender      = src
+        DC.base_damage   = final_amount
+        DC.physical_type  = parsed_physical
+        DC.elemental_type = parsed_elemental
+        DC.is_true_damage = (damage_type == "True") ? 1 : 0
+        DC.bypass        = bypass
+
+        DC.ResolveDamage()
+
+        // ---- Phase 4: Handle Absorb ----
+        if(DC.was_absorbed)
+            var/elem_color = (DC.elemental_type != "") ? element_factory.GetColor(DC.elemental_type) : "#00FF00"
+            world << "<font color='[elem_color]'><b>[src.name] absorbed the attack!</b></font>"
+            src.ApplyHeal(DC.base_damage, attacker)
+            src.SendSignal("SIG_DAMAGED", attacker)
+            if(attacker && attacker != src)
+                attacker.last_target = src
+                attacker.SendSignal("SIG_DEALT_DAMAGE", 0)
+            return 0
+
+        // ---- Phase 5: Handle Null ----
+        if(DC.was_nulled)
+            world << "<font color='#FFFFFF'><b>[src.name] is immune!</b></font>"
+            src.SendSignal("SIG_DAMAGED", attacker)
+            if(attacker && attacker != src)
+                attacker.last_target = src
+                attacker.SendSignal("SIG_DEALT_DAMAGE", 0)
+            return 0
+
+        // ---- Phase 6: Apply final damage to HP ----
+        src.hp -= DC.final_damage
+
+        // ---- Phase 7: Battle log messages ----
+        // Defending message (always shown so the player understands the halving).
+        if(DC.defender.defending)
+            world << "<i>[src.name] mitigates the attack!</i>"
+
+        // Elemental weakness (always shown; contains the fully resolved damage number).
+        if(DC.hit_weakness)
+            var/wk_color = element_factory.GetColor(DC.elemental_type)
+            var/type_lbl = DC.elemental_type
+            world << "<font color='[wk_color]'><b>WEAK! [DC.final_damage] [type_lbl] damage!</b></font>"
+
+        // Affinity resist (always shown).
+        else if(DC.hit_resist)
+            var/type_lbl = (DC.elemental_type != "") ? DC.elemental_type : ((DC.physical_type != "") ? DC.physical_type : damage_type)
+            world << "<font color='#AAAAAA'>Resisted! [DC.final_damage] [type_lbl] damage.</font>"
+
+        // Standard message for callers that did not show their own (silent=0).
+        else if(!silent)
             var/hp_info = (src.hp <= 0) ? " ([src.hp] HP)" : ""
             if(attacker)
-                world << "<b>[attacker.name]</b> attacks <b>[src.name]</b>! ([final_amount] Damage)[hp_info]"
+                world << "<b>[attacker.name]</b> attacks <b>[src.name]</b>! ([DC.final_damage] Damage)[hp_info]"
             else
-                world << "<b>[src.name]</b> takes [final_amount] damage![hp_info]"
-            
+                world << "<b>[src.name]</b> takes [DC.final_damage] damage![hp_info]"
+
+        // ---- Phase 8: Signals and post-damage hooks ----
         src.SendSignal("SIG_DAMAGED", attacker)
 
-        if(final_amount >= (src.max_hp * 0.25))
+        if(DC.final_damage >= (src.max_hp * 0.25))
             if(hascall(src, "Bark")) src:Bark("hurt")
 
         if(attacker && attacker != src)
             attacker.last_target = src
-            attacker.SendSignal("SIG_DEALT_DAMAGE", final_amount)
+            attacker.SendSignal("SIG_DEALT_DAMAGE", DC.final_damage)
 
         src.ClampStats()
+        return DC.final_damage
 
     proc/HandleDeath(mob/killer)
         if(src.is_dead) return

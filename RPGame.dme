@@ -20,6 +20,8 @@
 #include "Code\Datums\Classes.dm"
 #include "Code\Datums\Components.dm"
 #include "Code\Datums\Items.dm"
+#include "Code\systems\element_factory.dm"
+#include "Code\systems\Combat\DamageContext.dm"
 #include "Code\Mobs\Base.dm"
 #include "Code\Mobs\Enemy_Ai.dm"
 #include "Code\Mobs\NPCS.dm"

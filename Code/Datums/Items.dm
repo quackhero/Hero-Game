@@ -18,6 +18,14 @@ datum/item/equipment
     // Weapon-only: the weapon category required by skill req_weapon_type
     var/weapon_type = ""
 
+    // Weapon-only: physical damage subtype ("Slashing", "Piercing", "Blunt").
+    // Defaults to "Physical" for backwards compatibility with untyped weapons.
+    var/damage_type = "Physical"
+
+    // Weapon-only: elemental enchantment tag ("Fire", "Ice", etc.).
+    // When non-empty, BasicAttack combines this with damage_type: "Slashing Fire".
+    var/elemental_tag = ""
+
     // Weapon-only: flavor lines randomly picked during BasicAttack.
     // Placeholders: (I)/(user) = attacker name, (target)/(E) = target name
     var/list/attack_messages = null
@@ -26,6 +34,14 @@ datum/item/equipment
     // Managed by UpdateStats() — added and removed automatically on equip/unequip.
     var/list/granted_skill_ids   = null
     var/list/granted_passive_ids = null
+
+    // Armour affinity overrides: associative list of damage type string → resist_pct decimal.
+    // Positive value = resistance (e.g. 0.20 = 20% reduction).
+    // Negative value = vulnerability (e.g. -0.20 = 20% extra damage).
+    // Parsed from JSON "damage_affinities" key. Converted to datum/component/affinity
+    // instances by UpdateStats() in Players.dm; keyed by "armor" source so they
+    // are removed and re-added whenever gear changes.
+    var/list/damage_affinities = null
 
     // Flat stat bonuses added on top of base stats by UpdateStats()
     var/strength_bonus     = 0

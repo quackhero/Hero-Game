@@ -4,6 +4,7 @@
         "name": "Iron Sword",
         "item_type": "Weapon",
         "weapon_type": "Sword",
+        "damage_type": "Slashing",
         "desc": "A standard, reliable blade.",
         "stat_bonuses": {
             "strength": 5,
@@ -21,6 +22,7 @@
         "name": "Iron Dagger",
         "item_type": "Weapon",
         "weapon_type": "Dagger",
+        "damage_type": "Piercing",
         "desc": "A quick, lightweight blade.",
         "stat_bonuses": {
             "dexterity": 4,
@@ -33,6 +35,25 @@
         "buy_price": 80
     },
     {
+        "id": "fire_sword",
+        "name": "Fire Sword",
+        "item_type": "Weapon",
+        "weapon_type": "Sword",
+        "damage_type": "Slashing",
+        "elemental_tag": "Fire",
+        "desc": "A blade wreathed in flames. Deals Slashing Fire damage.",
+        "stat_bonuses": {
+            "strength": 7,
+            "dexterity": 1
+        },
+        "attack_messages": [
+            "(I) slashes (target) with a blazing arc!",
+            "(I) scorches (target) with a fiery strike!",
+            "Flames erupt as (I) drives the sword into (target)!"
+        ],
+        "buy_price": 350
+    },
+    {
         "id": "leather_armor",
         "name": "Leather Armor",
         "item_type": "Armor",
@@ -42,6 +63,22 @@
             "resilience": 2
         },
         "buy_price": 80
+    },
+    {
+        "id": "chainmail",
+        "name": "Chainmail",
+        "item_type": "Armor",
+        "desc": "Metal ringwork that deflects blades but leaves gaps for fire.",
+        "stat_bonuses": {
+            "vitality": 2,
+            "resilience": 5
+        },
+        "damage_affinities": {
+            "Slashing": 0.10,
+            "Piercing": -0.10,
+            "Fire": -0.20
+        },
+        "buy_price": 200
     },
     {
         "id": "iron_shield",
