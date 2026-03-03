@@ -40,6 +40,7 @@ mob
     var/is_vanished = 0        // Set by Vanish status: mob cannot be targeted at all
     var/is_aerial_target = 0   // Set by Ascend/Float: mob is an aerial target
     var/is_burrowed = 0        // Set by Dig/Burrow status: mob is underground
+    var/is_marked = 0          // Set by the mark skill event; TARGET_MARKED AOE only hits marked mobs
 
     var/channel_start_state = "" // Positional state stored when channeling begins
     var/override_attack_damage_type = "" // Computed by BasicAttack; read by the damage event to apply weapon subtype/element
@@ -342,6 +343,9 @@ mob
                 weapon_dmg_type = "[wdt] [W.elemental_tag]"
         src.override_attack_damage_type = weapon_dmg_type
 
+        // Step 4: SIG_PRE_ATTACK fires just before the attack executes
+        src.SendSignal(SIG_PRE_ATTACK, target)
+
         if(attack_skill)
             attack_skill.Execute(src, target, src.current_encounter)
         else
@@ -349,6 +353,10 @@ mob
             var/dmg = max(1, src.strength - target.resilience)
             target.TakeDamage(dmg, src, weapon_dmg_type)
             src.EndTurn()
+
+        // Step 4: SIG_POST_ATTACK fires after the Execute() call returns
+        // Note: Execute() uses spawn() internally, so this fires at the point of dispatch
+        src.SendSignal(SIG_POST_ATTACK, target)
     
     // ============================================================
     // TakeDamage — full damage pipeline entry point
@@ -458,12 +466,28 @@ mob
         // ---- Phase 8: Signals and post-damage hooks ----
         src.SendSignal("SIG_DAMAGED", attacker)
 
+        // Step 5: Element-filtered victim signal — e.g. "SIG_DAMAGED_BY_FIRE"
+        // Passives with trigger_condition == "SIG_DAMAGED_BY_FIRE" match exactly.
+        if(damage_type && damage_type != "")
+            src.SendSignal("SIG_DAMAGED_BY_[uppertext(damage_type)]", attacker)
+
         if(DC.final_damage >= (src.max_hp * 0.25))
             if(hascall(src, "Bark")) src:Bark("hurt")
 
         if(attacker && attacker != src)
             attacker.last_target = src
             attacker.SendSignal("SIG_DEALT_DAMAGE", DC.final_damage)
+
+            // Step 5: Element-filtered attacker signal — e.g. "SIG_DEALT_FIRE_DAMAGE"
+            if(damage_type && damage_type != "")
+                attacker.SendSignal("SIG_DEALT_[uppertext(damage_type)]_DAMAGE", DC.final_damage)
+
+        // Step 6: Zero-damage signals — fires when pipeline reduced HP damage to 0
+        // (won't fire for absorb/null hits since those return early above)
+        if(DC.final_damage <= 0)
+            src.SendSignal(SIG_TOOK_ZERO_DAMAGE, attacker)
+            if(attacker && attacker != src)
+                attacker.SendSignal(SIG_DEALT_ZERO_DAMAGE, src)
 
         src.ClampStats()
         return DC.final_damage
@@ -511,6 +535,7 @@ mob
 
             world << "<i><font color='#B19CD9'>[src.name] gains [new_status.name]!</font></i>"
             src.SendSignal("SIG_STATUS_APPLIED", status_id)
+            src.SendSignal(SIG_ON_INFECT, new_status)  // Step 2: trigger passive infect reactions
 
     proc/GetStatus(status_id)
         for(var/datum/component/status/C in src.components)
@@ -543,6 +568,7 @@ mob
         src.components -= S
         S.OnRemove(src)
         world << "<i><font color='#B19CD9'>[src.name]'s [S.name] wore off!</font></i>"
+        src.SendSignal(SIG_ON_EXPIRE, S)   // Step 2: fire before del() so datum is still valid
         del(S)
         src.SendSignal("SIG_STATUS_REMOVED", sid)
 

@@ -29,6 +29,7 @@ datum/skill_factory
         if("trigger_category" in data) S.trigger_category = data["trigger_category"]
         
         if("afterlink" in data) S.afterlink = data["afterlink"]
+        if("aftermsg" in data) S.aftermsg = data["aftermsg"]   // Step 9
         if("on_target_death" in data) S.on_target_death = data["on_target_death"]
         
         // --- PASSIVES & COMBO BRANCHES ---
@@ -50,6 +51,7 @@ datum/skill_factory
                 if(flag_str == "TARGET_REVIVE") S.targeting_flags |= TARGET_REVIVE
                 if(flag_str == "TARGET_DEFLECT") S.targeting_flags |= TARGET_DEFLECT
                 if(flag_str == "TARGET_AERIAL") S.targeting_flags |= TARGET_AERIAL
+                if(flag_str == "TARGET_MARKED") S.targeting_flags |= TARGET_MARKED  // Step 10
 
         // 1b. Positional flags — which positional states this skill can target.
         // Default (unset) = POS_GROUND only. Example JSON: "pos_flags": ["POS_AERIAL", "POS_GROUND"]
@@ -77,6 +79,8 @@ datum/skill_factory
             if("req_target_status" in reqs) S.req_target_status = reqs["req_target_status"]
             if("req_user_status" in reqs) S.req_user_status = reqs["req_user_status"]
             if("req_weapon_type" in reqs) S.req_weapon_type = reqs["req_weapon_type"]
+            if("req_ally_name"   in reqs) S.req_ally_name   = reqs["req_ally_name"]    // Step 11
+            if("req_skill_id"    in reqs) S.req_skill_id    = reqs["req_skill_id"]     // Step 12
 
         // 3. Build the Timeline using the new BuildEvent proc
         if(data["timeline"])
@@ -119,6 +123,8 @@ datum/skill_factory
                 I.duration = event_data["duration"]
                 if("amount" in event_data) I.amount = event_data["amount"]
                 if("chance" in event_data) I.chance = event_data["chance"]
+                // Step 8: "target": "self" inflicts the status on the caster instead
+                if("target" in event_data) I.target_self = (event_data["target"] == "self") ? 1 : 0
                 EV = I
 
             if("stat_mod")
@@ -144,7 +150,37 @@ datum/skill_factory
                         if(SUB) C.false_events += SUB
                 EV = C
 
-        if(EV && "delay" in event_data) 
+            // Step 10: Mark — applies is_marked flag; TARGET_MARKED AOE filters by this
+            if("mark")
+                var/datum/skill_event/mark/MK = new()
+                EV = MK
+
+            // Step 16: AddSkill / RemoveSkill — runtime skill grants and removal
+            if("addskill")
+                var/datum/skill_event/addskill/AS = new()
+                AS.skill_id = event_data["skill_id"]
+                EV = AS
+
+            if("removeskill")
+                var/datum/skill_event/removeskill/RS = new()
+                RS.skill_id = event_data["skill_id"]
+                EV = RS
+
+            // Step 17: Transform — swap user for a different NPC (boss phase change)
+            if("transform")
+                var/datum/skill_event/transform/TR = new()
+                TR.npc_id = event_data["npc_id"]
+                if("carry_hp" in event_data) TR.carry_hp = event_data["carry_hp"]
+                EV = TR
+
+            // Step 18: Backup — summon NPC reinforcements into the battle
+            if("backup")
+                var/datum/skill_event/backup/BU = new()
+                BU.npc_id = event_data["npc_id"]
+                if("count" in event_data) BU.count = event_data["count"]
+                EV = BU
+
+        if(EV && "delay" in event_data)
             EV.delay = event_data["delay"]
-            
+
         return EV

@@ -82,6 +82,9 @@ datum/status_factory
             if("granted_passives" in status_data) S.granted_passive_ids = status_data["granted_passives"]
             if("lock_position" in status_data) S.lock_position = status_data["lock_position"]
 
+            // --- Mind Control ---
+            if("mind_control" in status_data) S.mind_control = status_data["mind_control"]  // Step 14
+
             src.loaded_statuses[S.id] = S
             
         world << "<b>[src.loaded_statuses.len] JSON Statuses Loaded!</b>"

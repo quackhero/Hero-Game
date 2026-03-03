@@ -31,6 +31,12 @@ datum/encounter
             M.ComputeTotalWeight()
             M.atb_wait = M.CalculateATBWait()
 
+        // --- Step 3: SIG_JOIN_BATTLE — fires after each mob is fully initialized ---
+        // Passives with trigger_condition == "SIG_JOIN_BATTLE" and trigger_once=1
+        // act as one-shot JoinBattle setup skills (stat buffs, status self-inflicts, etc.)
+        for(var/mob/M in src.all_participants)
+            M.SendSignal(SIG_JOIN_BATTLE)
+
         src.Start()
 
     proc/Start()
@@ -149,6 +155,8 @@ datum/encounter
             M.atb_gauge = 0
             M.is_busy = 0
             M.current_encounter = null
+            // Step 20: clear the mark flag so it doesn't persist between battles
+            if("is_marked" in M.vars) M.is_marked = 0
             if(M.client)
                 M << browse(null, "window=battle_menu")
 

@@ -171,17 +171,21 @@ datum/skill_event/sound
 
 /**
  * Status Event: Handles Inflict
+ * Set target_self = 1 to inflict the status on the user instead of the target.
  */
 datum/skill_event/inflict
     var/status_type = "" // Now a string ID
     var/chance = 100
     var/amount = 0
     var/duration = 3
+    var/target_self = 0  // Step 8: if 1, inflict on caster instead of target
 
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
         if(!prob(src.chance)) return
-        if(target && hascall(target, "ApplyStatus")) 
-            target.ApplyStatus(src.status_type, src.duration, src.amount)
+        // Step 8: redirect to caster when target_self is set
+        var/mob/actual_target = src.target_self ? user : target
+        if(actual_target && hascall(actual_target, "ApplyStatus"))
+            actual_target.ApplyStatus(src.status_type, src.duration, src.amount)
 
 /**
  * Stat Modification Event: Buffs/Debuffs
@@ -232,3 +236,107 @@ datum/skill_event/condition
             for(var/datum/skill_event/EV in src.false_events)
                 EV.Run(user, target, S, E)
                 if(EV.delay > 0) sleep(EV.delay)
+
+// ============================================================
+// Step 10: Mark Event — applies the is_marked flag to a target
+// Skills with TARGET_MARKED AOE will only hit marked mobs.
+// ============================================================
+datum/skill_event/mark
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!target) return
+        target.is_marked = 1
+        world << "<i>[target.name] has been marked!</i>"
+
+// ============================================================
+// Step 16: AddSkill / RemoveSkill Events
+// Temporarily adds or removes a skill from a mob's equipped list.
+// ============================================================
+datum/skill_event/addskill
+    var/skill_id = ""
+
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!target || !src.skill_id) return
+        var/datum/skill/SK = skill_factory.loaded_skills[src.skill_id]
+        if(SK && !(SK in target.equipped_skills))
+            target.equipped_skills += SK
+            target.skills += SK
+            world << "<i>[target.name] gained [SK.name]!</i>"
+
+datum/skill_event/removeskill
+    var/skill_id = ""
+
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!target || !src.skill_id) return
+        var/datum/skill/SK = skill_factory.loaded_skills[src.skill_id]
+        if(SK)
+            target.equipped_skills -= SK
+            target.skills -= SK
+            world << "<i>[target.name] lost [SK.name]!</i>"
+
+// ============================================================
+// Step 17: Transform Event
+// Replaces the user with a different NPC mid-battle (boss phase change).
+// carry_hp = 1 preserves HP% from the old form to the new one.
+// ============================================================
+datum/skill_event/transform
+    var/npc_id  = ""
+    var/carry_hp = 0
+
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!user || !E || !src.npc_id) return
+
+        // 1. Spawn the replacement NPC
+        var/mob/enemy/new_mob = npc_factory.SpawnNPC(src.npc_id)
+        if(!new_mob) return
+
+        // 2. Insert into encounter BEFORE removing old mob so CheckStatus stays stable
+        new_mob.current_encounter = E
+        new_mob.atb_gauge = user.atb_gauge
+        new_mob.atb_wait  = user.atb_wait
+        E.enemies += new_mob
+        E.all_participants += new_mob
+
+        // 3. HP carry — preserve percentage from old form
+        if(src.carry_hp && user.max_hp > 0)
+            var/pct = user.hp / user.max_hp
+            new_mob.hp = max(1, round(new_mob.max_hp * pct))
+
+        // 4. Remove old mob from encounter lists (leave all_participants for the del sweep)
+        E.enemies -= user
+        E.players -= user
+        E.all_participants -= user
+
+        // 5. War cry from the new form
+        if(hascall(new_mob, "Bark")) new_mob.Bark("war_cry")
+
+        // 6. Deferred deletion — lets the current timeline finish before the datum is gone
+        spawn(0) del(user)
+
+// ============================================================
+// Step 18: Backup Event
+// Summons one or more NPC allies into the encounter mid-battle.
+// ============================================================
+datum/skill_event/backup
+    var/npc_id = ""
+    var/count  = 1
+
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!E || !src.npc_id) return
+        var/i = 0
+        while(i < src.count)
+            var/mob/enemy/ally = npc_factory.SpawnNPC(src.npc_id)
+            if(!ally) break
+            ally.current_encounter = E
+            ally.atb_wait = ally.CalculateATBWait()
+            // Join the same side as the skill user
+            if(user in E.players)
+                E.players += ally
+            else
+                E.enemies += ally
+            E.all_participants += ally
+            // Reset trigger tracking for the new participant
+            if(!ally.temp_triggers_used) ally.temp_triggers_used = list()
+            // Announce and fire JoinBattle passives
+            world << "<i>[ally.name] joins the battle!</i>"
+            ally.SendSignal(SIG_JOIN_BATTLE)
+            i++

@@ -32,7 +32,9 @@ datum/skill
     var/req_target_hp = 0
     var/list/req_target_status = null
     var/list/req_user_status = null
-    var/req_weapon_type = ""  // e.g. "Sword" — if set, user must have this weapon type equipped
+    var/req_weapon_type = ""     // e.g. "Sword" — if set, user must have this weapon type equipped
+    var/req_ally_name = ""       // Step 11: named ally must be alive in the encounter
+    var/req_skill_id  = ""       // Step 12: this skill ID must be in user's equipped_skills
 
     var/list/event_timeline = list()
     var/uninterrupt_level = 0
@@ -44,6 +46,7 @@ datum/skill
 
     var/dodgeable = 0     // If 1, target may dodge this skill via the DEX contest
     var/on_target_death = "STOP"
+    var/aftermsg = ""    // Step 9: printed after all events complete (supports (I)/(E) substitution)
 
     // --- Filter Logic ---
     proc/ExecuteStep(mob/user, mob/target, step_data)
@@ -103,6 +106,29 @@ datum/skill
             var/wtype = equipped_w ? (equipped_w:weapon_type) : ""
             if(wtype != src.req_weapon_type)
                 user << "<b>[src.name] requires a [src.req_weapon_type] equipped!</b>"
+                user.EndTurn()
+                return
+
+        // Step 11: named ally must be alive in the current encounter
+        if(src.req_ally_name != "")
+            var/ally_found = 0
+            if(user.current_encounter)
+                for(var/mob/A in user.current_encounter.GetAllies(user))
+                    if(A.name == src.req_ally_name && !A.is_dead)
+                        ally_found = 1
+                        break
+            if(!ally_found)
+                user << "<b>[src.name] requires [src.req_ally_name] to be alive!</b>"
+                user.EndTurn()
+                return
+
+        // Step 12: required skill must be equipped
+        if(src.req_skill_id != "")
+            var/skill_found = 0
+            for(var/datum/skill/SK in user.equipped_skills)
+                if(SK.id == src.req_skill_id) { skill_found = 1; break }
+            if(!skill_found)
+                user << "<b>[src.name] requires [src.req_skill_id] to be equipped!</b>"
                 user.EndTurn()
                 return
 
@@ -176,9 +202,24 @@ datum/skill
                         EV.Run(user, target[1], src, E)
                     else
                         for(var/mob/T in target)
+                            // Step 10: TARGET_MARKED — skip unmarked mobs in the AOE list
+                            if((src.targeting_flags & TARGET_MARKED) && !T.is_marked) continue
                             EV.Run(user, T, src, E)
                 else
                     EV.Run(user, target, src, E)
+
+            // Step 9: aftermsg — displayed after all events finish, before afterlink/combos
+            if(src.aftermsg != "")
+                var/after = src.aftermsg
+                after = replacetext(after, "(I)",    user.name)
+                after = replacetext(after, "(user)", user.name)
+                if(!islist(target))
+                    var/mob/aftertarg = target
+                    if(aftertarg)
+                        after = replacetext(after, "(E)",      aftertarg.name)
+                        after = replacetext(after, "(enemy)",  aftertarg.name)
+                        after = replacetext(after, "(target)", aftertarg.name)
+                world << "<i>[after]</i>"
 
             if(src.final_attack)
                 world << "<b>[user.name] sacrifices themselves!</b>"

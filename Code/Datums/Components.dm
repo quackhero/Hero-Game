@@ -148,6 +148,10 @@ datum/component/status
     var/list/status_granted_skills = null // Internal: tracks what was actually added (for cleanup on remove)
     var/lock_position = 0                 // If 1, this mob's positional state cannot be changed by other statuses
 
+    // --- Mind Control ---
+    var/mind_control = 0       // Step 14: swaps which encounter party this mob belongs to
+    var/was_in_players = -1    // Internal: -1=unset, 1=was in players, 0=was in enemies
+
     // ============================================================
     // --- THE CLONER ---
     // ============================================================
@@ -201,7 +205,8 @@ datum/component/status
         S.granted_skill_ids = src.granted_skill_ids ? src.granted_skill_ids.Copy() : null
         S.granted_passive_ids = src.granted_passive_ids ? src.granted_passive_ids.Copy() : null
         S.lock_position = src.lock_position
-        // Note: status_granted_skills is instance state — not copied from the template
+        S.mind_control = src.mind_control
+        // Note: status_granted_skills and was_in_players are instance state — not copied from template
         return S
 
     // ============================================================
@@ -284,6 +289,20 @@ datum/component/status
                     M.equipped_skills += GS
                     src.status_granted_skills += GS
 
+        // 7. Mind Control: swap the mob's encounter party membership
+        if(src.mind_control && M.current_encounter)
+            var/datum/encounter/E = M.current_encounter
+            if(M in E.players)
+                src.was_in_players = 1
+                E.players -= M
+                E.enemies += M
+                world << "<font color='#CC00CC'><b>[M.name] has been Mind Controlled!</b></font>"
+            else if(M in E.enemies)
+                src.was_in_players = 0
+                E.enemies -= M
+                E.players += M
+                world << "<font color='#CC00CC'><b>[M.name] has been Mind Controlled and fights for you!</b></font>"
+
     proc/OnRemove(mob/M)
         // 1. Primary stat reversal
         if(src.stat_mod && src.stat_amount != 0)
@@ -322,6 +341,20 @@ datum/component/status
                 M.skills -= GS
                 M.equipped_skills -= GS
             src.status_granted_skills = null
+
+        // 7. Mind Control reversal: restore original party membership
+        if(src.mind_control && src.was_in_players >= 0 && M.current_encounter)
+            var/datum/encounter/E = M.current_encounter
+            if(src.was_in_players == 1)
+                // Was originally a player — move back
+                E.enemies -= M
+                E.players += M
+            else
+                // Was originally an enemy — move back
+                E.players -= M
+                E.enemies += M
+            src.was_in_players = -1
+            world << "<font color='#CC00CC'><i>[M.name] breaks free from Mind Control!</i></font>"
 
     // Computes a flat change as a percentage of the mob's current base stat
     proc/ComputeStatPct(mob/M, stat, pct)
