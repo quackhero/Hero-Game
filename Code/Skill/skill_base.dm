@@ -42,6 +42,7 @@ datum/skill
     // Use POS_AERIAL, POS_BURROWED, or POS_ANY for broader coverage.
     var/position_flags = 0
 
+    var/dodgeable = 0     // If 1, target may dodge this skill via the DEX contest
     var/on_target_death = "STOP"
 
     // --- Filter Logic ---

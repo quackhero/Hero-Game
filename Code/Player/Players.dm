@@ -131,6 +131,8 @@ mob
                     src.vars[derived] += S.passive_stat_mods[stat_name]
 
         src.ClampStats()
+        src.ComputeTotalWeight()
+        src.atb_wait = src.CalculateATBWait()
 
     proc/LevelUp()
         src.level++

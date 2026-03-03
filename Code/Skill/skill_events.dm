@@ -29,6 +29,15 @@ datum/skill_event/damage
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
         if(!target) return
 
+        // --- Dodge check — DEX contest for basic attacks and dodgeable skills ---
+        if(S && (S.id == "basic_attack" || S.dodgeable))
+            if(user && hascall(target, "CalculateDodgeChance"))
+                var/dodge_pct = target.CalculateDodgeChance(user)
+                if(prob(dodge_pct))
+                    world << "<i>[target.name] dodges [user.name]'s attack!</i>"
+                    target.SendSignal(SIG_DODGE)
+                    return
+
         // For basic attacks, use the weapon's computed damage type (subtype + elemental tag)
         // stored on the caster mob. Falls back to the event's own damage_type for all other skills,
         // keeping full backwards compatibility with hardcoded "Physical", "Fire", etc.

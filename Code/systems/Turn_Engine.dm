@@ -25,6 +25,12 @@ datum/encounter
             if(M.temp_triggers_used) M.temp_triggers_used.Cut()
             else M.temp_triggers_used = list()
 
+        // --- ATB WAIT INITIALIZATION ---
+        // Compute each mob's starting countdown so faster mobs act sooner.
+        for(var/mob/M in src.all_participants)
+            M.ComputeTotalWeight()
+            M.atb_wait = M.CalculateATBWait()
+
         src.Start()
 
     proc/Start()
@@ -40,13 +46,9 @@ datum/encounter
         spawn(0)
             while(src.is_active)
                 for(var/mob/M in src.all_participants)
-                    // Supports Negative HP/Death Thresholds and prevents double turns
                     if(M.is_dead || M.hp <= M.death_threshold || M.is_busy) continue
-
-                    M.atb_gauge += (M.dexterity + 1)
-
-                    if(M.atb_gauge >= ATB_GAUGE_MAX)
-                        M.atb_gauge = ATB_GAUGE_MAX
+                    M.atb_wait--
+                    if(M.atb_wait <= 0)
                         world << "<small>*** [M.name] is ready! ***</small>"
                         src.ExecuteTurn(M)
 

@@ -43,6 +43,10 @@ datum/item/equipment
     // are removed and re-added whenever gear changes.
     var/list/damage_affinities = null
 
+    // Equipment weight — heavier gear increases ATB wait and reduces effective dodge DEX.
+    // Summed by ComputeTotalWeight() on the carrier mob.
+    var/weight = 0
+
     // Flat stat bonuses added on top of base stats by UpdateStats()
     var/strength_bonus     = 0
     var/dexterity_bonus    = 0

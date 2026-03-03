@@ -113,7 +113,7 @@ mob/TakeAction(datum/encounter/E)
     src.UpdateBattleMenu(E, "Main")
     
     // --- THE TURN TIMER ---
-    spawn(150) // 15 seconds
+    spawn(300) // 30 seconds — matches the new ATB_BASE_WAIT baseline
         if(src && src.turn_id == current_turn && src.is_busy)
             src << browse(null, "window=battle_menu") 
             src.defending = 1

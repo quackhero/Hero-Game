@@ -6,6 +6,7 @@
         "weapon_type": "Sword",
         "damage_type": "Slashing",
         "desc": "A standard, reliable blade.",
+        "weight": 12,
         "stat_bonuses": {
             "strength": 5,
             "dexterity": 1
@@ -24,6 +25,7 @@
         "weapon_type": "Dagger",
         "damage_type": "Piercing",
         "desc": "A quick, lightweight blade.",
+        "weight": 5,
         "stat_bonuses": {
             "dexterity": 4,
             "strength": 2
@@ -42,6 +44,7 @@
         "damage_type": "Slashing",
         "elemental_tag": "Fire",
         "desc": "A blade wreathed in flames. Deals Slashing Fire damage.",
+        "weight": 12,
         "stat_bonuses": {
             "strength": 7,
             "dexterity": 1
@@ -58,6 +61,7 @@
         "name": "Leather Armor",
         "item_type": "Armor",
         "desc": "Light but sturdy protection.",
+        "weight": 8,
         "stat_bonuses": {
             "vitality": 3,
             "resilience": 2
@@ -69,6 +73,7 @@
         "name": "Chainmail",
         "item_type": "Armor",
         "desc": "Metal ringwork that deflects blades but leaves gaps for fire.",
+        "weight": 18,
         "stat_bonuses": {
             "vitality": 2,
             "resilience": 5
@@ -85,6 +90,7 @@
         "name": "Iron Shield",
         "item_type": "Accessory",
         "desc": "A solid shield that bolsters endurance.",
+        "weight": 10,
         "stat_bonuses": {
             "resilience": 4,
             "vitality": 2

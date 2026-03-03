@@ -16,8 +16,12 @@ mob
     var/attribute = ""     // Elemental identity used by the damage pipeline ("Fire","Ice", etc.)
     var/turn_id = 0
     
-    var/atb_gauge = 0      
-    var/is_busy = 0        
+    var/atb_gauge = 0      // Legacy display var — no longer drives CombatLoop
+    var/atb_wait = 0       // Countdown ticks until this mob's next turn
+    var/total_weight = 0   // Sum of equipped gear weight (updated by ComputeTotalWeight)
+    var/dodge_bonus = 0    // Flat bonus to effective dodge DEX (e.g. from passives)
+    var/dodge_cap = BASE_DODGE_CAP  // Max dodge % this mob can achieve
+    var/is_busy = 0
     var/is_dead = 0
     var/defending = 0
     var/max_skill_slots = 4
@@ -268,9 +272,10 @@ mob
     proc/EndTurn()
         for(var/datum/component/C in src.components)
             C.OnTurnEnd(src)
-        
-        src.atb_gauge = 0
+
         src.is_busy = 0
+        src.ComputeTotalWeight()
+        src.atb_wait = src.CalculateATBWait()
         src.SendSignal("ON_TURN_END")
 
     proc/BasicAttack(mob/target)
@@ -540,3 +545,42 @@ mob
         world << "<i><font color='#B19CD9'>[src.name]'s [S.name] wore off!</font></i>"
         del(S)
         src.SendSignal("SIG_STATUS_REMOVED", sid)
+
+    // ============================================================
+    // WEIGHT & ATB WAIT PROCS
+    // ============================================================
+
+    // Sums the weight of all equipped gear pieces using the colon operator
+    // so the proc works safely on any mob type (base or player).
+    proc/ComputeTotalWeight()
+        var/w = 0
+        if("equipped_weapon" in src.vars && src:equipped_weapon)
+            w += src:equipped_weapon:weight
+        if("equipped_armor" in src.vars && src:equipped_armor)
+            w += src:equipped_armor:weight
+        if("equipped_accessory" in src.vars && src:equipped_accessory)
+            w += src:equipped_accessory:weight
+        src.total_weight = w
+
+    // Returns DEX after subtracting the weight penalty, floored at 0.
+    proc/GetEffectiveDodgeDEX()
+        return max(0, src.dexterity + src.dodge_bonus - round(src.total_weight * WEIGHT_DODGE_FACTOR))
+
+    // Returns the number of countdown ticks before this mob acts,
+    // incorporating both DEX speed and weight penalty.
+    proc/CalculateATBWait()
+        var/wait = round(ATB_BASE_WAIT / (1 + src.dexterity * ATB_DEX_FACTOR))
+        wait += round(src.total_weight * WEIGHT_ATB_FACTOR)
+        return max(ATB_MIN_WAIT, min(wait, ATB_BASE_WAIT))
+
+    // Computes dodge % for a DEX contest between src (defender) and attacker.
+    // Adds any flat dodge_chance from active status components on top.
+    proc/CalculateDodgeChance(mob/attacker)
+        var/target_edex = src.GetEffectiveDodgeDEX()
+        var/attacker_edex = max(1, attacker.GetEffectiveDodgeDEX())
+        var/chance = round((target_edex / (target_edex + attacker_edex)) * src.dodge_cap)
+        // Add flat dodge_chance from active status components (e.g. Time Stop)
+        for(var/datum/component/status/C in src.components)
+            if(C.dodge_chance > 0)
+                chance += C.dodge_chance
+        return min(chance, src.dodge_cap)

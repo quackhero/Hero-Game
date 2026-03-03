@@ -123,6 +123,11 @@ datum/npc_factory
         if(data["finisher_opportunities"])
             E.finisher_opportunities = data["finisher_opportunities"].Copy()
 
+        // --- ATB Wait Initialization ---
+        // Compute weight from any equipped gear, then set the opening countdown.
+        E.ComputeTotalWeight()
+        E.atb_wait = E.CalculateATBWait()
+
         return E
 
 var/datum/npc_factory/npc_factory = new()

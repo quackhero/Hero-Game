@@ -63,6 +63,9 @@ datum/skill_factory
         // 1c. Uninterruptible flag from JSON
         if("uninterrupt_level" in data) S.uninterrupt_level = data["uninterrupt_level"]
 
+        // 1d. Dodge flag from JSON
+        if("dodgeable" in data) S.dodgeable = data["dodgeable"]
+
         // 2. Guardrails
         if(data["requirements"])
             var/list/reqs = data["requirements"]

@@ -32,7 +32,14 @@ var/datum/element_factory/element_factory = new()
 #define POS_ANY       7   // Skill hits all positional states
 
 // --- ATB Engine ---
-#define ATB_GAUGE_MAX 100
+#define ATB_GAUGE_MAX       1000   // Raised; used only for display/legacy references
+#define ATB_BASE_WAIT       150    // Baseline ticks between turns (30s at tick_rate=2)
+#define ATB_DEX_FACTOR      0.03   // How much each DEX point reduces wait
+#define ATB_MIN_WAIT        20     // Hard floor — no character acts faster than this
+#define WEIGHT_ATB_FACTOR   0.8    // Each weight unit adds this many ticks to wait
+#define WEIGHT_DODGE_FACTOR 0.4    // Each weight unit reduces effective dodge DEX by this
+#define BASE_DODGE_CAP      30     // Max dodge % without the dodge passive
+#define FULL_DODGE_CAP      75     // Max dodge % with the dodge passive equipped
 
 
 // --- Damage Types ---
@@ -47,6 +54,7 @@ var/datum/element_factory/element_factory = new()
 #define SIG_ON_DAMAGE     "ON_DAMAGE_DEALT"
 #define SIG_ON_DAMAGED    "ON_DAMAGE_TAKEN"
 #define SIG_ON_DODGE      "ON_DODGE"
+#define SIG_DODGE         "SIG_DODGE"
 #define SIG_ON_KILL       "ON_KILL"
 #define SIG_ON_DEATH      "ON_DEATH"
 #define SIG_ON_INFECT     "ON_INFECT_APPLIED"

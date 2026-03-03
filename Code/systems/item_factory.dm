@@ -34,6 +34,7 @@ datum/item_factory
             if("weapon_type" in data)    E.weapon_type        = data["weapon_type"]
             if("damage_type" in data)    E.damage_type        = data["damage_type"]
             if("elemental_tag" in data)  E.elemental_tag      = data["elemental_tag"]
+            if("weight" in data)         E.weight             = data["weight"]
             if("attack_messages" in data) E.attack_messages   = data["attack_messages"]
             if("granted_skills" in data)  E.granted_skill_ids  = data["granted_skills"]
             if("granted_passives" in data) E.granted_passive_ids = data["granted_passives"]
@@ -126,6 +127,7 @@ datum/item_factory
             E.weapon_type         = T.weapon_type
             E.damage_type         = T.damage_type
             E.elemental_tag       = T.elemental_tag
+            E.weight              = T.weight
             E.attack_messages     = T.attack_messages     // list ref — read-only
             E.granted_skill_ids   = T.granted_skill_ids   // list ref — read-only
             E.granted_passive_ids = T.granted_passive_ids // list ref — read-only
