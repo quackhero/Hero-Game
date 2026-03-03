@@ -130,4 +130,4 @@ datum/npc_factory
 
         return E
 
-var/datum/npc_factory/npc_factory = new()
+// var/datum/npc_factory/npc_factory = new()

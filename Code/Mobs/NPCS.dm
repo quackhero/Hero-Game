@@ -6,7 +6,6 @@ mob/enemy
     var/base_exp = 50                   // EXP rewarded on defeat
     var/gil_reward = 0                  // Gil rewarded on defeat
     var/ai_difficulty = 0               // 0=Weak, 2=Aggressive, 4=Brutal, 5=Merciless, 6=Leader, 7=Ultimate
-    var/attribute = ""                  // Element/creature type tag (e.g. "Fire", "Earth", "Wind")
     var/npc_id = ""                     // JSON template ID this was spawned from
 
     // Basic attack flavor text. null = no extra message (skill handles its own output).
