@@ -2,6 +2,7 @@ var/datum/skill_factory/skill_factory = new()
 var/datum/item_factory/item_factory = new()
 var/datum/npc_factory/npc_factory = new()
 var/datum/element_factory/element_factory = new()
+var/datum/encounter_factory/encounter_factory = new()
 
 // --- Targeting Bitflags ---
 // These allow Target, AOE, Aerial, and Deflect to be used in tandem.

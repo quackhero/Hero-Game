@@ -13,7 +13,8 @@ world
 		skill_factory.LoadAllSkills()
 		status_factory.LoadAllStatuses()
 		item_factory.LoadAllItems()
-		npc_factory.LoadAllNPCs()        // Must be last — references skills and items
+		npc_factory.LoadAllNPCs()        // Must be before encounters — enemy IDs reference NPC templates
+		encounter_factory.LoadAllEncounters()
 // Make objects move 8 pixels per tick when walking
 
 mob

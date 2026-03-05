@@ -73,6 +73,33 @@ datum/encounter
     proc/GetAllies(mob/looker)
         return (looker in src.players) ? src.players : src.enemies
 
+    // Returns the correct display name for a newly summoned enemy with the given
+    // base_name, based on how many enemies sharing that name already exist.
+    // - 0 existing → no suffix ("Wolf")
+    // - 1 existing with no suffix → rename it to "Wolf A", return "Wolf B"
+    // - N existing with suffixes  → return "Wolf [N+1]" ("Wolf C", "Wolf D", ...)
+    // Dead mobs are counted so suffixes are never reused within a battle.
+    // Call this before adding the new mob to src.enemies.
+    proc/GetSummonName(base_name)
+        var/count = 0
+        var/mob/nameless = null  // existing mob with exact base_name and no suffix yet
+        for(var/mob/E in src.enemies)
+            if(E.name == base_name)
+                count++
+                nameless = E
+            else if(findtext(E.name, base_name + " ") == 1)
+                count++
+
+        var/new_index = count + 1
+        if(new_index == 1)
+            return base_name  // only one of this kind — no suffix needed
+
+        // Second arrival: retroactively suffix the previously-alone predecessor
+        if(nameless)
+            nameless.name = base_name + " " + encounter_factory.Suffix(1)
+
+        return base_name + " " + encounter_factory.Suffix(new_index)
+
     proc/CheckStatus()
         var/p_alive = 0
         var/e_alive = 0

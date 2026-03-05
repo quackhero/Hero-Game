@@ -50,6 +50,147 @@ mob/verb/Test_Give_Item()
             src.inventory += I
             src << "Gave you: [I.name]!"
 
+mob/verb/Manage_Encounters()
+    set category = "Admin"
+
+    var/action = input(src, "Encounter Manager", "Manage Encounters") in list("-Cancel-", "-New-", "-List-", "-List Encounters-", "-Sort-", "-Clean-")
+    if(!action || action == "-Cancel-") return
+
+    switch(action)
+        if("-New-")
+            var/raw = input(src, "Format: Name:Type,EnemyID,EnemyID,...\nExample: Blade:Normal,goblin_scout,goblin_scout", "New Encounter") as text|null
+            if(!raw) return
+
+            var/colon_pos = findtext(raw, ":")
+            if(!colon_pos)
+                src << "Invalid format. Use Name:Type,EnemyID,EnemyID,..."
+                return
+
+            var/enc_name = copytext(raw, 1, colon_pos)
+            var/rest = copytext(raw, colon_pos + 1)
+            var/list/parts = splittext(rest, ",")
+            if(parts.len < 2)
+                src << "Need a type and at least one enemy. Format: Name:Type,EnemyID,..."
+                return
+
+            var/enc_type = parts[1]
+            var/list/enemies = list()
+            for(var/i = 2 to parts.len)
+                enemies += parts[i]
+
+            var/list/new_enc = list("name" = enc_name, "type" = enc_type, "enemies" = enemies)
+            encounter_factory.AddEncounter(new_enc)
+            encounter_factory.SaveAllEncounters()
+            src << "<b>Encounter '[enc_name]' ([enc_type]) created with [enemies.len] enemy slot(s).</b>"
+
+        if("-List-")
+            if(!encounter_factory.loaded_encounters.len)
+                src << "No encounters saved."
+                return
+
+            var/list/enc_names = list()
+            for(var/list/enc in encounter_factory.loaded_encounters)
+                enc_names += enc["name"]
+
+            var/choice = input(src, "Select an encounter to view:", "Encounter List") in enc_names
+            if(!choice) return
+
+            for(var/list/enc in encounter_factory.loaded_encounters)
+                if(enc["name"] == choice)
+                    src << "<b>[enc["name"]]</b> | Type: [enc["type"]] | Enemies ([enc["enemies"].len]): [jointext(enc["enemies"], ", ")]"
+                    break
+
+        if("-List Encounters-")
+            if(!encounter_factory.loaded_encounters.len)
+                src << "No encounters saved."
+                return
+
+            var/list/enc_names = list()
+            for(var/list/enc in encounter_factory.loaded_encounters)
+                enc_names += enc["name"]
+
+            var/choice = input(src, "Select an encounter to launch:", "Launch Encounter") in enc_names
+            if(!choice) return
+
+            if(!global_main_party.len)
+                src << "<b>Main Party is empty! Add players first using Main_Party.</b>"
+                return
+
+            var/list/enc_data = null
+            for(var/list/enc in encounter_factory.loaded_encounters)
+                if(enc["name"] == choice)
+                    enc_data = enc
+                    break
+            if(!enc_data) return
+
+            // Count how many of each base name appear for FF-style suffix assignment
+            var/list/name_counts = list()
+            for(var/eid in enc_data["enemies"])
+                var/list/npc_data = npc_factory.loaded_npcs[eid]
+                var/ename = npc_data ? npc_data["name"] : eid
+                if(ename in name_counts)
+                    name_counts[ename]++
+                else
+                    name_counts[ename] = 1
+
+            // Spawn enemies, appending " A", " B", " AA"... suffix when more than one share a name
+            var/list/enemy_list = list()
+            var/list/name_assign = list()
+            for(var/eid in enc_data["enemies"])
+                var/mob/enemy/E = npc_factory.SpawnNPC(eid)
+                if(!E) continue
+                var/base_name = E.name
+                if(name_counts[base_name] > 1)
+                    if(!(base_name in name_assign))
+                        name_assign[base_name] = 0
+                    name_assign[base_name]++
+                    E.name = base_name + " " + encounter_factory.Suffix(name_assign[base_name])
+                enemy_list += E
+
+            if(!enemy_list.len)
+                src << "Failed to spawn any enemies!"
+                return
+
+            new /datum/encounter(global_main_party, enemy_list)
+            world << "<b>Admin launched encounter: [enc_data["name"]] ([enc_data["type"]])</b>"
+
+        if("-Sort-")
+            var/n = encounter_factory.loaded_encounters.len
+            if(n <= 1)
+                src << "Nothing to sort."
+                return
+
+            // Bubble sort by name (alphabetical)
+            for(var/i = 1 to n - 1)
+                for(var/j = 1 to n - i)
+                    var/list/a = encounter_factory.loaded_encounters[j]
+                    var/list/b = encounter_factory.loaded_encounters[j + 1]
+                    if(a["name"] > b["name"])
+                        encounter_factory.loaded_encounters[j] = b
+                        encounter_factory.loaded_encounters[j + 1] = a
+
+            encounter_factory.SaveAllEncounters()
+            src << "<b>Encounters sorted alphabetically and saved.</b>"
+
+        if("-Clean-")
+            var/list/cleaned = list()
+            var/removed = 0
+            for(var/list/enc in encounter_factory.loaded_encounters)
+                var/valid = 1
+                for(var/eid in enc["enemies"])
+                    if(!npc_factory.loaded_npcs[eid])
+                        valid = 0
+                        break
+                if(valid)
+                    cleaned.len++
+                    cleaned[cleaned.len] = enc
+                else
+                    removed++
+
+            encounter_factory.loaded_encounters = cleaned
+            encounter_factory.SaveAllEncounters()
+            src << "<b>Clean complete. Removed [removed] invalid encounter(s).</b>"
+
 mob/verb/Main_Party()
     set category = "Admin"
     var/action = input(src, "What would you like to do with the party?", "Main Party") in list("Add Player", "Remove Player", "View Party", "Clear Party", "Cancel")
