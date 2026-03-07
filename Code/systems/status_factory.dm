@@ -85,6 +85,11 @@ datum/status_factory
             // --- Mind Control ---
             if("mind_control" in status_data) S.mind_control = status_data["mind_control"]  // Step 14
 
+            // --- Equipment Removal ---
+            if("remove_weapon" in status_data)    S.remove_weapon    = status_data["remove_weapon"]
+            if("remove_armor" in status_data)     S.remove_armor     = status_data["remove_armor"]
+            if("remove_accessory" in status_data) S.remove_accessory = status_data["remove_accessory"]
+
             src.loaded_statuses[S.id] = S
             
         world << "<b>[src.loaded_statuses.len] JSON Statuses Loaded!</b>"

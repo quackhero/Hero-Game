@@ -90,3 +90,13 @@ var/datum/encounter_factory/encounter_factory = new()
 
 // --- Battle entry ---
 #define SIG_JOIN_BATTLE       "SIG_JOIN_BATTLE"  // Fires once per mob when they enter the encounter
+
+// --- Defend / Intercept ---
+#define SIG_DEFEND_BLOCK      "SIG_DEFEND_BLOCK"  // Fires on defender when defending=1 halves damage (passed_val = pre-halving damage)
+
+// --- Summon Birth ---
+#define SIG_BIRTH             "SIG_BIRTH"  // Fires on a mob spawned via guardian/prism/shield_summon (distinct from backup)
+
+// Dynamic signal documentation (cannot be fixed-string defines — generated at runtime):
+// "SIG_INFECTED_BY_[STATUS_ID_UPPERCASE]" — fires on status apply for a specific status ID
+// "SIG_EXPIRED_[STATUS_ID_UPPERCASE]"     — fires on status expiry for a specific status ID

@@ -17,6 +17,7 @@ datum/damage_context
     var/was_nulled     = 0      // If 1, damage was completely blocked
     var/hit_weakness   = 0      // If 1, elemental cycle triggered a weakness (show WEAK!)
     var/hit_resist     = 0      // If 1, an affinity blocked some damage (show RESIST)
+    var/pre_defend_damage = 0   // Damage value captured just before the defending-halving step
 
     // Runs the full damage resolution pipeline in order and populates
     // final_damage, was_absorbed, was_nulled, hit_weakness, hit_resist.
@@ -59,6 +60,7 @@ datum/damage_context
 
         // Step 6: Defending halves damage
         if(src.defender && src.defender.defending)
+            src.pre_defend_damage = src.final_damage
             src.final_damage = src.final_damage * 0.5
 
         // Step 7: Floor (skip if the hit was suppressed)

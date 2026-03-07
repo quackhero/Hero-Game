@@ -68,6 +68,24 @@ datum/skill_factory
         // 1d. Dodge flag from JSON
         if("dodgeable" in data) S.dodgeable = data["dodgeable"]
 
+        // 1e. Jump flag — caster becomes Airborne and can hit aerial targets
+        if("is_jump" in data) S.is_jump = data["is_jump"]
+        if(S.is_jump) S.position_flags |= POS_AERIAL
+
+        // 1f. Multi-hit
+        if("hit_count" in data) S.hit_count = data["hit_count"]
+
+        // 1g. ForEvery AOE afterlink
+        if("for_every" in data) S.for_every = data["for_every"]
+
+        // 1h. Counter Stance
+        if("is_counter_stance" in data) S.is_counter_stance = data["is_counter_stance"]
+        if("counter_window" in data) S.counter_window = data["counter_window"]
+
+        // 1i. Overtime AOE
+        if("overtime" in data) S.overtime = data["overtime"]
+        if("overtime_wait" in data) S.overtime_wait = data["overtime_wait"]
+
         // 2. Guardrails
         if(data["requirements"])
             var/list/reqs = data["requirements"]
@@ -179,6 +197,24 @@ datum/skill_factory
                 BU.npc_id = event_data["npc_id"]
                 if("count" in event_data) BU.count = event_data["count"]
                 EV = BU
+
+            // Guardian — summon an NPC that intercepts all hits aimed at the caster
+            if("guardian")
+                var/datum/skill_event/guardian/GU = new()
+                GU.npc_id = event_data["npc_id"]
+                EV = GU
+
+            // Prism — summon an NPC that imprisons a target enemy
+            if("prism")
+                var/datum/skill_event/prism/PR = new()
+                PR.npc_id = event_data["npc_id"]
+                EV = PR
+
+            // Shield Summon — summon an NPC that intercepts damage-only hits on a target ally
+            if("shield_summon")
+                var/datum/skill_event/shield_summon/SH = new()
+                SH.npc_id = event_data["npc_id"]
+                EV = SH
 
         if(EV && "delay" in event_data)
             EV.delay = event_data["delay"]

@@ -435,7 +435,8 @@
 
     {
         "id": "mind_controlled",
-        "name": "Mind Control"
+        "name": "Mind Control",
+        "mind_control": 1
     },
 
     {
@@ -678,5 +679,20 @@
         "id": "minor_ja_status",
         "name": "Minor Ja",
         "provoke_reverse": 1
+    },
+    {
+        "id": "remove_weapon",
+        "name": "Remove Weapon",
+        "remove_weapon": 1
+    },
+    {
+        "id": "remove_armor",
+        "name": "Remove Armor",
+        "remove_armor": 1
+    },
+    {
+        "id": "remove_accessory",
+        "name": "Remove Accessory",
+        "remove_accessory": 1
     }
 ]

@@ -27,7 +27,8 @@ mob
     var/max_skill_slots = 4
     var/list/equipped_skills = list()
 
-    var/list/active_combo_targets = null // Remembers who we are combo-ing!
+    var/list/active_combo_targets = null    // Remembers who we are combo-ing!
+    var/list/active_counter_windows = null  // Active counter stance windows (datum/counter_window)
 
     mob/enemy
         var/base_exp = 50
@@ -41,6 +42,7 @@ mob
     var/is_aerial_target = 0   // Set by Ascend/Float: mob is an aerial target
     var/is_burrowed = 0        // Set by Dig/Burrow status: mob is underground
     var/is_marked = 0          // Set by the mark skill event; TARGET_MARKED AOE only hits marked mobs
+    var/is_imprisoned = 0      // Set by the prism skill event; imprisoned mob cannot act or be targeted
 
     var/channel_start_state = "" // Positional state stored when channeling begins
     var/override_attack_damage_type = "" // Computed by BasicAttack; read by the damage event to apply weapon subtype/element
@@ -95,6 +97,10 @@ mob
         if(T.current_encounter != src.current_encounter) return 0
         if(T.is_vanished)
             if(!silent) src << "[T.name] cannot be targeted right now!"
+            return 0
+        // Imprisoned mobs (trapped in a Prism) cannot be targeted by anyone
+        if(T.is_imprisoned)
+            if(!silent) src << "[T.name] is imprisoned and cannot be targeted!"
             return 0
 
         // --- Positional state check ---
@@ -195,10 +201,15 @@ mob
     proc/ReadyTurn()
         for(var/datum/component/C in src.components)
             C.OnTurnStart(src)
-        
+
         if(!src.CanAct())
             if(src.hp <= src.death_threshold)
                 src.EndTurn()
+            return
+
+        // Imprisoned mobs skip their turn silently
+        if(src.is_imprisoned)
+            src.EndTurn()
             return
 
         // Full Disable: Freeze, Petrify, Sleep, Stop, Captured, Entangled, etc.
@@ -441,8 +452,9 @@ mob
 
         // ---- Phase 7: Battle log messages ----
         // Defending message (always shown so the player understands the halving).
-        if(DC.defender.defending)
+        if(DC.defender.defending && DC.final_damage > 0)
             world << "<i>[src.name] mitigates the attack!</i>"
+            src.SendSignal(SIG_DEFEND_BLOCK, DC.pre_defend_damage)
 
         // Elemental weakness (always shown; contains the fully resolved damage number).
         if(DC.hit_weakness)
@@ -489,6 +501,13 @@ mob
             if(attacker && attacker != src)
                 attacker.SendSignal(SIG_DEALT_ZERO_DAMAGE, src)
 
+        // ---- Phase 9: Counter Window check ----
+        // If the victim has active counter windows, trigger one against the attacker.
+        if(src.active_counter_windows && src.active_counter_windows.len && attacker && attacker != src)
+            for(var/datum/counter_window/CW in src.active_counter_windows.Copy())
+                CW.OnHit(attacker)
+                break  // only one counter fires per hit
+
         src.ClampStats()
         return DC.final_damage
 
@@ -510,7 +529,29 @@ mob
         if(killer && killer != src)
             killer.SendSignal("SIG_KILL", src) // Fires on the killer, passing the defeated mob
             if(hascall(killer, "Bark")) killer:Bark("kill")
-        if(src.current_encounter) src.current_encounter.CheckStatus()
+        // Guardian/Shield/Prison cleanup: remove this mob from encounter tracking lists
+        var/datum/encounter/CE = src.current_encounter
+        if(CE)
+            // Remove from guardians (this mob was a guardian protecting someone)
+            for(var/mob/protected in CE.guardians)
+                if(CE.guardians[protected] == src)
+                    CE.guardians.Remove(protected)
+                    world << "<i>The guardian protecting [protected.name] has fallen!</i>"
+                    break
+            // Remove from shields
+            for(var/mob/shielded in CE.shields)
+                if(CE.shields[shielded] == src)
+                    CE.shields.Remove(shielded)
+                    world << "<i>The shield protecting [shielded.name] has been destroyed!</i>"
+                    break
+            // Remove from prisons — free the trapped mob
+            for(var/mob/trapped in CE.prisons)
+                if(CE.prisons[trapped] == src)
+                    CE.prisons.Remove(trapped)
+                    if("is_imprisoned" in trapped.vars) trapped.is_imprisoned = 0
+                    world << "<i>[trapped.name] has been freed from imprisonment!</i>"
+                    break
+            CE.CheckStatus()
 
     proc/ApplyStatus(status_id, duration, amount)
         // 1. Grab the template from the factory
@@ -536,6 +577,8 @@ mob
             world << "<i><font color='#B19CD9'>[src.name] gains [new_status.name]!</font></i>"
             src.SendSignal("SIG_STATUS_APPLIED", status_id)
             src.SendSignal(SIG_ON_INFECT, new_status)  // Step 2: trigger passive infect reactions
+            // Per-status targeted infect signal — e.g. "SIG_INFECTED_BY_POISONED"
+            src.SendSignal("SIG_INFECTED_BY_[uppertext(new_status.id)]", new_status)
 
     proc/GetStatus(status_id)
         for(var/datum/component/status/C in src.components)
@@ -569,6 +612,8 @@ mob
         S.OnRemove(src)
         world << "<i><font color='#B19CD9'>[src.name]'s [S.name] wore off!</font></i>"
         src.SendSignal(SIG_ON_EXPIRE, S)   // Step 2: fire before del() so datum is still valid
+        // Per-status targeted expire signal — e.g. "SIG_EXPIRED_SLEEPING"
+        src.SendSignal("SIG_EXPIRED_[uppertext(sid)]", S)
         del(S)
         src.SendSignal("SIG_STATUS_REMOVED", sid)
 

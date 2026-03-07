@@ -5,6 +5,20 @@ datum/encounter
     var/is_active = 0
     var/tick_rate = 2 // Slightly slower for text readability
 
+    // --- Guardian / Prism / Shield summon tracking ---
+    var/list/guardians = list()  // assoc: protected_mob → guardian_mob
+    var/list/prisons   = list()  // assoc: trapped_mob  → prism_mob
+    var/list/shields   = list()  // assoc: protected_mob → shield_mob
+
+    // Returns the actual damage target after checking Guardian/Shield redirects.
+    // Guardian takes priority over Shield. Returns target unchanged if no redirect applies.
+    proc/RedirectTarget(mob/intended_target, mob/attacker)
+        if(src.guardians && (intended_target in src.guardians))
+            return src.guardians[intended_target]
+        if(src.shields && (intended_target in src.shields))
+            return src.shields[intended_target]
+        return intended_target
+
     New(list/P, list/E)
         src.players = P
         src.enemies = E
@@ -45,6 +59,10 @@ datum/encounter
         // War cries from enemies at encounter start
         for(var/mob/enemy/E in src.enemies)
             if(hascall(E, "Bark")) E.Bark("war_cry")
+        // Part 13: Display opportunities for each enemy that has them
+        for(var/mob/enemy/E in src.enemies)
+            if(("opportunities" in E.vars) && E:opportunities && length(E:opportunities))
+                world << "<font color='#AAAAFF'><i>Opportunity: [jointext(E:opportunities, " / ")]</i></font>"
         src.CombatLoop()
 
 
@@ -177,6 +195,14 @@ datum/encounter
             for(var/mob/enemy/E in src.enemies)
                 if(!E.is_dead && hascall(E, "Bark")) E.Bark("win")
 
+        // --- GUARDIAN / PRISM / SHIELD CLEANUP ---
+        src.guardians.Cut()
+        src.shields.Cut()
+        for(var/mob/T in src.prisons)
+            var/mob/prisoner = T
+            if("is_imprisoned" in prisoner.vars) prisoner.is_imprisoned = 0
+        src.prisons.Cut()
+
         // --- CONSOLIDATED CLEANUP LOOP ---
         for(var/mob/M in src.all_participants)
             M.atb_gauge = 0
@@ -184,6 +210,12 @@ datum/encounter
             M.current_encounter = null
             // Step 20: clear the mark flag so it doesn't persist between battles
             if("is_marked" in M.vars) M.is_marked = 0
+            if("is_imprisoned" in M.vars) M.is_imprisoned = 0
+            // Clear counter windows
+            if("active_counter_windows" in M.vars && M.active_counter_windows)
+                for(var/datum/counter_window/CW in M.active_counter_windows)
+                    del(CW)
+                M.active_counter_windows = null
             if(M.client)
                 M << browse(null, "window=battle_menu")
 

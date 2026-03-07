@@ -152,6 +152,14 @@ datum/component/status
     var/mind_control = 0       // Step 14: swaps which encounter party this mob belongs to
     var/was_in_players = -1    // Internal: -1=unset, 1=was in players, 0=was in enemies
 
+    // --- Equipment Removal ---
+    var/remove_weapon    = 0   // If 1, strips equipped_weapon on apply
+    var/remove_armor     = 0   // If 1, strips equipped_armor on apply
+    var/remove_accessory = 0   // If 1, strips equipped_accessory on apply
+    // Instance state — stores the stripped item so it can be restored on remove
+    var/datum/item/equipment/stripped_item = null
+    var/stripped_slot = ""     // "weapon", "armor", or "accessory"
+
     // ============================================================
     // --- THE CLONER ---
     // ============================================================
@@ -206,7 +214,10 @@ datum/component/status
         S.granted_passive_ids = src.granted_passive_ids ? src.granted_passive_ids.Copy() : null
         S.lock_position = src.lock_position
         S.mind_control = src.mind_control
-        // Note: status_granted_skills and was_in_players are instance state — not copied from template
+        S.remove_weapon    = src.remove_weapon
+        S.remove_armor     = src.remove_armor
+        S.remove_accessory = src.remove_accessory
+        // Note: status_granted_skills, was_in_players, stripped_item, stripped_slot are instance state — not copied from template
         return S
 
     // ============================================================
@@ -289,7 +300,27 @@ datum/component/status
                     M.equipped_skills += GS
                     src.status_granted_skills += GS
 
-        // 7. Mind Control: swap the mob's encounter party membership
+        // 7. Remove Equipment
+        if(src.remove_weapon && ("equipped_weapon" in M.vars) && M.equipped_weapon)
+            src.stripped_item = M.equipped_weapon
+            src.stripped_slot = "weapon"
+            M.equipped_weapon = null
+            if(hascall(M, "UpdateStats")) M.UpdateStats()
+            world << "<font color='#CC4400'><b>[M.name]'s weapon was torn away!</b></font>"
+        else if(src.remove_armor && ("equipped_armor" in M.vars) && M.equipped_armor)
+            src.stripped_item = M.equipped_armor
+            src.stripped_slot = "armor"
+            M.equipped_armor = null
+            if(hascall(M, "UpdateStats")) M.UpdateStats()
+            world << "<font color='#CC4400'><b>[M.name]'s armor was stripped!</b></font>"
+        else if(src.remove_accessory && ("equipped_accessory" in M.vars) && M.equipped_accessory)
+            src.stripped_item = M.equipped_accessory
+            src.stripped_slot = "accessory"
+            M.equipped_accessory = null
+            if(hascall(M, "UpdateStats")) M.UpdateStats()
+            world << "<font color='#CC4400'><b>[M.name]'s accessory was removed!</b></font>"
+
+        // 8. Mind Control: swap the mob's encounter party membership
         if(src.mind_control && M.current_encounter)
             var/datum/encounter/E = M.current_encounter
             if(M in E.players)
@@ -342,7 +373,24 @@ datum/component/status
                 M.equipped_skills -= GS
             src.status_granted_skills = null
 
-        // 7. Mind Control reversal: restore original party membership
+        // 7. Restore stripped equipment
+        if(src.stripped_item && src.stripped_slot != "")
+            if(src.stripped_slot == "weapon" && ("equipped_weapon" in M.vars) && !M.equipped_weapon)
+                M.equipped_weapon = src.stripped_item
+                if(hascall(M, "UpdateStats")) M.UpdateStats()
+                world << "<i>[M.name]'s [src.stripped_item.name] is returned.</i>"
+            else if(src.stripped_slot == "armor" && ("equipped_armor" in M.vars) && !M.equipped_armor)
+                M.equipped_armor = src.stripped_item
+                if(hascall(M, "UpdateStats")) M.UpdateStats()
+                world << "<i>[M.name]'s [src.stripped_item.name] is returned.</i>"
+            else if(src.stripped_slot == "accessory" && ("equipped_accessory" in M.vars) && !M.equipped_accessory)
+                M.equipped_accessory = src.stripped_item
+                if(hascall(M, "UpdateStats")) M.UpdateStats()
+                world << "<i>[M.name]'s [src.stripped_item.name] is returned.</i>"
+            src.stripped_item = null
+            src.stripped_slot = ""
+
+        // 8. Mind Control reversal: restore original party membership
         if(src.mind_control && src.was_in_players >= 0 && M.current_encounter)
             var/datum/encounter/E = M.current_encounter
             if(src.was_in_players == 1)
@@ -579,3 +627,30 @@ datum/component/affinity
                 DC.final_damage *= (1.0 - src.resist_pct)
                 if(src.resist_pct > 0)
                     DC.hit_resist = 1
+
+// ============================================================
+// COUNTER WINDOW DATUM
+// Created by skills with is_counter_stance=1. Tracks a timed
+// window during which an incoming hit triggers the afterlink skill.
+// Stored in mob/active_counter_windows (Base.dm).
+// ============================================================
+datum/counter_window
+    var/mob/owner
+    var/datum/skill/counter_skill   // The afterlink skill to fire on counter
+    var/ticks_remaining = 50
+
+    proc/Tick()
+        src.ticks_remaining--
+        if(src.ticks_remaining <= 0)
+            src.Expire()
+
+    proc/OnHit(mob/attacker)
+        if(src.counter_skill && attacker)
+            owner << "<b>Counter!</b>"
+            src.counter_skill.ProcessTimeline(owner, attacker, owner.current_encounter, 1)
+        src.Expire()
+
+    proc/Expire()
+        if(owner && owner.active_counter_windows)
+            owner.active_counter_windows -= src
+        del(src)

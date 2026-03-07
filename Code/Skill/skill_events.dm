@@ -29,6 +29,14 @@ datum/skill_event/damage
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
         if(!target) return
 
+        // --- Guardian / Shield redirect ---
+        // Check if the intended target is protected; if so, hit the guardian/shield instead.
+        if(E && E.guardians && E.shields)
+            var/mob/redirected = E.RedirectTarget(target, user)
+            if(redirected != target)
+                world << "<i>[redirected.name] intercepts the attack for [target.name]!</i>"
+                target = redirected
+
         // --- Dodge check — DEX contest for basic attacks and dodgeable skills ---
         if(S && (S.id == "basic_attack" || S.dodgeable))
             if(user && hascall(target, "CalculateDodgeChance"))
@@ -311,6 +319,77 @@ datum/skill_event/transform
 
         // 6. Deferred deletion — lets the current timeline finish before the datum is gone
         spawn(0) del(user)
+
+// ============================================================
+// Guardian Event — spawns an NPC that intercepts all hits aimed at the summoner.
+// Both damage AND non-AOE heals/buffs aimed at the summoner route through the guardian.
+// ============================================================
+datum/skill_event/guardian
+    var/npc_id = ""
+
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!E || !src.npc_id) return
+        var/mob/enemy/guard = npc_factory.SpawnNPC(src.npc_id)
+        if(!guard) return
+        guard.current_encounter = E
+        guard.atb_wait = guard.CalculateATBWait()
+        if(user in E.players) E.players += guard
+        else E.enemies += guard
+        E.all_participants += guard
+        if(!guard.temp_triggers_used) guard.temp_triggers_used = list()
+        // Register guardian protection
+        E.guardians[user] = guard
+        world << "<i>[user.name] calls forth a guardian!</i>"
+        guard.SendSignal(SIG_JOIN_BATTLE)
+        guard.SendSignal(SIG_BIRTH)
+
+// ============================================================
+// Prism Event — spawns an NPC that imprisons a target enemy.
+// The trapped mob cannot act or be targeted until the prism is destroyed.
+// ============================================================
+datum/skill_event/prism
+    var/npc_id = ""
+
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!E || !src.npc_id || !target) return
+        var/mob/enemy/prison_mob = npc_factory.SpawnNPC(src.npc_id)
+        if(!prison_mob) return
+        prison_mob.current_encounter = E
+        prison_mob.atb_wait = prison_mob.CalculateATBWait()
+        // Join the user's side (the prism is on the caster's team)
+        if(user in E.players) E.players += prison_mob
+        else E.enemies += prison_mob
+        E.all_participants += prison_mob
+        if(!prison_mob.temp_triggers_used) prison_mob.temp_triggers_used = list()
+        // Imprison the target
+        target.is_imprisoned = 1
+        E.prisons[target] = prison_mob
+        world << "<i>[target.name] has been imprisoned in a [prison_mob.name]!</i>"
+        prison_mob.SendSignal(SIG_JOIN_BATTLE)
+        prison_mob.SendSignal(SIG_BIRTH)
+
+// ============================================================
+// Shield Summon Event — spawns an NPC that intercepts damage-only hits on a target ally.
+// Heals and buffs still reach the protected ally; AOE attacks bypass the shield.
+// ============================================================
+datum/skill_event/shield_summon
+    var/npc_id = ""
+
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!E || !src.npc_id || !target) return
+        var/mob/enemy/shield_mob = npc_factory.SpawnNPC(src.npc_id)
+        if(!shield_mob) return
+        shield_mob.current_encounter = E
+        shield_mob.atb_wait = shield_mob.CalculateATBWait()
+        if(user in E.players) E.players += shield_mob
+        else E.enemies += shield_mob
+        E.all_participants += shield_mob
+        if(!shield_mob.temp_triggers_used) shield_mob.temp_triggers_used = list()
+        // Register shield protection
+        E.shields[target] = shield_mob
+        world << "<i>[shield_mob.name] stands guard over [target.name]!</i>"
+        shield_mob.SendSignal(SIG_JOIN_BATTLE)
+        shield_mob.SendSignal(SIG_BIRTH)
 
 // ============================================================
 // Step 18: Backup Event
