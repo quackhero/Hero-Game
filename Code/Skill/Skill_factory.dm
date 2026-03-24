@@ -37,7 +37,10 @@ datum/skill_factory
         if("trigger_once" in data) S.trigger_once = data["trigger_once"]
         if("targeting_mode" in data) S.targeting_mode = data["targeting_mode"]
         if("passive_stat_mods" in data) S.passive_stat_mods = data["passive_stat_mods"]
+        if("passive_stat_pct_mods" in data) S.passive_stat_pct_mods = data["passive_stat_pct_mods"]
         if("combo_branches" in data) S.combo_branches = data["combo_branches"]
+        if("hitrate" in data) S.hitrate = data["hitrate"]
+        if("charge_time" in data) S.charge_time = data["charge_time"] * 10  // Convert seconds to ticks
         if("trigger_condition" in data) S.trigger_condition = data["trigger_condition"]
         if("trigger_chance" in data) S.trigger_chance = text2num(data["trigger_chance"])
         
@@ -215,6 +218,13 @@ datum/skill_factory
                 var/datum/skill_event/shield_summon/SH = new()
                 SH.npc_id = event_data["npc_id"]
                 EV = SH
+
+            // Remove Status — removes a specific status from the target or caster
+            if("remove_status")
+                var/datum/skill_event/remove_status/RS = new()
+                RS.status_id = event_data["status"]
+                if("target" in event_data) RS.target_self = (event_data["target"] == "self") ? 1 : 0
+                EV = RS
 
         if(EV && "delay" in event_data)
             EV.delay = event_data["delay"]

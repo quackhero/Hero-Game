@@ -13,8 +13,6 @@ mob
     var/datum/item/equipment/equipped_accessory
 
     // --- NEW: BASE STATS (Naked Stats) ---
-    var/base_max_hp = 100
-    var/base_max_mp = 50
     var/base_strength = 10
     var/base_dexterity = 10
     var/base_intelligence = 10
@@ -43,8 +41,6 @@ mob
             del(A)
 
         // 1. Reset to naked stats
-        src.max_hp = src.base_max_hp
-        src.max_mp = src.base_max_mp
         src.strength = src.base_strength
         src.dexterity = src.base_dexterity
         src.intelligence = src.base_intelligence
@@ -54,8 +50,6 @@ mob
 
         // 2. Add Weapon Stats
         if(src.equipped_weapon)
-            src.max_hp += src.equipped_weapon.max_hp_bonus
-            src.max_mp += src.equipped_weapon.max_mp_bonus
             src.strength += src.equipped_weapon.strength_bonus
             src.dexterity += src.equipped_weapon.dexterity_bonus
             src.intelligence += src.equipped_weapon.intelligence_bonus
@@ -65,8 +59,6 @@ mob
 
         // 3. Add Armor Stats
         if(src.equipped_armor)
-            src.max_hp += src.equipped_armor.max_hp_bonus
-            src.max_mp += src.equipped_armor.max_mp_bonus
             src.strength += src.equipped_armor.strength_bonus
             src.dexterity += src.equipped_armor.dexterity_bonus
             src.intelligence += src.equipped_armor.intelligence_bonus
@@ -76,8 +68,6 @@ mob
 
         // 4. Add Accessory Stats
         if(src.equipped_accessory)
-            src.max_hp += src.equipped_accessory.max_hp_bonus
-            src.max_mp += src.equipped_accessory.max_mp_bonus
             src.strength += src.equipped_accessory.strength_bonus
             src.dexterity += src.equipped_accessory.dexterity_bonus
             src.intelligence += src.equipped_accessory.intelligence_bonus
@@ -120,7 +110,7 @@ mob
                 else                    A.elemental_type = dtype
                 src.components += A
 
-        // 5. Apply Passive Skill Stat Mods
+        // 5. Apply Passive Skill Stat Mods (flat)
         // Keys like "base_strength" map to the derived var "strength" — strip "base_" prefix.
         // Modifying base_* here would compound every UpdateStats call.
         for(var/datum/skill/S in src.equipped_skills)
@@ -130,13 +120,37 @@ mob
                 if(derived in src.vars)
                     src.vars[derived] += S.passive_stat_mods[stat_name]
 
+        // 5b. Apply Percentage-Based Passive Stat Mods (after flat mods, before HP/MP derivation)
+        for(var/datum/skill/S in src.equipped_skills)
+            if(!S.is_passive || !S.passive_stat_pct_mods) continue
+            for(var/stat_name in S.passive_stat_pct_mods)
+                var/derived = replacetext(stat_name, "base_", "")
+                if(derived in src.vars)
+                    var/pct = S.passive_stat_pct_mods[stat_name]
+                    src.vars[derived] += round(src.vars[derived] * pct)
+
+        // 6. Derive HP/MP from VIT/MND AFTER all stat modifiers
+        src.max_hp = 15 + (src.vitality * 3)
+        src.max_mp = 8 + (src.mind * 2)
+
+        // 7. Equipment flat HP/MP bonuses (applied after derivation)
+        if(src.equipped_weapon)
+            src.max_hp += src.equipped_weapon.max_hp_bonus
+            src.max_mp += src.equipped_weapon.max_mp_bonus
+        if(src.equipped_armor)
+            src.max_hp += src.equipped_armor.max_hp_bonus
+            src.max_mp += src.equipped_armor.max_mp_bonus
+        if(src.equipped_accessory)
+            src.max_hp += src.equipped_accessory.max_hp_bonus
+            src.max_mp += src.equipped_accessory.max_mp_bonus
+
         src.ClampStats()
         src.ComputeTotalWeight()
         src.atb_wait = src.CalculateATBWait()
 
     proc/LevelUp()
         src.level++
-        src.stat_points += 2
+        src.stat_points += 4
         src.max_exp = GetMaxExpForLevel(src.level)
         src << "<font color='#FFFF00'><b>*** LEVEL UP! You are now Level [src.level]! ***</b></font>"
 
@@ -156,7 +170,7 @@ mob
                 src.skills += new_skill
                 src << "<font color='#00FFFF'><b>You learned a new technique: [new_skill.name]!</b></font>"
 
-        src << "<b>You gained 2 Stat Points to spend!</b>"
+        src << "<b>You gained 4 Stat Points to spend!</b>"
 
         src.UpdateStats() // Apply the new stats!
         src.hp = src.max_hp
@@ -168,39 +182,67 @@ mob
         var/new_name = input(src, "What is your name, hero?", "Character Creation", src.name) as text|null
         if(new_name) src.name = html_encode(new_name)
 
-        var/list/classes = list("Novice")
-        var/class_choice = input(src, "Choose your starting path.", "Class Selection") in classes
+        // Build class selection list with descriptions
+        var/list/class_options = list(
+            "Fighter"  = /datum/class/fighter,
+            "Warrior"  = /datum/class/warrior,
+            "Rogue"    = /datum/class/rogue,
+            "Mage"     = /datum/class/mage,
+            "Cleric"   = /datum/class/cleric,
+            "Oracle"   = /datum/class/oracle
+        )
 
-        if(class_choice == "Novice")
-            src.Primary_class = new /datum/class/novice()
+        // Show class descriptions before selection
+        var/desc_text = "<b>Choose your class:</b><br><br>"
+        for(var/cname in class_options)
+            var/cpath = class_options[cname]
+            var/datum/class/temp = new cpath()
+            desc_text += "<b>[cname]</b> - [temp.description]<br><br>"
+            del(temp)
+        src << browse(desc_text, "window=class_info;size=500x400;can_close=1")
 
+        var/class_choice = input(src, "Choose your starting path.", "Class Selection") in class_options
+        src << browse(null, "window=class_info")
+
+        if(!class_choice) class_choice = "Fighter" // Fallback
+        var/class_path = class_options[class_choice]
+        src.Primary_class = new class_path()
+
+        // Set level and exp
         src.level = 1
         src.current_exp = 0
         src.max_exp = GetMaxExpForLevel(src.level)
-        src.base_max_hp = 20
-        src.base_max_mp = 10
-        src.base_strength = 5
-        src.base_dexterity = 5
-        src.base_intelligence = 5
-        src.base_mind = 5
-        src.base_vitality = 5
-        src.base_resilience = 5
-        src.stat_points = 5
 
+        // Initialize ALL base stats to 0
+        src.base_strength = 0
+        src.base_dexterity = 0
+        src.base_intelligence = 0
+        src.base_mind = 0
+        src.base_vitality = 0
+        src.base_resilience = 0
+
+        // Apply one-time starting stats from class
+        for(var/stat_name in src.Primary_class.starting_stats)
+            var/start_amt = src.Primary_class.starting_stats[stat_name]
+            if(stat_name in src.vars)
+                src.vars[stat_name] += start_amt
+
+        // Apply first level of auto-growth
         for(var/stat_name in src.Primary_class.stat_growths)
             var/growth_amt = src.Primary_class.stat_growths[stat_name]
             if(stat_name in src.vars)
                 src.vars[stat_name] += growth_amt
 
-        src.UpdateStats() // Calculate true stats
+        // Player starts with 0 free stat points (earned on level up, 4 per level)
+        src.stat_points = 0
+
+        // Calculate derived stats (HP from VIT, MP from MND)
+        src.UpdateStats()
         src.hp = src.max_hp
         src.mp = src.max_mp
 
-        src.skills += new /datum/skill/heavy_strike()
-
-
         world << "<b>[src.name]</b> has begun their journey as a <b>[src.Primary_class.name]</b>!"
-        src << "<b>Creation complete! You have [src.stat_points] unspent stat points. Check the 'Tools' tab to spend them.</b>"
+        src << "<b>Creation complete!</b>"
 
     proc/GainEXP(amount)
         if(amount <= 0) return

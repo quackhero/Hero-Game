@@ -419,3 +419,18 @@ datum/skill_event/backup
             world << "<i>[ally.name] joins the battle!</i>"
             ally.SendSignal(SIG_JOIN_BATTLE)
             i++
+
+/**
+ * Remove Status Event — removes a specific status from the target (or caster if target_self=1)
+ */
+datum/skill_event/remove_status
+    var/status_id = ""
+    var/target_self = 0  // If 1, removes from caster instead of target
+
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        var/mob/victim = src.target_self ? user : target
+        if(!victim) return
+        if(!hascall(victim, "GetStatus")) return
+        var/datum/component/status/existing = victim.GetStatus(src.status_id)
+        if(existing)
+            victim.RemoveStatus(existing)

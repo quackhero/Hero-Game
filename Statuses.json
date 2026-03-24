@@ -46,8 +46,7 @@
         "id": "wound",
         "name": "Wound",
         "dot_amount": 10,
-        "dot_type": "Physical",
-        "stack_double": 1
+        "dot_type": "Physical"
     },
     {
         "id": "fatal_wound",

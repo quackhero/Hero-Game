@@ -20,8 +20,6 @@ mob
         F["mp"] << src.mp
 
         // Save BASE stats (equipment bonuses must not be baked in permanently)
-        F["base_max_hp"]       << src.base_max_hp
-        F["base_max_mp"]       << src.base_max_mp
         F["base_strength"]     << src.base_strength
         F["base_dexterity"]    << src.base_dexterity
         F["base_intelligence"] << src.base_intelligence
@@ -61,8 +59,6 @@ mob
         F["mp"] >> src.mp
 
         // Load BASE stats
-        F["base_max_hp"]       >> src.base_max_hp
-        F["base_max_mp"]       >> src.base_max_mp
         F["base_strength"]     >> src.base_strength
         F["base_dexterity"]    >> src.base_dexterity
         F["base_intelligence"] >> src.base_intelligence

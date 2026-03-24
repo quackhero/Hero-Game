@@ -24,6 +24,10 @@ datum/skill
     var/is_passive = 0
     var/trigger_once = 0      // If 1, can only fire once per battle (tracked via temp_triggers_used)
     var/list/passive_stat_mods = null
+    var/list/passive_stat_pct_mods = null  // Percentage-based stat mods: list("base_strength" = 0.10)
+
+    var/hitrate = 100      // Percentage chance the skill hits. Rolled BEFORE timeline processing.
+    var/charge_time = 0    // Delay in ticks BEFORE the skill timeline begins. 0 = instant.
 
     var/list/combo_branches = null
     
@@ -152,6 +156,14 @@ datum/skill
         user.is_busy = 1
         src.PayCost(user)
 
+        // Hit rate check — rolled after MP is consumed but before effects resolve
+        if(src.hitrate < 100)
+            if(!prob(src.hitrate))
+                world << "<i>[user.name]'s [src.name] missed!</i>"
+                user.is_busy = 0
+                if(hascall(user, "EndTurn")) user.EndTurn()
+                return
+
         // Jump: apply Ascend status so the caster is Airborne during execution
         if(src.is_jump)
             if(hascall(user, "ApplyStatus"))
@@ -185,6 +197,30 @@ datum/skill
         var/cast_state = hascall(user, "GetPositionalState") ? user.GetPositionalState() : ""
 
         spawn(0)
+            // --- CHARGE TIME ---
+            if(src.charge_time > 0 && !is_reaction)
+                world << "<i>[user.name] begins charging [src.name]...</i>"
+                sleep(src.charge_time)
+
+                // Check if caster is still alive and able to act
+                if(user.hp <= user.death_threshold)
+                    world << "<i>[user.name]'s [src.name] was interrupted!</i>"
+                    user.is_busy = 0
+                    if(hascall(user, "EndTurn")) user.EndTurn()
+                    return
+
+                // Check for positional interruption
+                if(src.uninterrupt_level == SKILL_UNINTERRUPT_NONE)
+                    if(cast_state && hascall(user, "GetPositionalState"))
+                        var/current_state = user.GetPositionalState()
+                        if(current_state != cast_state)
+                            world << "<i><font color='#FFAA00'>[user.name]'s [src.name] was interrupted!</font></i>"
+                            user.is_busy = 0
+                            if(hascall(user, "EndTurn")) user.EndTurn()
+                            return
+
+                world << "<b>[user.name]'s [src.name] fires!</b>"
+
             // ---- Multi-hit outer loop ----
             // hit_count defaults to 1, so single-hit skills are unaffected.
             var/hit_pass = 0

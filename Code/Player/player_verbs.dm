@@ -16,7 +16,7 @@ mob
                 src << "You have no stat points to spend."
                 return
             
-            var/list/options = list("base_max_hp", "base_max_mp", "base_strength", "base_resilience", "base_dexterity", "base_intelligence", "base_mind", "base_vitality", "Cancel")
+            var/list/options = list("base_strength", "base_dexterity", "base_intelligence", "base_mind", "base_vitality", "base_resilience", "Cancel")
             
             var/choice = input(src, "You have [src.stat_points] points. Which stat would you like to increase by 1?", "Stat Allocation") in options
             if(choice == "Cancel") return
@@ -35,7 +35,7 @@ mob
 mob/verb/Debug_Level_Up()
     set category = "Debug"
     // Give ourselves the Novice class if we don't have it
-    if(!src.Primary_class) src.Primary_class = new /datum/class/novice()
+    if(!src.Primary_class) src.Primary_class = new /datum/class/fighter()
     src.LevelUp()
 
 mob/verb/Open_Menu()

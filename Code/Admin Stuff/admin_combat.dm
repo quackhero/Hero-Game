@@ -320,7 +320,6 @@ mob/verb/Debug_Set_Stat()
     set category = "Debug"
     set name = "Set Stat"
     var/list/stat_list = list(
-        "base_max_hp", "base_max_mp",
         "base_strength", "base_resilience", "base_dexterity",
         "base_intelligence", "base_mind", "base_vitality"
     )
