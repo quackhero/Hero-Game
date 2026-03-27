@@ -45,7 +45,7 @@ datum/damage_context
             if(def_attr != "")
                 var/mult = element_factory.GetMultiplier(src.elemental_type, def_attr)
                 if(mult != 1.0)
-                    src.final_damage = src.final_damage * mult
+                    src.final_damage = round(src.final_damage * mult)
                     if(mult > 1.0)
                         src.hit_weakness = 1
 
@@ -60,11 +60,11 @@ datum/damage_context
 
         // Step 6: Defending halves damage (Shield Wall upgrades to 75% reduction)
         if(src.defender && src.defender.defending)
-            src.pre_defend_damage = src.final_damage
+            src.pre_defend_damage = round(src.final_damage)
             var/defend_mult = 0.5
             if(hascall(src.defender, "HasStatus") && src.defender.HasStatus("shield_wall"))
                 defend_mult = 0.25
-            src.final_damage = src.final_damage * defend_mult
+            src.final_damage = round(src.final_damage * defend_mult)
 
         // Step 7: Floor (skip if the hit was suppressed)
         if(!src.was_nulled && !src.was_absorbed)

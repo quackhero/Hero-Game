@@ -66,7 +66,7 @@ datum/component/status
     name = "Unknown Status"
     amount = 0
     duration = 0
-    max_duration = 0  // Stores the original duration for display purposes (e.g. "3/5 turns")
+    var/max_duration = 0  // Stores the original duration for display purposes (e.g. "3/5 turns")
     owner = null
 
     // --- Trigger Integration ---
@@ -645,7 +645,7 @@ datum/component/affinity
             if("Resist")
                 // Diminishing returns: multiply remaining damage by (1 - pct).
                 // Negative pct (vulnerability) multiplies damage above 1.0 automatically.
-                DC.final_damage *= (1.0 - src.resist_pct)
+                DC.final_damage = round(DC.final_damage * (1.0 - src.resist_pct))
                 if(src.resist_pct > 0)
                     DC.hit_resist = 1
 
