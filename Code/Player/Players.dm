@@ -129,19 +129,17 @@ mob
                     var/pct = S.passive_stat_pct_mods[stat_name]
                     src.vars[derived] += round(src.vars[derived] * pct)
 
-        // 5c. Dodge passive: upgrade dodge cap if Dodge is equipped
-        src.dodge_cap = BASE_DODGE_CAP  // Reset to base each update
+        // 5c. Passive dodge cap upgrade (modular)
+        src.dodge_cap = BASE_DODGE_CAP
         for(var/datum/skill/S in src.equipped_skills)
-            if(S.is_passive && (S.id == "fighter_dodge" || S.id == "rogue_dodge"))
-                src.dodge_cap = FULL_DODGE_CAP
-                break
+            if(S.is_passive && S.passive_dodge_cap > src.dodge_cap)
+                src.dodge_cap = S.passive_dodge_cap
 
-        // 5d. Foresight passive: add flat dodge bonus
-        src.dodge_bonus = 0  // Reset each update
+        // 5d. Passive flat dodge bonus (modular)
+        src.dodge_bonus = 0
         for(var/datum/skill/S in src.equipped_skills)
-            if(S.is_passive && S.id == "oracle_foresight")
-                src.dodge_bonus += 15
-                break
+            if(S.is_passive && S.passive_dodge_bonus > 0)
+                src.dodge_bonus += S.passive_dodge_bonus
 
         // 6. Derive HP/MP from VIT/MND AFTER all stat modifiers
         src.max_hp = 15 + (src.vitality * 3)

@@ -99,6 +99,10 @@ mob/proc/UniversalAI(datum/encounter/E)
     if(roll <= defend_chance)
         // Defend (rare at low difficulty, never at high)
         src.defending = 1
+        for(var/datum/skill/P in src.equipped_skills)
+            if(P.is_passive && P.passive_defend_empower_pct != 0)
+                src.is_concentrated = 1
+                break
         world << "<i>[src.name] braces for impact!</i>"
         src.EndTurn()
         return

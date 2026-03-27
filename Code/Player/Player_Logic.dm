@@ -289,6 +289,11 @@ mob/Topic(href, href_list)
     else if(action == "guard")
         src << browse(null, "window=battle_menu")
         src.defending = 1
+        src.momentum_stacks = 0
+        for(var/datum/skill/P in src.equipped_skills)
+            if(P.is_passive && P.passive_defend_empower_pct != 0)
+                src.is_concentrated = 1
+                break
         world << "<i>[src.name] braces for impact!</i>"
         src.turn_id++
         src.SendSignal("SIG_WAIT")

@@ -38,6 +38,22 @@ datum/skill_factory
         if("targeting_mode" in data) S.targeting_mode = data["targeting_mode"]
         if("passive_stat_mods" in data) S.passive_stat_mods = data["passive_stat_mods"]
         if("passive_stat_pct_mods" in data) S.passive_stat_pct_mods = data["passive_stat_pct_mods"]
+        if("passive_dmg_vs_status" in data) S.passive_dmg_vs_status = data["passive_dmg_vs_status"]
+        if("passive_dmg_vs_status_pct" in data) S.passive_dmg_vs_status_pct = data["passive_dmg_vs_status_pct"]
+        if("passive_dmg_vs_dual_status_a" in data) S.passive_dmg_vs_dual_status_a = data["passive_dmg_vs_dual_status_a"]
+        if("passive_dmg_vs_dual_status_b" in data) S.passive_dmg_vs_dual_status_b = data["passive_dmg_vs_dual_status_b"]
+        if("passive_dmg_vs_dual_status_pct" in data) S.passive_dmg_vs_dual_status_pct = data["passive_dmg_vs_dual_status_pct"]
+        if("passive_weakness_bonus_pct" in data) S.passive_weakness_bonus_pct = data["passive_weakness_bonus_pct"]
+        if("passive_defend_empower_pct" in data) S.passive_defend_empower_pct = data["passive_defend_empower_pct"]
+        if("passive_defend_empower_category" in data) S.passive_defend_empower_category = data["passive_defend_empower_category"]
+        if("passive_momentum_pct" in data) S.passive_momentum_pct = data["passive_momentum_pct"]
+        if("passive_momentum_max" in data) S.passive_momentum_max = data["passive_momentum_max"]
+        if("passive_counter_persist" in data) S.passive_counter_persist = data["passive_counter_persist"]
+        if("passive_dodge_cap" in data) S.passive_dodge_cap = data["passive_dodge_cap"]
+        if("passive_dodge_bonus" in data) S.passive_dodge_bonus = data["passive_dodge_bonus"]
+        if("passive_survive_fatal" in data) S.passive_survive_fatal = data["passive_survive_fatal"]
+        if("passive_survive_fatal_overkill" in data) S.passive_survive_fatal_overkill = data["passive_survive_fatal_overkill"]
+        if("random_target" in data) S.random_target = data["random_target"]
         if("combo_branches" in data) S.combo_branches = data["combo_branches"]
         if("hitrate" in data) S.hitrate = data["hitrate"]
         if("charge_time" in data) S.charge_time = data["charge_time"] * 10  // Convert seconds to ticks
@@ -105,6 +121,7 @@ datum/skill_factory
             if("req_target_or_user_status" in reqs) S.req_target_or_user_status = reqs["req_target_or_user_status"]
             if("req_ally_name"   in reqs) S.req_ally_name   = reqs["req_ally_name"]    // Step 11
             if("req_skill_id"    in reqs) S.req_skill_id    = reqs["req_skill_id"]     // Step 12
+            if("req_ambush"      in reqs) S.req_ambush      = reqs["req_ambush"]
 
         // 3. Build the Timeline using the new BuildEvent proc
         if(data["timeline"])
@@ -133,6 +150,7 @@ datum/skill_factory
                 if("hitrate" in event_data) D.hitrate = event_data["hitrate"]
                 if("bypass" in event_data) D.bypass = event_data["bypass"]
                 if("leech" in event_data) D.leech = event_data["leech"]
+                if("mp_leech" in event_data) D.mp_leech = event_data["mp_leech"]
                 EV = D
                 
             if("heal")

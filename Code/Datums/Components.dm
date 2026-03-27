@@ -669,7 +669,15 @@ datum/counter_window
         if(src.counter_skill && attacker)
             owner << "<b>Counter!</b>"
             src.counter_skill.ProcessTimeline(owner, attacker, owner.current_encounter, 1)
-        src.Expire()
+
+        var/persist = 0
+        if(owner)
+            for(var/datum/skill/P in owner.equipped_skills)
+                if(P.is_passive && P.passive_counter_persist)
+                    persist = 1
+                    break
+        if(!persist)
+            src.Expire()
 
     proc/Expire()
         if(owner && owner.active_counter_windows)

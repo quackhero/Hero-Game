@@ -22,9 +22,10 @@ datum/skill_event/damage
     var/txt = ""
     var/formula = "0"
     var/damage_type = "Physical"
-    var/hitrate = 100   
-    var/bypass = 0      
-    var/leech = 0.0     
+    var/hitrate = 100
+    var/bypass = 0
+    var/leech = 0.0
+    var/mp_leech = 0.0
 
     Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
         if(!target) return
@@ -55,6 +56,7 @@ datum/skill_event/damage
 
         if(src.hitrate < 100 && !prob(src.hitrate))
             world << "<i>[user.name] missed [target.name]!</i>"
+            if(user && ("momentum_stacks" in user.vars)) user.momentum_stacks = 0
             return
 
         var/base_dmg = parser.Evaluate(src.formula, user, target)
@@ -64,6 +66,50 @@ datum/skill_event/damage
         for(var/datum/component/status/C in user.components)
             if(C.damage_dealt_mult != 0)
                 base_dmg = round(base_dmg * C.damage_dealt_mult)
+
+        // ========== MODULAR PASSIVE DAMAGE MODIFIERS ==========
+        if(user)
+            for(var/datum/skill/P in user.equipped_skills)
+                if(!P.is_passive) continue
+
+                // Bonus damage vs specific status on target
+                if(P.passive_dmg_vs_status != "" && P.passive_dmg_vs_status_pct != 0)
+                    if(target && hascall(target, "HasStatus") && target.HasStatus(P.passive_dmg_vs_status))
+                        base_dmg = round(base_dmg * (1.0 + P.passive_dmg_vs_status_pct))
+
+                // Bonus damage vs dual status families (both required)
+                if(P.passive_dmg_vs_dual_status_a && P.passive_dmg_vs_dual_status_b && P.passive_dmg_vs_dual_status_pct != 0)
+                    if(target && hascall(target, "HasStatus"))
+                        var/has_a = 0
+                        var/has_b = 0
+                        for(var/sid_a in P.passive_dmg_vs_dual_status_a)
+                            if(target.HasStatus(sid_a)) { has_a = 1; break }
+                        for(var/sid_b in P.passive_dmg_vs_dual_status_b)
+                            if(target.HasStatus(sid_b)) { has_b = 1; break }
+                        if(has_a && has_b)
+                            base_dmg = round(base_dmg * (1.0 + P.passive_dmg_vs_dual_status_pct))
+
+                // Momentum: consecutive hit stacking
+                if(P.passive_momentum_pct != 0 && P.passive_momentum_max > 0)
+                    if(("momentum_stacks" in user.vars) && user.momentum_stacks > 0)
+                        base_dmg = round(base_dmg * (1.0 + user.momentum_stacks * P.passive_momentum_pct))
+
+                // Defend empower: bonus after guarding (consumed on use)
+                if(P.passive_defend_empower_pct != 0 && ("is_concentrated" in user.vars) && user.is_concentrated)
+                    if(P.passive_defend_empower_category == "" || (S && S.category == P.passive_defend_empower_category))
+                        base_dmg = round(base_dmg * (1.0 + P.passive_defend_empower_pct))
+                        user.is_concentrated = 0
+
+        // ========== ID-SPECIFIC PASSIVE CHECKS ==========
+        // Attunement (Mage-line only): +15% when casting same element consecutively
+        if(user && ("last_element_used" in user.vars) && src.damage_type != "" && src.damage_type != "Physical")
+            if(user.last_element_used == src.damage_type)
+                for(var/datum/skill/AT in user.equipped_skills)
+                    if(AT.is_passive && AT.id == "mage_attunement")
+                        base_dmg = round(base_dmg * 1.15)
+                        break
+
+        // ========== END PASSIVE DAMAGE MODIFIERS ==========
 
         // Show the skill's flavor message.
         // Uses base_dmg (pre-pipeline) for any (dmg) placeholder — the final resolved
@@ -100,6 +146,33 @@ datum/skill_event/damage
                 user.hp += heal
                 user.ClampStats()
                 world << "<i>[user.name] absorbs [heal] HP!</i>"
+
+        // MP Leech
+        if(src.mp_leech > 0 && actual_dmg > 0)
+            var/mp_restore = round(actual_dmg * src.mp_leech)
+            if(mp_restore > 0)
+                user.mp = min(user.max_mp, user.mp + mp_restore)
+                world << "<i>[user.name] recovers [mp_restore] MP!</i>"
+
+        // ========== POST-DAMAGE TRACKING ==========
+        if(user)
+            // Momentum: increment stacks on hit
+            if(actual_dmg > 0 && ("momentum_stacks" in user.vars))
+                for(var/datum/skill/P in user.equipped_skills)
+                    if(P.is_passive && P.passive_momentum_max > 0)
+                        user.momentum_stacks = min(user.momentum_stacks + 1, P.passive_momentum_max)
+                        break
+
+            // Attunement: track last element used
+            if(("last_element_used" in user.vars) && src.damage_type != "Physical" && src.damage_type != "")
+                user.last_element_used = src.damage_type
+
+            // Ambush: track attacked targets
+            if(actual_dmg > 0 && target && ("attacked_targets" in user.vars))
+                if(!user.attacked_targets) user.attacked_targets = list()
+                if(!(target in user.attacked_targets))
+                    user.attacked_targets += target
+        // ========== END POST-DAMAGE TRACKING ==========
 
         // --- THE TRIGGER / COUNTER HOOK ---
         if(target && target.hp > 0 && user != target)

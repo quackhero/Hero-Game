@@ -55,6 +55,12 @@ mob
     var/mob/last_attacker
     var/mob/last_target           // The last mob this mob attacked/hit
     var/list/temp_triggers_used   // Tracks trigger_once skills fired this battle
+
+    var/momentum_stacks = 0
+    var/last_element_used = ""
+    var/is_concentrated = 0
+    var/list/attacked_targets = null
+    var/has_acted_this_encounter = 0
     var/datum/encounter/current_encounter
 
     // ============================================================
@@ -143,6 +149,19 @@ mob
                 src << "<font color='#00AA00'><b>[src.name] is Zombified — healing deals damage instead!</b></font>"
                 src.TakeDamage(amount, healer, "True", 0)
                 return
+        // Misfortune: enemies with 3+ debuffs receive reduced healing
+        if(src.current_encounter)
+            var/debuff_count = 0
+            for(var/datum/component/status/C in src.components)
+                if(C.dot_amount > 0 || C.stat_amount < 0 || C.full_disable || C.skip_chance > 0 || C.miss_chance > 0 || C.disable_type != "" || C.sap_mp > 0 || C.confusion > 0 || C.damage_resist_pct < 0)
+                    debuff_count++
+            if(debuff_count >= 3)
+                for(var/mob/opp in src.current_encounter.GetEnemies(src))
+                    if(opp.is_dead) continue
+                    for(var/datum/skill/P in opp.equipped_skills)
+                        if(P.is_passive && P.id == "oracle_misfortune")
+                            amount = round(amount * 0.70)
+                            break
         src.hp += amount
         src.ClampStats()
 
@@ -216,6 +235,7 @@ mob
         var/datum/component/status/disable_status = src.HasFullDisable()
         if(disable_status)
             world << "<i><font color='#CCCC00'>[src.name] is [disable_status.name] and cannot act!</font></i>"
+            src.momentum_stacks = 0
             src.EndTurn()
             return
 
@@ -223,6 +243,7 @@ mob
         for(var/datum/component/status/C in src.components)
             if(C.skip_chance > 0 && prob(C.skip_chance))
                 world << "<i><font color='#CCAA00'>[src.name] is [C.name] and loses their turn!</font></i>"
+                src.momentum_stacks = 0
                 src.EndTurn()
                 return
 
@@ -266,10 +287,16 @@ mob
                         else if(src.CanTarget(T)) src.BasicAttack(T)
                     if("Guard")
                         src.defending = 1
+                        src.momentum_stacks = 0
+                        for(var/datum/skill/P in src.equipped_skills)
+                            if(P.is_passive && P.passive_defend_empower_pct != 0)
+                                src.is_concentrated = 1
+                                break
                         world << "<i>[src.name] braces for impact!</i>"
                         src.SendSignal("SIG_WAIT")
                         src.EndTurn()
                     if("Pass")
+                        src.momentum_stacks = 0
                         src.SendSignal("SIG_WAIT")
                         src.EndTurn()
         else
@@ -285,6 +312,7 @@ mob
         for(var/datum/component/C in src.components)
             C.OnTurnEnd(src)
 
+        src.has_acted_this_encounter = 1
         src.is_busy = 0
         src.ComputeTotalWeight()
         src.atb_wait = src.CalculateATBWait()
@@ -514,18 +542,17 @@ mob
     proc/HandleDeath(mob/killer)
         if(src.is_dead) return
 
-        // Bravery: survive at 1 HP if the blow didn't exceed max_hp (not an overkill)
-        if(src.hp > -(src.max_hp))
-            for(var/datum/skill/S in src.equipped_skills)
-                if(S.is_passive && (S.id == "fighter_bravery" || S.id == "warrior_bravery"))
-                    if(!src.temp_triggers_used) src.temp_triggers_used = list()
-                    if(!(S.id in src.temp_triggers_used))
-                        src.temp_triggers_used += S.id
-                        src.hp = 1
-                        src.is_downed = 0
-                        world << "<b><font color='#FFD700'>[src.name]'s Bravery activates! They cling to life!</font></b>"
-                        return
-                    break
+        // Passive survive fatal blow (modular)
+        for(var/datum/skill/S in src.equipped_skills)
+            if(!S.is_passive || !S.passive_survive_fatal) continue
+            if(!S.passive_survive_fatal_overkill && src.hp <= -(src.max_hp)) continue
+            if(!src.temp_triggers_used) src.temp_triggers_used = list()
+            if(S.id in src.temp_triggers_used) continue
+            src.temp_triggers_used += S.id
+            src.hp = 1
+            src.is_downed = 0
+            world << "<b><font color='#FFD700'>[src.name] clings to life!</font></b>"
+            return
 
         src.SendSignal("SIG_DYING", killer) // Before is_dead: Re-Raise OnSignal restores HP here
 

@@ -26,6 +26,47 @@ datum/skill
     var/list/passive_stat_mods = null
     var/list/passive_stat_pct_mods = null  // Percentage-based stat mods: list("base_strength" = 0.10)
 
+    // --- Modular Passive Tags (any passive can use these via JSON) ---
+
+    // Bonus damage when target has a specific status
+    var/passive_dmg_vs_status = ""        // Status ID (e.g. "blinded")
+    var/passive_dmg_vs_status_pct = 0.0   // Bonus (e.g. 0.20 = +20%)
+
+    // Bonus damage when target has BOTH of two status families
+    var/list/passive_dmg_vs_dual_status_a = null  // First family IDs (any match)
+    var/list/passive_dmg_vs_dual_status_b = null  // Second family IDs (any match)
+    var/passive_dmg_vs_dual_status_pct = 0.0
+
+    // Bonus damage on elemental weakness hits
+    var/passive_weakness_bonus_pct = 0.0  // e.g. 0.20 = +20%
+
+    // Bonus damage after defending (consumed on next qualifying attack)
+    var/passive_defend_empower_pct = 0.0          // e.g. 0.25 = +25%
+    var/passive_defend_empower_category = ""       // "Spell", "Attack", "" = any
+
+    // Consecutive hit damage stacking
+    var/passive_momentum_pct = 0.0   // Per-stack bonus (e.g. 0.05 = +5%)
+    var/passive_momentum_max = 0     // Max stacks (e.g. 4)
+
+    // Counter stance persists (not consumed after one trigger)
+    var/passive_counter_persist = 0
+
+    // Dodge cap upgrade
+    var/passive_dodge_cap = 0    // If > 0, sets dodge_cap to this value
+
+    // Flat dodge bonus
+    var/passive_dodge_bonus = 0  // Added to dodge_bonus
+
+    // Survive fatal blow (once per battle)
+    var/passive_survive_fatal = 0
+    var/passive_survive_fatal_overkill = 0  // If 0, doesn't trigger on overkill
+
+    // Random target flag
+    var/random_target = 0  // If 1, each hit_pass picks a new random enemy
+
+    // Ambush requirement
+    var/req_ambush = 0  // Target must not have acted OR user must not have attacked them
+
     var/hitrate = 100      // Percentage chance the skill hits. Rolled BEFORE timeline processing.
     var/charge_time = 0    // Delay in ticks BEFORE the skill timeline begins. 0 = instant.
 
@@ -117,6 +158,14 @@ datum/skill
                         has_either = 1
                         break
             if(!has_either) return 0
+
+        // Ambush: target hasn't acted this encounter OR user hasn't attacked them
+        if(src.req_ambush)
+            var/target_hasnt_acted = ("has_acted_this_encounter" in target.vars) ? !target.has_acted_this_encounter : 0
+            var/user_hasnt_hit = 1
+            if(user && ("attacked_targets" in user.vars) && user.attacked_targets)
+                if(target in user.attacked_targets) user_hasnt_hit = 0
+            if(!target_hasnt_acted && !user_hasnt_hit) return 0
 
         return 1
 
@@ -278,6 +327,18 @@ datum/skill
                                         if(en.hp > 0) alive_en += en
                                 if(alive_en.len) target = pick(alive_en)
                                 else break
+
+                // Random target: pick a new random enemy each hit
+                if(src.random_target && !islist(target) && E)
+                    var/list/alive_targets = list()
+                    for(var/mob/rt in E.GetEnemies(user))
+                        if(!rt.is_dead && rt.hp > rt.death_threshold)
+                            if(user.CanTarget(rt, src, 1))
+                                alive_targets += rt
+                    if(alive_targets.len)
+                        target = pick(alive_targets)
+                    else
+                        break
 
                 for(var/datum/skill_event/EV in src.event_timeline)
                     if(user.hp <= user.death_threshold) break

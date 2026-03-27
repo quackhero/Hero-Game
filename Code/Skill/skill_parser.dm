@@ -34,8 +34,29 @@ datum/skill_parser
             var/result = (target && hascall(target, "HasStatus") && target.HasStatus(status_id)) ? "1" : "0"
             processed = copytext(processed, 1, start) + result + copytext(processed, paren_close + 1)
 
+        // IS_RACE: returns 1 if target's race matches the argument
+        while(findtext(processed, "IS_RACE("))
+            var/start = findtext(processed, "IS_RACE(")
+            var/paren_close = findtext(processed, ")", start + 8)
+            if(!paren_close) break
+            var/race_check = copytext(processed, start + 8, paren_close)
+            var/result = (target && ("race" in target.vars) && target.race == race_check) ? "1" : "0"
+            processed = copytext(processed, 1, start) + result + copytext(processed, paren_close + 1)
+
+        // COUNT_DEBUFFS: returns number of negative status components on target
+        while(findtext(processed, "COUNT_DEBUFFS"))
+            var/start = findtext(processed, "COUNT_DEBUFFS")
+            var/debuff_count = 0
+            if(target)
+                for(var/datum/component/status/C in target.components)
+                    if(C.dot_amount > 0 || C.stat_amount < 0 || C.full_disable || C.skip_chance > 0 || C.miss_chance > 0 || C.disable_type != "" || C.sap_mp > 0 || C.confusion > 0 || C.damage_resist_pct < 0)
+                        debuff_count++
+            processed = copytext(processed, 1, start) + "[debuff_count]" + copytext(processed, start + 13)
+
         // --- STEP A: Replace Target Stats (before user stats to avoid partial matches) ---
         if(target)
+            processed = replacetext(processed, "MAX_HP(E)", "[target.max_hp]")
+            processed = replacetext(processed, "MAX_MP(E)", "[target.max_mp]")
             processed = replacetext(processed, "STR(E)", "[target.strength]")
             processed = replacetext(processed, "RES(E)", "[target.resilience]")
             processed = replacetext(processed, "DEX(E)", "[target.dexterity]")
@@ -47,6 +68,8 @@ datum/skill_parser
 
         // --- STEP B: Replace User Stats ---
         if(user)
+            processed = replacetext(processed, "MAX_HP", "[user.max_hp]")
+            processed = replacetext(processed, "MAX_MP", "[user.max_mp]")
             processed = replacetext(processed, "STR", "[user.strength]")
             processed = replacetext(processed, "RES", "[user.resilience]")
             processed = replacetext(processed, "DEX", "[user.dexterity]")

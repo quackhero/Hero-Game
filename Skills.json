@@ -106,12 +106,7 @@
             {"type": "damage", "formula": "STR * 1.2", "damage_type": "Blunt", "text": "(I) strikes (target) mid-air! ([dmg] Damage)"}
         ]
     },
-    {
-        "id": "fighter_dodge",
-        "name": "Dodge",
-        "is_passive": 1,
-        "_note": "ENGINE: When equipped, sets owner.dodge_cap to FULL_DODGE_CAP (75) instead of BASE_DODGE_CAP (30). Requires custom handling in UpdateStats."
-    },
+    {"id": "fighter_dodge", "name": "Dodge", "is_passive": 1, "passive_dodge_cap": 75},
     {
         "id": "fighter_feint",
         "name": "Feint",
@@ -130,23 +125,16 @@
         "category": "Attack",
         "cost": 12,
         "hitrate": 85,
-        "target_flags": ["TARGET_AOE"],
+        "hit_count": 3,
+        "random_target": 1,
+        "target_flags": ["TARGET_SINGLE"],
         "requirements": {"req_weapon_type": "Fist"},
         "on_target_death": "RETARGET",
         "timeline": [
-            {"type": "message", "text": "(I) unleashes a wild flurry of punches!"},
-            {"type": "damage", "formula": "STR * 0.7", "damage_type": "Blunt", "text": "(E) is struck! ([dmg] Damage)"},
-            {"type": "damage", "delay": 2, "formula": "STR * 0.7", "damage_type": "Blunt", "text": "(E) is hit again! ([dmg] Damage)"},
-            {"type": "damage", "delay": 2, "formula": "STR * 0.7", "damage_type": "Blunt", "text": "(E) takes another blow! ([dmg] Damage)"}
-        ],
-        "_note": "ENGINE: Flurry should ideally hit random targets, not all enemies. Current AOE hits everyone. May need a RANDOM_TARGET flag or custom handling."
+            {"type": "damage", "formula": "STR * 0.7", "damage_type": "Blunt", "text": "(I) lands a punch on (target)! ([dmg] Damage)"}
+        ]
     },
-    {
-        "id": "fighter_bravery",
-        "name": "Bravery",
-        "is_passive": 1,
-        "_note": "ENGINE: On SIG_DYING, if damage did not exceed max_hp (not overkill), set HP to 1 and abort death. Requires trigger_condition SIG_DYING with custom logic. trigger_once=1."
-    },
+    {"id": "fighter_bravery", "name": "Bravery", "is_passive": 1, "passive_survive_fatal": 1, "passive_survive_fatal_overkill": 0},
     {
         "id": "fighter_sweep_kick",
         "name": "Sweep Kick",
@@ -169,12 +157,7 @@
             }
         ]
     },
-    {
-        "id": "fighter_self_defense",
-        "name": "Self Defense",
-        "is_passive": 1,
-        "_note": "ENGINE: Modifies Counter Stance behavior. When equipped, counter_window triggers on ALL physical attacks, not just the first. Requires custom handling in counter_window.OnHit — do not remove the window after first trigger if this passive is equipped."
-    },
+    {"id": "fighter_self_defense", "name": "Self Defense", "is_passive": 1, "passive_counter_persist": 1},
     {
         "id": "fighter_duelascend",
         "name": "Duelascend",
@@ -202,12 +185,7 @@
         ],
         "_note": "Should only hit grounded enemies. May need pos_flags filtering on AOE."
     },
-    {
-        "id": "fighter_momentum",
-        "name": "Momentum",
-        "is_passive": 1,
-        "_note": "ENGINE: Track consecutive attacks. Each consecutive attack without Defend/stun/miss grants +5% damage, up to +20%. Resets on Defend, stun, freeze, sleep, or miss. Requires a counter variable on the mob and integration with the damage pipeline."
-    },
+    {"id": "fighter_momentum", "name": "Momentum", "is_passive": 1, "passive_momentum_pct": 0.05, "passive_momentum_max": 4},
     {
         "id": "fighter_elbow_smash",
         "name": "Elbow Smash",
@@ -221,14 +199,13 @@
                 "type": "condition",
                 "formula": "HAS_STATUS(de_dodge)",
                 "if_true": [
-                    {"type": "damage", "formula": "STR * 2.0", "damage_type": "Blunt", "bypass": -1, "text": "(I) drives an elbow through (target)'s guard! ([dmg] Damage)"}
+                    {"type": "damage", "formula": "STR * 2.0 + RES(E) * 0.5", "damage_type": "Blunt", "text": "(I) drives an elbow through (target)'s guard! ([dmg] Damage)"}
                 ],
                 "if_false": [
                     {"type": "damage", "formula": "STR * 2.0", "damage_type": "Blunt", "text": "(I) slams an elbow into (target)! ([dmg] Damage)"}
                 ]
             }
-        ],
-        "_note": "The bypass -1 on the De-Dodge branch ignores all RES. Design says bypass 50% RES — may need a bypass value of RES/2 instead. Tuning target."
+        ]
     },
     {
         "id": "fighter_rising_storm",
@@ -280,12 +257,7 @@
             {"type": "inflict", "status": "provoked", "duration": 3, "chance": 100, "target": "self"}
         ]
     },
-    {
-        "id": "warrior_bravery",
-        "name": "Bravery",
-        "is_passive": 1,
-        "_note": "ENGINE: Same as fighter_bravery. On SIG_DYING, survive at 1 HP if not overkill. trigger_once=1."
-    },
+    {"id": "warrior_bravery", "name": "Bravery", "is_passive": 1, "passive_survive_fatal": 1, "passive_survive_fatal_overkill": 0},
     {
         "id": "warrior_war_cry",
         "name": "War Cry",
@@ -399,13 +371,12 @@
         "timeline": [
             {
                 "type": "condition",
-                "formula": "HP < HP(E) * 0.25",
+                "formula": "HP < MAX_HP * 0.25",
                 "if_true": [
-                    {"type": "heal", "formula": "VIT * 0.03"}
+                    {"type": "heal", "formula": "MAX_HP * 0.03"}
                 ]
             }
-        ],
-        "_note": "The formula HP < HP(E)*0.25 is a workaround. Ideally this checks if user HP is below 25% of user max_hp. Parser may need a MAX_HP reference."
+        ]
     },
     {
         "id": "warrior_shield_wall",
@@ -506,12 +477,7 @@
             {"type": "inflict", "status": "poisoned", "duration": 3, "chance": 80}
         ]
     },
-    {
-        "id": "rogue_dodge",
-        "name": "Dodge",
-        "is_passive": 1,
-        "_note": "ENGINE: Same as fighter_dodge. Sets dodge_cap to FULL_DODGE_CAP when equipped."
-    },
+    {"id": "rogue_dodge", "name": "Dodge", "is_passive": 1, "passive_dodge_cap": 75},
     {
         "id": "rogue_smoke_bomb",
         "name": "Smoke Bomb",
@@ -523,12 +489,7 @@
             {"type": "inflict", "status": "blinded", "duration": 3, "chance": 90}
         ]
     },
-    {
-        "id": "rogue_cheap_shot",
-        "name": "Cheap Shot",
-        "is_passive": 1,
-        "_note": "ENGINE: All attacks vs Blinded targets deal +20% damage. Requires integration in the damage pipeline — check target for blinded status, apply 1.2 multiplier. Similar to how damage_dealt_mult works but conditional on target status."
-    },
+    {"id": "rogue_cheap_shot", "name": "Cheap Shot", "is_passive": 1, "passive_dmg_vs_status": "blinded", "passive_dmg_vs_status_pct": 0.20},
     {
         "id": "rogue_lacerate",
         "name": "Lacerate",
@@ -641,23 +602,17 @@
             {"type": "inflict", "status": "poisoned", "duration": 3, "chance": 20}
         ]
     },
-    {
-        "id": "rogue_exploit_weakness",
-        "name": "Exploit Weakness",
-        "is_passive": 1,
-        "_note": "ENGINE: All attacks vs targets with BOTH poisoned (any tier) AND wound (any tier) deal +20% damage. Requires damage pipeline integration — check target for both status families, apply 1.2 multiplier."
-    },
+    {"id": "rogue_exploit_weakness", "name": "Exploit Weakness", "is_passive": 1, "passive_dmg_vs_dual_status_a": ["poisoned", "poisoned_ga", "poisoned_ja"], "passive_dmg_vs_dual_status_b": ["minor_wound", "wound", "fatal_wound", "lethal_wound", "terminal_wound"], "passive_dmg_vs_dual_status_pct": 0.20},
     {
         "id": "rogue_ambush",
         "name": "Ambush",
         "category": "Attack",
         "cost": 12,
         "target_flags": ["TARGET_SINGLE"],
-        "requirements": {"req_weapon_type": "Dagger"},
+        "requirements": {"req_weapon_type": "Dagger", "req_ambush": 1},
         "timeline": [
             {"type": "damage", "formula": "DEX * 1.8", "damage_type": "Piercing", "text": "(I) ambushes (target) from the shadows! ([dmg] Damage)"}
-        ],
-        "_note": "ENGINE: Can only target enemies that haven't acted this encounter OR targets the Rogue hasn't previously attacked. Needs custom targeting validation — track attacked_targets list on the mob and check encounter turn history."
+        ]
     },
     {
         "id": "rogue_shadow_dance",
@@ -672,9 +627,24 @@
             {"type": "message", "text": "(I) begins a deadly shadow dance!"},
             {"type": "damage", "formula": "DEX * 0.8", "damage_type": "Piercing", "text": "(I) dashes in and strikes! ([dmg] Damage)"},
             {"type": "damage", "delay": 5, "formula": "DEX * 0.8", "damage_type": "Piercing", "text": "(I) vanishes and strikes from behind! ([dmg] Damage)"},
-            {"type": "damage", "delay": 5, "formula": "DEX * 1.5", "damage_type": "Piercing", "text": "(I) reappears for the final blow! ([dmg] Damage)"}
-        ],
-        "_note": "ENGINE: Final hit should gain +10% per debuff on target at time of cast (max +40%). Needs snapshot of debuff count at skill start, then modify the final hit formula. Complex — may need a custom event or pre-computed variable."
+            {
+                "type": "condition", "formula": "COUNT_DEBUFFS >= 4",
+                "if_true": [{"type": "damage", "delay": 5, "formula": "DEX * 2.1", "damage_type": "Piercing", "text": "(I) reappears for a devastating final blow! ([dmg] Damage)"}],
+                "if_false": [{
+                    "type": "condition", "formula": "COUNT_DEBUFFS >= 3",
+                    "if_true": [{"type": "damage", "delay": 5, "formula": "DEX * 1.95", "damage_type": "Piercing", "text": "(I) reappears for a powerful final blow! ([dmg] Damage)"}],
+                    "if_false": [{
+                        "type": "condition", "formula": "COUNT_DEBUFFS >= 2",
+                        "if_true": [{"type": "damage", "delay": 5, "formula": "DEX * 1.8", "damage_type": "Piercing", "text": "(I) reappears for a heavy final blow! ([dmg] Damage)"}],
+                        "if_false": [{
+                            "type": "condition", "formula": "COUNT_DEBUFFS >= 1",
+                            "if_true": [{"type": "damage", "delay": 5, "formula": "DEX * 1.65", "damage_type": "Piercing", "text": "(I) reappears for the final blow! ([dmg] Damage)"}],
+                            "if_false": [{"type": "damage", "delay": 5, "formula": "DEX * 1.5", "damage_type": "Piercing", "text": "(I) reappears for the final blow! ([dmg] Damage)"}]
+                        }]
+                    }]
+                }]
+            }
+        ]
     },
 
     {"_comment": "========== MAGE SKILLS =========="},
@@ -728,9 +698,8 @@
         "cost": 7,
         "target_flags": ["TARGET_SINGLE"],
         "timeline": [
-            {"type": "damage", "formula": "INT * 1.0", "damage_type": "Necrotic", "leech": 0.0, "text": "(I) drains aether from (target)! ([dmg] Necrotic Damage)"}
-        ],
-        "_note": "ENGINE: Should restore MP equal to 25% of damage dealt after RES. Leech field currently only restores HP. Needs a 'mp_leech' field or custom event that converts damage to MP restoration."
+            {"type": "damage", "formula": "INT * 1.0", "damage_type": "Necrotic", "mp_leech": 0.25, "text": "(I) drains aether from (target)! ([dmg] Necrotic Damage)"}
+        ]
     },
     {
         "id": "mage_mana_shield",
@@ -756,12 +725,7 @@
             {"type": "inflict", "status": "minor_burn", "duration": 3, "chance": 20}
         ]
     },
-    {
-        "id": "mage_attunement",
-        "name": "Attunement",
-        "is_passive": 1,
-        "_note": "ENGINE: When casting the same element consecutively, +15% damage. Does not stack. Resets on element switch. Requires tracking last_element_used on the mob and applying a multiplier in the damage pipeline when elements match."
-    },
+    {"id": "mage_attunement", "name": "Attunement", "is_passive": 1, "_note": "Handled by ID check in damage pipeline. +15% same element consecutive."},
     {
         "id": "mage_blizzard_storm",
         "name": "Blizzard Storm",
@@ -775,12 +739,7 @@
             {"type": "inflict", "status": "frozen", "duration": 1, "chance": 20}
         ]
     },
-    {
-        "id": "mage_elemental_sight",
-        "name": "Elemental Sight",
-        "is_passive": 1,
-        "_note": "ENGINE: Spells hitting elemental weakness deal +20% bonus. Requires checking the element_factory weakness result in the damage pipeline and applying an additional 1.2 multiplier when this passive is equipped. Stacks multiplicatively with the existing 1.2x weakness bonus for a total of 1.44x."
-    },
+    {"id": "mage_elemental_sight", "name": "Elemental Sight", "is_passive": 1, "passive_weakness_bonus_pct": 0.20},
     {
         "id": "mage_fira",
         "name": "Fira",
@@ -807,12 +766,7 @@
             {"type": "inflict", "status": "stunned", "duration": 1, "chance": 15}
         ]
     },
-    {
-        "id": "mage_concentrate",
-        "name": "Concentrate",
-        "is_passive": 1,
-        "_note": "ENGINE: After using Defend (SIG_WAIT), next spell deals +25%. Does not stack. Persists until a spell is cast. Requires a flag on the mob (is_concentrated) set by SIG_WAIT signal, consumed on next spell cast, applying 1.25 multiplier."
-    },
+    {"id": "mage_concentrate", "name": "Concentrate", "is_passive": 1, "passive_defend_empower_pct": 0.25, "passive_defend_empower_category": "Spell"},
     {
         "id": "mage_barrier_burst",
         "name": "Barrier Burst",
@@ -921,9 +875,17 @@
         "cost": 8,
         "target_flags": ["TARGET_SINGLE"],
         "timeline": [
-            {"type": "damage", "formula": "MND * 1.2", "damage_type": "Light", "text": "(I) smites (target) with holy light! ([dmg] Light Damage)"}
-        ],
-        "_note": "ENGINE: Should deal +50% vs Undead race. Needs a condition check: if target.race == Undead, use MND*1.8 instead. Could use a condition event checking race, but parser doesn't support race checks yet."
+            {
+                "type": "condition",
+                "formula": "IS_RACE(Undead)",
+                "if_true": [
+                    {"type": "damage", "formula": "MND * 1.8", "damage_type": "Light", "text": "(I) smites (target) with holy light! The undead burn! ([dmg] Light Damage)"}
+                ],
+                "if_false": [
+                    {"type": "damage", "formula": "MND * 1.2", "damage_type": "Light", "text": "(I) smites (target) with holy light! ([dmg] Light Damage)"}
+                ]
+            }
+        ]
     },
     {
         "id": "cleric_regen",
@@ -1067,12 +1029,7 @@
         ],
         "_note": "ENGINE: curse_marked status needs to be added to Statuses.json. Should increase ALL damage taken by 10% (including DoTs). Could use a negative damage_resist_pct of -0.10 or a custom damage_taken_mult field."
     },
-    {
-        "id": "oracle_foresight",
-        "name": "Foresight",
-        "is_passive": 1,
-        "_note": "ENGINE: 15% flat dodge chance that stacks with Dodge passive and other sources. When equipped, adds 15 to the mob's dodge calculation. Could be implemented via passive_stat_mods adding to a dodge_bonus var, or a flat dodge_chance field on the passive."
-    },
+    {"id": "oracle_foresight", "name": "Foresight", "is_passive": 1, "passive_dodge_bonus": 15},
     {
         "id": "oracle_enfeeble",
         "name": "Enfeeble",
@@ -1101,9 +1058,17 @@
         "cost": 12,
         "target_flags": ["TARGET_SINGLE"],
         "timeline": [
-            {"type": "damage", "formula": "INT * 1.5", "damage_type": "Necrotic", "text": "(I) fixes (target) with a baleful gaze! ([dmg] Necrotic Damage)"}
-        ],
-        "_note": "ENGINE: If target has 2+ debuffs, damage should be +50% (INT*2.25). Needs a condition that counts active debuffs on the target. Parser doesn't currently support COUNT_DEBUFFS. Could use nested HAS_STATUS checks but that's fragile — better to add a debuff counter to the parser."
+            {
+                "type": "condition",
+                "formula": "COUNT_DEBUFFS >= 2",
+                "if_true": [
+                    {"type": "damage", "formula": "INT * 2.25", "damage_type": "Necrotic", "text": "(I) fixes (target) with a baleful gaze! The hexes amplify! ([dmg] Necrotic Damage)"}
+                ],
+                "if_false": [
+                    {"type": "damage", "formula": "INT * 1.5", "damage_type": "Necrotic", "text": "(I) fixes (target) with a baleful gaze! ([dmg] Necrotic Damage)"}
+                ]
+            }
+        ]
     },
     {
         "id": "oracle_slow",
@@ -1169,12 +1134,7 @@
             {"type": "inflict", "status": "de_strength", "duration": 3, "chance": 80}
         ]
     },
-    {
-        "id": "oracle_misfortune",
-        "name": "Misfortune",
-        "is_passive": 1,
-        "_note": "ENGINE: Enemies with 3+ debuffs have ALL healing received reduced by 30%. Requires: count debuffs on a mob, and if >=3, reduce all healing by 30%. Could be implemented as a check in ApplyHeal or as a debuff-count-triggered status. Complex — needs custom code."
-    },
+    {"id": "oracle_misfortune", "name": "Misfortune", "is_passive": 1, "_note": "Handled by ID check in ApplyHeal. -30% healing on enemies with 3+ debuffs."},
     {
         "id": "oracle_mind_break",
         "name": "Mind Break",
@@ -1206,8 +1166,23 @@
         "target_flags": ["TARGET_AOE"],
         "timeline": [
             {"type": "message", "text": "(I) unravels the threads of fate!"},
-            {"type": "damage", "formula": "INT * 1.2", "damage_type": "Necrotic", "text": "Fate tears at (E)! ([dmg] Necrotic Damage)"}
-        ],
-        "_note": "ENGINE: Damage should be INT*1.2 PER DEBUFF on each target, max 4 debuffs (INT*4.8 max). Needs a debuff counter per target that multiplies the base formula. The current single damage event fires once at INT*1.2 — needs custom scaling logic. Most complex skill in the game to implement correctly."
+            {
+                "type": "condition", "formula": "COUNT_DEBUFFS >= 4",
+                "if_true": [{"type": "damage", "formula": "INT * 4.8", "damage_type": "Necrotic", "text": "Fate tears (E) apart! ([dmg] Necrotic Damage)"}],
+                "if_false": [{
+                    "type": "condition", "formula": "COUNT_DEBUFFS >= 3",
+                    "if_true": [{"type": "damage", "formula": "INT * 3.6", "damage_type": "Necrotic", "text": "Fate rips through (E)! ([dmg] Necrotic Damage)"}],
+                    "if_false": [{
+                        "type": "condition", "formula": "COUNT_DEBUFFS >= 2",
+                        "if_true": [{"type": "damage", "formula": "INT * 2.4", "damage_type": "Necrotic", "text": "Fate tears at (E)! ([dmg] Necrotic Damage)"}],
+                        "if_false": [{
+                            "type": "condition", "formula": "COUNT_DEBUFFS >= 1",
+                            "if_true": [{"type": "damage", "formula": "INT * 1.2", "damage_type": "Necrotic", "text": "Fate brushes (E)! ([dmg] Necrotic Damage)"}],
+                            "if_false": [{"type": "message", "text": "(E) has no debuffs — the threads find nothing to unravel."}]
+                        }]
+                    }]
+                }]
+            }
+        ]
     }
 ]

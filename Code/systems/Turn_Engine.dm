@@ -39,6 +39,12 @@ datum/encounter
             if(M.temp_triggers_used) M.temp_triggers_used.Cut()
             else M.temp_triggers_used = list()
 
+            if("momentum_stacks" in M.vars) M.momentum_stacks = 0
+            if("last_element_used" in M.vars) M.last_element_used = ""
+            if("is_concentrated" in M.vars) M.is_concentrated = 0
+            if("attacked_targets" in M.vars) M.attacked_targets = list()
+            if("has_acted_this_encounter" in M.vars) M.has_acted_this_encounter = 0
+
         // --- ATB WAIT INITIALIZATION ---
         // Compute each mob's starting countdown so faster mobs act sooner.
         for(var/mob/M in src.all_participants)

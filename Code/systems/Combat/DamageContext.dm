@@ -48,6 +48,11 @@ datum/damage_context
                     src.final_damage = round(src.final_damage * mult)
                     if(mult > 1.0)
                         src.hit_weakness = 1
+                        // Modular weakness bonus from passives
+                        if(src.attacker)
+                            for(var/datum/skill/P in src.attacker.equipped_skills)
+                                if(P.is_passive && P.passive_weakness_bonus_pct != 0)
+                                    src.final_damage = round(src.final_damage * (1.0 + P.passive_weakness_bonus_pct))
 
         // Step 5: Affinity resolution
         // Each datum/component/affinity on the defender gets to modify final_damage.

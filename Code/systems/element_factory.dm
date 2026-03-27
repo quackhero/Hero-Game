@@ -25,6 +25,7 @@ datum/element_factory
     // Returns 1.0 otherwise (no interaction or unknown element).
     proc/GetMultiplier(attack_element, target_element)
         if(!attack_element || !target_element) return 1.0
+        if(attack_element == target_element) return 0.5
         var/list/elem_data = src.loaded_elements[target_element]
         if(!elem_data) return 1.0
         var/list/weak_list = elem_data["weak_against"]
