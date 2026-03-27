@@ -27,6 +27,7 @@ mob
         // --- THE LOAD / CREATE FORK ---
         if(src.LoadPlayer())
             src << "<font color='#00FF00'><b>Save file loaded successfully! Welcome back, [src.name].</b></font>"
+            src.SyncClassSkills() // Catch any skills added since the last save
         else
             spawn(5)
                 src.CharacterCreation()

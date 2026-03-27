@@ -513,6 +513,20 @@ mob
 
     proc/HandleDeath(mob/killer)
         if(src.is_dead) return
+
+        // Bravery: survive at 1 HP if the blow didn't exceed max_hp (not an overkill)
+        if(src.hp > -(src.max_hp))
+            for(var/datum/skill/S in src.equipped_skills)
+                if(S.is_passive && (S.id == "fighter_bravery" || S.id == "warrior_bravery"))
+                    if(!src.temp_triggers_used) src.temp_triggers_used = list()
+                    if(!(S.id in src.temp_triggers_used))
+                        src.temp_triggers_used += S.id
+                        src.hp = 1
+                        src.is_downed = 0
+                        world << "<b><font color='#FFD700'>[src.name]'s Bravery activates! They cling to life!</font></b>"
+                        return
+                    break
+
         src.SendSignal("SIG_DYING", killer) // Before is_dead: Re-Raise OnSignal restores HP here
 
         // Re-Raise: if a component restored HP during SIG_DYING, abort death
@@ -564,17 +578,19 @@ mob
         var/datum/component/status/existing = src.GetStatus(status_id)
         if(existing)
             existing.OnRefresh(duration, amount)
+            world << "<i><font color='#B19CD9'>[src.name] ([existing.name] [existing.duration]/[existing.max_duration] refreshed)</font></i>"
         else
             // 3. Clone the template and apply it!
             var/datum/component/status/new_status = template.Clone()
             new_status.owner = src
             new_status.duration = duration
+            new_status.max_duration = duration
             new_status.amount = amount
             src.components += new_status
 
             new_status.OnApply(src) // Apply the status effects immediately
 
-            world << "<i><font color='#B19CD9'>[src.name] gains [new_status.name]!</font></i>"
+            world << "<i><font color='#B19CD9'>[src.name] ([new_status.name] [new_status.duration]/[new_status.max_duration] inflicted)</font></i>"
             src.SendSignal("SIG_STATUS_APPLIED", status_id)
             src.SendSignal(SIG_ON_INFECT, new_status)  // Step 2: trigger passive infect reactions
             // Per-status targeted infect signal — e.g. "SIG_INFECTED_BY_POISONED"
@@ -610,7 +626,7 @@ mob
         var/sid = S.id // Save before del()
         src.components -= S
         S.OnRemove(src)
-        world << "<i><font color='#B19CD9'>[src.name]'s [S.name] wore off!</font></i>"
+        world << "<i><font color='#B19CD9'>[src.name] ([S.name] has worn off!)</font></i>"
         src.SendSignal(SIG_ON_EXPIRE, S)   // Step 2: fire before del() so datum is still valid
         // Per-status targeted expire signal — e.g. "SIG_EXPIRED_SLEEPING"
         src.SendSignal("SIG_EXPIRED_[uppertext(sid)]", S)

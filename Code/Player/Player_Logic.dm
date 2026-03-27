@@ -141,6 +141,7 @@ mob/Topic(href, href_list)
         src.UpdateMainMenu("Equip_Gear", href_list["slot"])
         return
     else if(action == "camp_skill")
+        src.SyncClassSkills() // Safety net: ensure no skills are missing before showing the list
         src.UpdateMainMenu("Equip_Skill", null, text2num(href_list["slot_idx"]))
         return
     else if(action == "camp_item")

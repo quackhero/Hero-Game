@@ -58,10 +58,13 @@ datum/damage_context
                 if(src.was_nulled || src.was_absorbed) break
                 A.Apply(src)
 
-        // Step 6: Defending halves damage
+        // Step 6: Defending halves damage (Shield Wall upgrades to 75% reduction)
         if(src.defender && src.defender.defending)
             src.pre_defend_damage = src.final_damage
-            src.final_damage = src.final_damage * 0.5
+            var/defend_mult = 0.5
+            if(hascall(src.defender, "HasStatus") && src.defender.HasStatus("shield_wall"))
+                defend_mult = 0.25
+            src.final_damage = src.final_damage * defend_mult
 
         // Step 7: Floor (skip if the hit was suppressed)
         if(!src.was_nulled && !src.was_absorbed)

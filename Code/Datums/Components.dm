@@ -66,6 +66,7 @@ datum/component/status
     name = "Unknown Status"
     amount = 0
     duration = 0
+    max_duration = 0  // Stores the original duration for display purposes (e.g. "3/5 turns")
     owner = null
 
     // --- Trigger Integration ---
@@ -167,6 +168,7 @@ datum/component/status
         var/datum/component/status/S = new()
         S.id = src.id
         S.name = src.name
+        S.max_duration = src.max_duration
         S.trigger_condition = src.trigger_condition
         S.trigger_chance = src.trigger_chance
         S.reaction_skill_id = src.reaction_skill_id
@@ -431,6 +433,7 @@ datum/component/status
     // ============================================================
     OnRefresh(dur, amt)
         src.duration = max(src.duration, dur)
+        src.max_duration = src.duration  // Reset max to match refreshed duration
         src.amount = max(src.amount, amt)
         // Wound stacking: each re-application doubles DoT damage
         if(src.stack_double && src.dot_amount > 0)
@@ -459,10 +462,10 @@ datum/component/status
             if(dot_dmg > 0)
                 if(src.dot_delayed_burst)
                     src.dot_accumulated += dot_dmg
-                    world << "<i><small>[src.name] festers in [M.name]... ([src.dot_accumulated] stored)</small></i>"
+                    world << "<i><small>[M.name] ([src.name]: [dot_dmg] stored, [M.hp] HP remaining)</small></i>"
                 else
-                    world << "<i><font color='#CC4444'>[M.name] suffers [dot_dmg] [src.dot_type] damage from [src.name]!</font></i>"
                     M.TakeDamage(dot_dmg, null, src.dot_type, 1)
+                    world << "<i><font color='#CC4444'>[M.name] ([src.name]: [dot_dmg] damage, [M.hp] HP remaining)</font></i>"
 
         // 2. Parasite burst: fires accumulated damage on the NEXT turn (when duration ticks)
         if(src.dot_delayed_burst && src.dot_accumulated > 0 && src.duration == 1)
@@ -470,7 +473,7 @@ datum/component/status
             src.dot_accumulated = 0
             if(src.dot_cannot_kill) burst = min(burst, M.hp - 1)
             if(burst > 0)
-                world << "<font color='#CC0000'><b>[src.name] erupts! [M.name] takes [burst] [src.dot_type] damage!</b></font>"
+                world << "<font color='#CC0000'><b>[M.name] ([src.name] erupts: [burst] damage!)</b></font>"
                 M.TakeDamage(burst, null, src.dot_type, 1)
 
         // 3. HP Heal Over Time
@@ -481,21 +484,21 @@ datum/component/status
             else
                 M.hp += hot_heal
                 M.ClampStats()
-            world << "<i><font color='#00FF00'>[M.name] recovers [hot_heal] HP from [src.name]!</font></i>"
+            world << "<i><font color='#00FF00'>[M.name] ([src.name]: [hot_heal] HP recovered, [M.hp] HP remaining)</font></i>"
 
         // 4. MP Restore per turn (Regen)
         if(src.hot_mp > 0)
             var/mp_regen = round(src.hot_mp)
             M.mp += mp_regen
             M.ClampStats()
-            world << "<i><font color='#6699FF'>[M.name] recovers [mp_regen] MP from [src.name]!</font></i>"
+            world << "<i><font color='#6699FF'>[M.name] ([src.name]: [mp_regen] MP recovered, [M.mp] MP remaining)</font></i>"
 
         // 5. MP Drain per turn (Sap)
         if(src.sap_mp > 0)
             var/mp_drain = min(round(src.sap_mp), M.mp)
             if(mp_drain > 0)
                 M.mp -= mp_drain
-                world << "<i><font color='#9933CC'>[src.name] drains [mp_drain] MP from [M.name]!</font></i>"
+                world << "<i><font color='#9933CC'>[M.name] ([src.name]: [mp_drain] MP drained, [M.mp] MP remaining)</font></i>"
 
     // ============================================================
     // --- TURN END ---
@@ -515,19 +518,37 @@ datum/component/status
     OnBeforeDamage(damage, type, mob/attacker)
         if(!owner || !(src in owner.components)) return damage
 
+        // 0a. Fortified: reduces all incoming damage by 20%
+        if(src.id == "fortified" && damage > 0)
+            damage = round(damage * 0.80)
+            return damage
+
+        // 0b. Barrier Shield: HP pool absorbs damage before anything else
+        if(src.id == "barrier_shield" && src.amount > 0 && damage > 0)
+            var/absorb = min(damage, src.amount)
+            src.amount -= absorb
+            damage -= absorb
+            owner << "<font color='#4488FF'>Barrier absorbed [absorb] damage!</font>"
+            if(src.amount <= 0)
+                owner << "<b>The barrier shatters!</b>"
+                if(hascall(owner, "RemoveStatus"))
+                    spawn(0) call(owner, "RemoveStatus")(src)
+            return damage
+
         // 1. Invincibility: block damage below threshold
         if(src.invincible_thresh > 0 && damage > 0 && damage < src.invincible_thresh)
             owner << "<font color='#FFD700'><b>INVINCIBLE! ([damage] blocked)</b></font>"
             return 0
 
-        // 2. Elemental Resistance Shield
-        // findtext() handles dual-type strings like "Slashing Fire" — a "Slashing" resist
-        // fires against "Slashing Fire" damage without requiring an exact match.
-        if(src.damage_resist_pct > 0)
+        // 2. Elemental Resistance Shield / Vulnerability
+        // findtext() handles dual-type strings like "Slashing Fire".
+        // Negative damage_resist_pct (e.g. Curse Mark: -0.10) amplifies damage by that fraction.
+        if(src.damage_resist_pct != 0)
             if(src.damage_resist_type == "" || findtext(type, src.damage_resist_type))
                 var/resist = round(damage * src.damage_resist_pct)
                 damage -= resist
-                owner << "<font color='#4488FF'>Resisted [resist] [type] damage!</font>"
+                if(src.damage_resist_pct > 0)
+                    owner << "<font color='#4488FF'>Resisted [resist] [type] damage!</font>"
                 return max(0, damage)
 
         // 3. Mana Shield: route damage to MP first

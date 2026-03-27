@@ -129,6 +129,20 @@ mob
                     var/pct = S.passive_stat_pct_mods[stat_name]
                     src.vars[derived] += round(src.vars[derived] * pct)
 
+        // 5c. Dodge passive: upgrade dodge cap if Dodge is equipped
+        src.dodge_cap = BASE_DODGE_CAP  // Reset to base each update
+        for(var/datum/skill/S in src.equipped_skills)
+            if(S.is_passive && (S.id == "fighter_dodge" || S.id == "rogue_dodge"))
+                src.dodge_cap = FULL_DODGE_CAP
+                break
+
+        // 5d. Foresight passive: add flat dodge bonus
+        src.dodge_bonus = 0  // Reset each update
+        for(var/datum/skill/S in src.equipped_skills)
+            if(S.is_passive && S.id == "oracle_foresight")
+                src.dodge_bonus += 15
+                break
+
         // 6. Derive HP/MP from VIT/MND AFTER all stat modifiers
         src.max_hp = 15 + (src.vitality * 3)
         src.max_mp = 8 + (src.mind * 2)
@@ -148,6 +162,33 @@ mob
         src.ComputeTotalWeight()
         src.atb_wait = src.CalculateATBWait()
 
+    // Grants every skill in the class skill_tree that the player qualifies for
+    // (level <= src.level) but doesn't already own. Safe to call any time.
+    proc/SyncClassSkills()
+        if(!src.Primary_class) return
+        for(var/lvl_str in src.Primary_class.skill_tree)
+            if(text2num(lvl_str) > src.level) continue
+            var/skill_entry = src.Primary_class.skill_tree[lvl_str]
+            if(istext(skill_entry))
+                var/datum/skill/S = skill_factory.loaded_skills[skill_entry]
+                if(!S)
+                    world.log << "WARNING: Class [src.Primary_class.name] skill_tree references unknown skill ID: [skill_entry]"
+                    continue
+                if(!(S in src.skills))
+                    src.skills += S
+                    src << "<font color='#00FFFF'><b>You learned a new technique: [S.name]!</b></font>"
+            else
+                // Hardcoded DM type path — check by type to avoid duplicates
+                var/already_have = 0
+                for(var/datum/skill/existing in src.skills)
+                    if(existing.type == skill_entry)
+                        already_have = 1
+                        break
+                if(!already_have)
+                    var/datum/skill/new_skill = new skill_entry()
+                    src.skills += new_skill
+                    src << "<font color='#00FFFF'><b>You learned a new technique: [new_skill.name]!</b></font>"
+
     proc/LevelUp()
         src.level++
         src.stat_points += 4
@@ -159,16 +200,10 @@ mob
                 var/growth_amt = src.Primary_class.stat_growths[stat_name]
                 if(stat_name in src.vars)
                     src.vars[stat_name] += growth_amt
-                    // Clean up the text for display (removes the word "base_")
                     var/display_name = replacetext(stat_name, "base_", "")
                     src << "<font color='#00FF00'>+ [growth_amt] [uppertext(display_name)]</font>"
 
-            var/lvl_str = num2text(src.level)
-            if(lvl_str in src.Primary_class.skill_tree)
-                var/skill_path = src.Primary_class.skill_tree[lvl_str]
-                var/datum/skill/new_skill = new skill_path()
-                src.skills += new_skill
-                src << "<font color='#00FFFF'><b>You learned a new technique: [new_skill.name]!</b></font>"
+            src.SyncClassSkills()
 
         src << "<b>You gained 4 Stat Points to spend!</b>"
 
@@ -240,6 +275,9 @@ mob
         src.UpdateStats()
         src.hp = src.max_hp
         src.mp = src.max_mp
+
+        // Grant level 1 class skills
+        src.SyncClassSkills()
 
         world << "<b>[src.name]</b> has begun their journey as a <b>[src.Primary_class.name]</b>!"
         src << "<b>Creation complete!</b>"

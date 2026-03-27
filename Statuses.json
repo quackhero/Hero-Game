@@ -693,5 +693,29 @@
         "id": "remove_accessory",
         "name": "Remove Accessory",
         "remove_accessory": 1
+    },
+
+    {
+        "id": "curse_marked",
+        "name": "Curse Mark",
+        "damage_resist_pct": -0.10
+    },
+    {
+        "id": "shield_wall",
+        "name": "Shield Wall",
+        "lock_position": 1
+    },
+    {
+        "id": "fortified",
+        "name": "Fortified"
+    },
+    {
+        "id": "protected_ally",
+        "name": "Protected"
+    },
+    {
+        "id": "barrier_shield",
+        "name": "Barrier",
+        "amount": 100
     }
 ]

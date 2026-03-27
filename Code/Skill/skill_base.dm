@@ -37,6 +37,9 @@ datum/skill
     var/list/req_target_status = null
     var/list/req_user_status = null
     var/req_weapon_type = ""     // e.g. "Sword" — if set, user must have this weapon type equipped
+    var/list/req_weapon_types = null  // List of acceptable weapon types (e.g. list("Sword", "Axe"))
+    var/req_accessory_type = ""  // e.g. "Shield" — checks equipped_accessory.weapon_type
+    var/list/req_target_or_user_status = null  // OR-based: target has X OR user has Y
     var/req_ally_name = ""       // Step 11: named ally must be alive in the encounter
     var/req_skill_id  = ""       // Step 12: this skill ID must be in user's equipped_skills
 
@@ -99,7 +102,22 @@ datum/skill
             for(var/status_id in src.req_user_status)
                 if(user.HasStatus(status_id)) { has_req = 1; break }
             if(!has_req) return 0
-            
+
+        // OR-based status requirement: target has X OR user has Y
+        if(src.req_target_or_user_status)
+            var/has_either = 0
+            if(src.req_target_or_user_status["target"])
+                for(var/sid in src.req_target_or_user_status["target"])
+                    if(target && hascall(target, "HasStatus") && target.HasStatus(sid))
+                        has_either = 1
+                        break
+            if(!has_either && src.req_target_or_user_status["user"])
+                for(var/sid in src.req_target_or_user_status["user"])
+                    if(user && hascall(user, "HasStatus") && user.HasStatus(sid))
+                        has_either = 1
+                        break
+            if(!has_either) return 0
+
         return 1
 
     proc/PayCost(mob/user)
@@ -127,6 +145,24 @@ datum/skill
             var/wtype = equipped_w ? (equipped_w:weapon_type) : ""
             if(wtype != src.req_weapon_type)
                 user << "<b>[src.name] requires a [src.req_weapon_type] equipped!</b>"
+                user.EndTurn()
+                return
+
+        // List-based weapon type requirement (Sword OR Axe)
+        if(src.req_weapon_types && src.req_weapon_types.len)
+            var/equipped_w = ("equipped_weapon" in user.vars) ? user.equipped_weapon : null
+            var/wtype = equipped_w ? (equipped_w:weapon_type) : ""
+            if(!(wtype in src.req_weapon_types))
+                user << "<b>[src.name] requires one of: [jointext(src.req_weapon_types, ", ")]!</b>"
+                user.EndTurn()
+                return
+
+        // Accessory type requirement (e.g. Shield)
+        if(src.req_accessory_type != "")
+            var/equipped_acc = ("equipped_accessory" in user.vars) ? user.equipped_accessory : null
+            var/atype = equipped_acc ? (equipped_acc:weapon_type) : ""
+            if(atype != src.req_accessory_type)
+                user << "<b>[src.name] requires a [src.req_accessory_type] equipped!</b>"
                 user.EndTurn()
                 return
 

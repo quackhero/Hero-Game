@@ -100,6 +100,9 @@ datum/skill_factory
             if("req_target_status" in reqs) S.req_target_status = reqs["req_target_status"]
             if("req_user_status" in reqs) S.req_user_status = reqs["req_user_status"]
             if("req_weapon_type" in reqs) S.req_weapon_type = reqs["req_weapon_type"]
+            if("req_weapon_types" in reqs) S.req_weapon_types = reqs["req_weapon_types"]
+            if("req_accessory_type" in reqs) S.req_accessory_type = reqs["req_accessory_type"]
+            if("req_target_or_user_status" in reqs) S.req_target_or_user_status = reqs["req_target_or_user_status"]
             if("req_ally_name"   in reqs) S.req_ally_name   = reqs["req_ally_name"]    // Step 11
             if("req_skill_id"    in reqs) S.req_skill_id    = reqs["req_skill_id"]     // Step 12
 
@@ -218,6 +221,16 @@ datum/skill_factory
                 var/datum/skill_event/shield_summon/SH = new()
                 SH.npc_id = event_data["npc_id"]
                 EV = SH
+
+            // Scan — reveals target HP%, attribute, weakness, and active statuses to the caster
+            if("scan")
+                var/datum/skill_event/scan/SC = new()
+                EV = SC
+
+            // Dispel — removes the most recently applied positive buff from the target
+            if("dispel")
+                var/datum/skill_event/dispel/DP = new()
+                EV = DP
 
             // Remove Status — removes a specific status from the target or caster
             if("remove_status")

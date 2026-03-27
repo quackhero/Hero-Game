@@ -1,204 +1,5 @@
 [
     {
-        "id": "fire_json",
-        "name": "Fire",
-        "cost": 9,
-        "target_flags": ["TARGET_SINGLE"],
-        "requirements": {
-            "target_dead": 0,
-            "fizzle_chance": 0
-        },
-        "timeline": [
-            {
-                "type": "damage",
-                "text": "blasts",
-                "formula": "INT * 1.75",
-                "damage_type": "Fire"
-            }
-        ]
-    },
-    {
-        "id": "poison_strike",
-        "name": "Poison Strike",
-        "cost": 5,
-        "target_flags": ["TARGET_SINGLE"],
-        "requirements": {
-            "target_dead": 0,
-            "fizzle_chance": 10
-        },
-        "timeline": [
-            {
-                "type": "message",
-                "text": "(I) lunges at (enemy) with a toxic blade!"
-            },
-            {
-                "type": "damage",
-                "text": "strikes",
-                "formula": "STR * 1.2",
-                "damage_type": "Physical"
-            },
-            {
-                "type": "inflict",
-                "status": "poisoned",
-                "duration": 3,
-                "amount": 5,
-                "chance": 100
-            }
-        ]
-    },
-    {
-    "id": "desperation",
-    "name": "Desperation",
-    "cost": 0,
-    "target_flags": ["TARGET_SELF"],
-    "timeline": [
-        {
-            "type": "message",
-            "text": "(I) is backed into a corner!"
-        },
-        {
-            "type": "condition",
-            "formula": "HP < 30",
-            "if_true": [
-                {
-                    "type": "message",
-                    "text": "(I) taps into their survival instincts! Strength Up!"
-                },
-                {
-                    "type": "stat_mod",
-                    "stat": "STR",
-                    "target_type": "Self",
-                    "formula": "20",
-                    "mod_type": "ADD"
-                }
-            ]
-        }
-    ]
-},
-{
-    "id": "goblin_slayer",
-    "name": "Goblin Slayer",
-    "cost": 5,
-    "target_flags": ["TARGET_SINGLE"],
-    "requirements": {
-        "req_target_race": ["Goblin", "Hobgoblin"]
-    },
-    "timeline": [
-        {
-            "type": "message",
-            "text": "(I) strikes down a Goblin!"
-        },
-        {
-            "type": "damage",
-            "text": "slashes",
-            "formula": "STR * 2.0",
-            "damage_type": "Physical"
-        }
-    ]
-},
-{
-    "id": "vamp_pierce",
-    "name": "Vampiric Pierce",
-    "timeline": [
-        {
-            "type": "damage",
-            "formula": "STR * 2",
-            "damage_type": "Necrotic",
-            "leech": 0.50,
-            "text": "(I) lunges at (E) with a blood-draining thrust! ([dmg] [type] Damage)"
-        }
-    ]
-},
-{
-    "id": "shadow_dance",
-    "name": "Shadow Dance",
-    "cost": 10,
-    "targeting_flags": ["TARGET_SINGLE", "TARGET_ENEMY"],
-    "on_target_death": "RETARGET",
-    "timeline": [
-        {
-            "type": "damage",
-            "formula": "STR * 0.8",
-            "damage_type": "Physical",
-            "text": "(I) dashes in and slashes (E)! ([dmg] Damage)"
-        },
-        {
-            "type": "damage",
-            "delay": 5,
-            "formula": "STR * 0.8",
-            "damage_type": "Physical",
-            "text": "(I) vanishes and strikes (enemy) from behind! ([dmg] Damage)"
-        },
-        {
-            "type": "damage",
-            "delay": 5,
-            "formula": "STR * 1.5",
-            "damage_type": "Physical",
-            "text": "(I) reappears above (target) for a crushing final blow! ([dmg] Damage)"
-        }
-    ]
-},
-{
-    "id": "fireball",
-    "name": "Fireball",
-    "cost": 15,
-    "afterlink": "fireball_explosion", 
-    "timeline": [
-        {
-            "type": "damage",
-            "formula": "INT * 2",
-            "damage_type": "Fire",
-            "text": "(I) hurls a massive fireball at (target)! ([dmg] Fire Damage)"
-        }
-    ]
-},
-{
-    "id": "fireball_explosion",
-    "name": "Explosion Aftermath",
-    "cost": 0, 
-    "timeline": [
-        {
-            "type": "damage",
-            "delay": 5,
-            "formula": "INT * 0.5",
-            "damage_type": "Fire",
-            "text": "The fireball erupts, scorching (target) again! ([dmg] Damage)"
-        }
-    ]
-},
-{
-    "id": "vengeful_strike",
-    "name": "Vengeful Strike Buff",
-    "trigger_condition": "OnDamaged",
-    "trigger_chance": 100,
-    "timeline": [
-        {
-            "type": "damage",
-            "delay": 5,
-            "formula": "STR * 1.5",
-            "damage_type": "Physical",
-            "text": "(I) absorbs the blow and viciously retaliates against (target)! ([dmg] Damage)"
-        }
-    ]
-},
-{
-        "id": "assume_vengeful_stance",
-        "name": "Assume Vengeful Stance",
-        "cost": 10,
-        "target_flags": ["TARGET_SELF"],
-        "timeline": [
-            {
-                "type": "message",
-                "text": "(I) takes a defensive posture, ready to strike back!"
-            },
-            {
-                "type": "inflict",
-                "status": "vengeful_stance",
-                "duration": 1
-            }
-        ]
-    },
-    {
         "id": "basic_attack",
         "name": "Attack",
         "category": "Attack",
@@ -212,167 +13,1201 @@
             }
         ]
     },
+
+    {"_comment": "========== FIGHTER SKILLS =========="},
+
     {
-        "id": "poison_dart",
-        "name": "Poison Dart",
+        "id": "fighter_dual_punch",
+        "name": "Dual Punch",
         "category": "Attack",
         "cost": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Fist"},
         "timeline": [
-            {
-                "type": "damage",
-                "formula": "STR * 0.5",
-                "text": "(I) shoots a toxic dart at (target)! ([dmg] Damage)"
-            },
-            {
-                "type": "inflict",
-                "status": "poisoned",
-                "duration": 3,
-                "chance": 100
-            }
+            {"type": "message", "text": "(I) throws a rapid one-two punch at (target)!"},
+            {"type": "damage", "formula": "STR * 0.8", "damage_type": "Blunt", "text": "(I) connects with a left! ([dmg] Damage)"},
+            {"type": "damage", "delay": 3, "formula": "STR * 0.8", "damage_type": "Blunt", "text": "(I) follows with a right! ([dmg] Damage)"}
         ]
     },
     {
-        "id": "war_cry",
-        "name": "War Cry",
+        "id": "fighter_counter_stance",
+        "name": "Counter Stance",
         "category": "Buff",
-        "cost": 5,
+        "cost": 6,
         "target_flags": ["TARGET_SELF"],
+        "is_counter_stance": 1,
+        "counter_window": 150,
+        "afterlink": "fighter_counter_strike",
         "timeline": [
-            {
-                "type": "message",
-                "text": "(I) lets out a furious battle cry!"
-            },
-            {
-                "type": "inflict",
-                "status": "attack_up",
-                "duration": 3,
-                "chance": 100
-            }
+            {"type": "message", "text": "(I) assumes a defensive posture, ready to strike back!"}
         ]
     },
     {
-        "id": "cleave",
-        "name": "Cleave",
-        "category": "Attack",
-        "cost": 5,
-        "target_flags": ["TARGET_AOE"],
-        "timeline": [
-            {
-                "type": "message",
-                "text": "(I) swings their weapon in a massive arc!"
-            },
-            {
-                "type": "damage",
-                "formula": "STR",
-                "text": "(E) is slashed! ([dmg] Damage)"
-            }
-        ]
-    },
-    {
-        "id": "resurrect",
-        "name": "Resurrect",
-        "category": "Spell",
-        "cost": 15,
-        "target_flags": ["TARGET_SINGLE", "TARGET_REVIVE"],
-        "requirements": {
-            "target_dead": 1
-        },
-        "timeline": [
-            {
-                "type": "message",
-                "text": "(I) casts a holy light over (target)'s fallen body!"
-            },
-            {
-                "type": "heal",
-                "formula": "50"
-            }
-        ]
-    },
-{
-        "id": "rising_uppercut",
-        "name": "Rising Uppercut",
-        "category": "Attack",
-        "cost": 5,
-        "target_flags": ["TARGET_SINGLE"],
-        "timeline": [
-            { "type": "message", "text": "(I) launches (target) into the air!" },
-            { "type": "damage", "formula": "STR * 1.5" }
-        ],
-        "combo_branches": ["meteor_strike", "impact_legdrop"]
-    },
-    {
-        "id": "meteor_strike",
-        "name": "Meteor Strike",
-        "category": "Attack",
-        "cost": 10,
-        "target_flags": ["TARGET_SINGLE"],
-        "timeline": [
-            { "type": "message", "text": "(I) leaps up and spikes (target) back into the dirt!" },
-            { "type": "damage", "formula": "STR * 2.5" }
-        ]
-    },
-    {
-        "id": "impact_legdrop",
-        "name": "Impact Legdrop",
-        "category": "Attack",
+        "id": "fighter_counter_strike",
+        "name": "Counter Strike",
         "cost": 0,
         "target_flags": ["TARGET_SINGLE"],
         "timeline": [
-            { "type": "message", "text": "(I) flips and drops a leg onto (target)!" },
-            { "type": "damage", "formula": "STR * 1.0" }
+            {"type": "damage", "formula": "STR * 1.0", "damage_type": "Blunt", "text": "(I) counters with a swift strike! ([dmg] Damage)"}
         ]
     },
     {
-        "id": "toxicity",
-        "name": "Toxicity",
-        "category": "Spell",
-        "cost": 8,
+        "id": "fighter_fighting_spirit",
+        "name": "Fighting Spirit",
+        "is_passive": 1,
+        "passive_stat_pct_mods": {
+            "base_strength": 0.10,
+            "base_resilience": -0.05
+        }
+    },
+    {
+        "id": "fighter_jump_kick",
+        "name": "Jump Kick",
+        "category": "Attack",
+        "cost": 4,
+        "target_flags": ["TARGET_SINGLE"],
+        "pos_flags": ["POS_GROUND", "POS_AERIAL"],
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.3", "damage_type": "Blunt", "text": "(I) leaps and drives a kick into (target)! ([dmg] Damage)"}
+        ]
+    },
+    {
+        "id": "fighter_uppercut",
+        "name": "Uppercut",
+        "category": "Attack",
+        "cost": 6,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_target_status_absent": ["ascended"]},
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.5", "damage_type": "Blunt", "text": "(I) drives an uppercut into (target)'s jaw! ([dmg] Damage)"},
+            {"type": "inflict", "status": "ascended", "duration": 2, "chance": 100}
+        ],
+        "combo_branches": ["fighter_hammer_fist", "fighter_air_combo"]
+    },
+    {
+        "id": "fighter_hammer_fist",
+        "name": "Hammer Fist",
+        "category": "Attack",
+        "cost": 4,
         "target_flags": ["TARGET_SINGLE"],
         "timeline": [
+            {"type": "message", "text": "(I) leaps up and slams a fist down on (target)!"},
+            {"type": "damage", "formula": "STR * 2.5", "damage_type": "Blunt", "text": "(target) is spiked into the ground! ([dmg] Damage)"},
+            {"type": "remove_status", "status": "ascended"}
+        ]
+    },
+    {
+        "id": "fighter_air_combo",
+        "name": "Air Combo",
+        "category": "Attack",
+        "cost": 2,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.2", "damage_type": "Blunt", "text": "(I) strikes (target) mid-air! ([dmg] Damage)"}
+        ]
+    },
+    {
+        "id": "fighter_dodge",
+        "name": "Dodge",
+        "is_passive": 1,
+        "_note": "ENGINE: When equipped, sets owner.dodge_cap to FULL_DODGE_CAP (75) instead of BASE_DODGE_CAP (30). Requires custom handling in UpdateStats."
+    },
+    {
+        "id": "fighter_feint",
+        "name": "Feint",
+        "category": "Debuff",
+        "cost": 4,
+        "target_flags": ["TARGET_SINGLE"],
+        "pos_flags": ["POS_GROUND", "POS_AERIAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) feints, throwing (target) off balance!"},
+            {"type": "inflict", "status": "de_dodge", "duration": 2, "chance": 100}
+        ]
+    },
+    {
+        "id": "fighter_flurry",
+        "name": "Flurry",
+        "category": "Attack",
+        "cost": 12,
+        "hitrate": 85,
+        "target_flags": ["TARGET_AOE"],
+        "requirements": {"req_weapon_type": "Fist"},
+        "on_target_death": "RETARGET",
+        "timeline": [
+            {"type": "message", "text": "(I) unleashes a wild flurry of punches!"},
+            {"type": "damage", "formula": "STR * 0.7", "damage_type": "Blunt", "text": "(E) is struck! ([dmg] Damage)"},
+            {"type": "damage", "delay": 2, "formula": "STR * 0.7", "damage_type": "Blunt", "text": "(E) is hit again! ([dmg] Damage)"},
+            {"type": "damage", "delay": 2, "formula": "STR * 0.7", "damage_type": "Blunt", "text": "(E) takes another blow! ([dmg] Damage)"}
+        ],
+        "_note": "ENGINE: Flurry should ideally hit random targets, not all enemies. Current AOE hits everyone. May need a RANDOM_TARGET flag or custom handling."
+    },
+    {
+        "id": "fighter_bravery",
+        "name": "Bravery",
+        "is_passive": 1,
+        "_note": "ENGINE: On SIG_DYING, if damage did not exceed max_hp (not overkill), set HP to 1 and abort death. Requires trigger_condition SIG_DYING with custom logic. trigger_once=1."
+    },
+    {
+        "id": "fighter_sweep_kick",
+        "name": "Sweep Kick",
+        "category": "Attack",
+        "cost": 7,
+        "target_flags": ["TARGET_SINGLE"],
+        "pos_flags": ["POS_GROUND", "POS_AERIAL"],
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.3", "damage_type": "Blunt", "text": "(I) sweeps a low kick at (target)! ([dmg] Damage)"},
             {
                 "type": "condition",
-                "formula": "HAS_STATUS(poisoned)",
+                "formula": "HAS_STATUS(ascended)",
                 "if_true": [
-                    { "type": "message", "text": "The poison ignites! (I) detonates (target)!" },
-                    { "type": "damage", "formula": "50", "damage_type": "True" }
+                    {"type": "remove_status", "status": "ascended"},
+                    {"type": "message", "text": "(target) is knocked back to the ground!"}
                 ],
                 "if_false": [
-                    { "type": "message", "text": "(I) injects (target) with venom!" },
-                    { "type": "damage", "formula": "10", "damage_type": "True" },
-                    { "type": "inflict", "status": "poisoned", "duration": 3 }
+                    {"type": "inflict", "status": "de_dodge", "duration": 2, "chance": 60}
                 ]
             }
         ]
     },
     {
-        "id": "warriors_body",
-        "name": "Warrior's Body",
+        "id": "fighter_self_defense",
+        "name": "Self Defense",
         "is_passive": 1,
-        "passive_stat_mods": {
-            "base_strength": 5,
-            "base_vitality": 3
+        "_note": "ENGINE: Modifies Counter Stance behavior. When equipped, counter_window triggers on ALL physical attacks, not just the first. Requires custom handling in counter_window.OnHit — do not remove the window after first trigger if this passive is equipped."
+    },
+    {
+        "id": "fighter_duelascend",
+        "name": "Duelascend",
+        "category": "Attack",
+        "cost": 12,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_target_status_absent": ["ascended"]},
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.2", "damage_type": "Blunt", "text": "(I) grabs (target) and launches them both skyward! ([dmg] Damage)"},
+            {"type": "inflict", "status": "ascended", "duration": 2, "chance": 100},
+            {"type": "inflict", "status": "ascended", "duration": 2, "chance": 100, "target": "self"}
+        ]
+    },
+    {
+        "id": "fighter_leg_sweep",
+        "name": "Leg Sweep",
+        "category": "Attack",
+        "cost": 10,
+        "hitrate": 85,
+        "target_flags": ["TARGET_AOE"],
+        "timeline": [
+            {"type": "message", "text": "(I) spins low, sweeping legs across the battlefield!"},
+            {"type": "damage", "formula": "STR * 0.8", "damage_type": "Blunt", "text": "(E) is caught by the sweep! ([dmg] Damage)"},
+            {"type": "inflict", "status": "de_dodge", "duration": 2, "chance": 30}
+        ],
+        "_note": "Should only hit grounded enemies. May need pos_flags filtering on AOE."
+    },
+    {
+        "id": "fighter_momentum",
+        "name": "Momentum",
+        "is_passive": 1,
+        "_note": "ENGINE: Track consecutive attacks. Each consecutive attack without Defend/stun/miss grants +5% damage, up to +20%. Resets on Defend, stun, freeze, sleep, or miss. Requires a counter variable on the mob and integration with the damage pipeline."
+    },
+    {
+        "id": "fighter_elbow_smash",
+        "name": "Elbow Smash",
+        "category": "Attack",
+        "cost": 12,
+        "hitrate": 90,
+        "target_flags": ["TARGET_SINGLE"],
+        "pos_flags": ["POS_GROUND", "POS_AERIAL"],
+        "timeline": [
+            {
+                "type": "condition",
+                "formula": "HAS_STATUS(de_dodge)",
+                "if_true": [
+                    {"type": "damage", "formula": "STR * 2.0", "damage_type": "Blunt", "bypass": -1, "text": "(I) drives an elbow through (target)'s guard! ([dmg] Damage)"}
+                ],
+                "if_false": [
+                    {"type": "damage", "formula": "STR * 2.0", "damage_type": "Blunt", "text": "(I) slams an elbow into (target)! ([dmg] Damage)"}
+                ]
+            }
+        ],
+        "_note": "The bypass -1 on the De-Dodge branch ignores all RES. Design says bypass 50% RES — may need a bypass value of RES/2 instead. Tuning target."
+    },
+    {
+        "id": "fighter_rising_storm",
+        "name": "Rising Storm",
+        "category": "Attack",
+        "cost": 18,
+        "hitrate": 90,
+        "charge_time": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "on_target_death": "STOP",
+        "timeline": [
+            {"type": "message", "text": "(I) charges up a devastating combination!"},
+            {"type": "damage", "formula": "STR * 1.0", "damage_type": "Blunt", "text": "(I) opens with a driving fist! ([dmg] Damage)"},
+            {"type": "damage", "delay": 3, "formula": "STR * 1.0", "damage_type": "Blunt", "text": "(I) follows with a spinning strike! ([dmg] Damage)"},
+            {
+                "type": "condition",
+                "formula": "HAS_STATUS(ascended)",
+                "if_true": [
+                    {"type": "damage", "delay": 3, "formula": "STR * 1.95", "damage_type": "Blunt", "text": "(I) unleashes the final blow on the airborne (target)! ([dmg] Damage)"}
+                ],
+                "if_false": [
+                    {"type": "damage", "delay": 3, "formula": "STR * 1.5", "damage_type": "Blunt", "text": "(I) finishes with a crushing strike! ([dmg] Damage)"}
+                ]
+            }
+        ]
+    },
+
+    {"_comment": "========== WARRIOR SKILLS =========="},
+
+    {
+        "id": "warrior_power_strike",
+        "name": "Power Strike",
+        "category": "Attack",
+        "cost": 3,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Sword"},
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.3", "damage_type": "Slashing", "text": "(I) delivers a powerful sword strike to (target)! ([dmg] Damage)"}
+        ]
+    },
+    {
+        "id": "warrior_taunt",
+        "name": "Taunt",
+        "category": "Buff",
+        "cost": 5,
+        "target_flags": ["TARGET_SELF"],
+        "timeline": [
+            {"type": "message", "text": "(I) roars a challenge, drawing the enemy's attention!"},
+            {"type": "inflict", "status": "provoked", "duration": 3, "chance": 100, "target": "self"}
+        ]
+    },
+    {
+        "id": "warrior_bravery",
+        "name": "Bravery",
+        "is_passive": 1,
+        "_note": "ENGINE: Same as fighter_bravery. On SIG_DYING, survive at 1 HP if not overkill. trigger_once=1."
+    },
+    {
+        "id": "warrior_war_cry",
+        "name": "War Cry",
+        "category": "Buff",
+        "cost": 8,
+        "target_flags": ["TARGET_AOE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) lets out a battle cry, inspiring all allies!"},
+            {"type": "inflict", "status": "attack_up", "duration": 3, "chance": 100}
+        ],
+        "_note": "Currently inflicts flat attack_up (+10 STR). Design calls for +10% of each ally's own STR. May need a percentage-based attack_up status or custom event."
+    },
+    {
+        "id": "warrior_open_wound",
+        "name": "Open Wound",
+        "category": "Attack",
+        "cost": 8,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_types": ["Sword", "Axe"]},
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.2", "damage_type": "Slashing", "text": "(I) slashes (target), opening a wound! ([dmg] Damage)"},
+            {"type": "inflict", "status": "minor_wound", "duration": 3, "chance": 60}
+        ]
+    },
+    {
+        "id": "warrior_shield_bash",
+        "name": "Shield Bash",
+        "category": "Attack",
+        "cost": 7,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_accessory_type": "Shield"},
+        "timeline": [
+            {"type": "damage", "formula": "RES * 1.2", "damage_type": "Blunt", "text": "(I) smashes (target) with their shield! ([dmg] Damage)"},
+            {"type": "inflict", "status": "stunned", "duration": 2, "chance": 75}
+        ]
+    },
+    {
+        "id": "warrior_guard_up",
+        "name": "Guard Up",
+        "is_passive": 1,
+        "passive_stat_pct_mods": {
+            "base_resilience": 0.10,
+            "base_strength": -0.05
         }
     },
     {
-        "id": "regeneration",
-        "name": "Regeneration",
+        "id": "warrior_protect",
+        "name": "Protect",
+        "category": "Buff",
+        "cost": 10,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) moves to shield (target) from harm!"},
+            {"type": "inflict", "status": "protected", "duration": 3, "chance": 100}
+        ],
+        "_note": "ENGINE: Protect needs a custom status or component that redirects 50% of damage from the protected ally to the Warrior. Not a simple inflict — needs encounter-level redirect logic similar to Guardian."
+    },
+    {
+        "id": "warrior_heavy_cleave",
+        "name": "Heavy Cleave",
+        "category": "Attack",
+        "cost": 12,
+        "hitrate": 85,
+        "charge_time": 3,
+        "target_flags": ["TARGET_AOE"],
+        "requirements": {"req_weapon_type": "Axe"},
+        "timeline": [
+            {"type": "message", "text": "(I) winds up a massive cleave!"},
+            {"type": "damage", "formula": "STR * 1.2", "damage_type": "Slashing", "text": "(E) is caught by the cleave! ([dmg] Damage)"}
+        ]
+    },
+    {
+        "id": "warrior_gash_wound",
+        "name": "Gash Wound",
+        "category": "Attack",
+        "cost": 14,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_types": ["Sword", "Axe"]},
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.5", "damage_type": "Slashing", "text": "(I) carves a deep gash into (target)! ([dmg] Damage)"},
+            {
+                "type": "condition",
+                "formula": "HAS_STATUS(minor_wound)",
+                "if_true": [
+                    {"type": "remove_status", "status": "minor_wound"},
+                    {"type": "inflict", "status": "wound", "duration": 3, "chance": 100},
+                    {"type": "message", "text": "(target)'s wound worsens!"}
+                ],
+                "if_false": [
+                    {
+                        "type": "condition",
+                        "formula": "HAS_STATUS(wound)",
+                        "if_true": [
+                            {"type": "inflict", "status": "wound", "duration": 3, "chance": 100},
+                            {"type": "message", "text": "(target)'s wound is aggravated!"}
+                        ],
+                        "if_false": [
+                            {"type": "inflict", "status": "minor_wound", "duration": 3, "chance": 75}
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "warrior_conditioning",
+        "name": "Conditioning",
         "is_passive": 1,
         "trigger_condition": "ON_TURN_START",
         "trigger_chance": 100,
         "timeline": [
-            { "type": "heal", "formula": "VIT * 0.1" }
+            {
+                "type": "condition",
+                "formula": "HP < HP(E) * 0.25",
+                "if_true": [
+                    {"type": "heal", "formula": "VIT * 0.03"}
+                ]
+            }
+        ],
+        "_note": "The formula HP < HP(E)*0.25 is a workaround. Ideally this checks if user HP is below 25% of user max_hp. Parser may need a MAX_HP reference."
+    },
+    {
+        "id": "warrior_shield_wall",
+        "name": "Shield Wall",
+        "category": "Buff",
+        "cost": 14,
+        "target_flags": ["TARGET_SELF"],
+        "requirements": {"req_accessory_type": "Shield"},
+        "timeline": [
+            {"type": "message", "text": "(I) plants their shield and braces, becoming an immovable wall!"},
+            {"type": "inflict", "status": "shield_wall", "duration": 3, "chance": 100, "target": "self"}
         ]
     },
     {
-        "id": "counter_strike",
-        "name": "Counter Strike",
-        "is_passive": 1,
-        "trigger_condition": "OnDamaged",
-        "trigger_chance": 50,
-        "targeting_mode": "Ref-Target",
+        "id": "warrior_armor_break",
+        "name": "Armor Break",
+        "category": "Attack",
+        "cost": 16,
+        "target_flags": ["TARGET_SINGLE"],
         "timeline": [
-            { "type": "message", "text": "(I) counters!" },
-            { "type": "damage", "formula": "STR", "damage_type": "Physical", "text": "(I) retaliates against (target)! ([dmg] Damage)" }
+            {"type": "damage", "formula": "STR * 1.5", "damage_type": "Blunt", "bypass": -1, "text": "(I) smashes through (target)'s defenses! ([dmg] Damage)"},
+            {"type": "inflict", "status": "de_armor", "duration": 3, "chance": 80}
+        ],
+        "_note": "bypass -1 ignores all RES. Design says 50% bypass. Tuning target — may need bypass = RES(E)/2."
+    },
+    {
+        "id": "warrior_fortify",
+        "name": "Fortify",
+        "category": "Buff",
+        "cost": 15,
+        "target_flags": ["TARGET_SELF"],
+        "requirements": {"req_user_status": ["provoked"]},
+        "timeline": [
+            {"type": "message", "text": "(I) steels themselves, becoming even harder to bring down!"},
+            {"type": "inflict", "status": "fortified", "duration": 4, "chance": 100, "target": "self"}
+        ],
+        "_note": "ENGINE: fortified status needs to be added to Statuses.json. Should reduce all incoming damage by 20%. Can use damage_dealt_mult on the DEFENDER side or a custom damage_resist_pct."
+    },
+    {
+        "id": "warrior_rallying_cry",
+        "name": "Rallying Cry",
+        "category": "Buff",
+        "cost": 12,
+        "target_flags": ["TARGET_AOE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) rallies the party, bolstering their defenses!"},
+            {"type": "inflict", "status": "guard_boost", "duration": 3, "chance": 100}
+        ],
+        "_note": "Currently inflicts flat guard_boost (+15 RES). Design calls for +10% of each ally's own RES. Same percentage issue as War Cry."
+    },
+    {
+        "id": "warrior_swordstrike",
+        "name": "Swordstrike",
+        "category": "Attack",
+        "cost": 20,
+        "hitrate": 90,
+        "charge_time": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Sword"},
+        "timeline": [
+            {"type": "message", "text": "(I) focuses their blade for a devastating combination!"},
+            {"type": "damage", "formula": "STR * 1.3", "damage_type": "Slashing", "text": "(I) strikes (target) with a swift slash! ([dmg] Damage)"},
+            {
+                "type": "condition",
+                "formula": "HAS_STATUS(wound)",
+                "if_true": [
+                    {"type": "damage", "delay": 5, "formula": "STR * 2.16", "damage_type": "Slashing", "text": "(I) tears through the wound with a brutal follow-up! ([dmg] Damage)"}
+                ],
+                "if_false": [
+                    {"type": "damage", "delay": 5, "formula": "STR * 1.8", "damage_type": "Slashing", "text": "(I) follows with a heavy overhead strike! ([dmg] Damage)"}
+                ]
+            }
         ]
+    },
+
+    {"_comment": "========== ROGUE SKILLS =========="},
+
+    {
+        "id": "rogue_quick_stab",
+        "name": "Quick Stab",
+        "category": "Attack",
+        "cost": 2,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Dagger"},
+        "timeline": [
+            {"type": "damage", "formula": "DEX * 1.2", "damage_type": "Piercing", "text": "(I) darts in with a quick stab at (target)! ([dmg] Damage)"}
+        ]
+    },
+    {
+        "id": "rogue_poison_strike",
+        "name": "Poison Strike",
+        "category": "Attack",
+        "cost": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Dagger"},
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.0", "damage_type": "Piercing", "text": "(I) strikes (target) with a venomous blade! ([dmg] Damage)"},
+            {"type": "inflict", "status": "poisoned", "duration": 3, "chance": 80}
+        ]
+    },
+    {
+        "id": "rogue_dodge",
+        "name": "Dodge",
+        "is_passive": 1,
+        "_note": "ENGINE: Same as fighter_dodge. Sets dodge_cap to FULL_DODGE_CAP when equipped."
+    },
+    {
+        "id": "rogue_smoke_bomb",
+        "name": "Smoke Bomb",
+        "category": "Debuff",
+        "cost": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "message", "text": "(I) hurls a smoke bomb at (target)!"},
+            {"type": "inflict", "status": "blinded", "duration": 3, "chance": 90}
+        ]
+    },
+    {
+        "id": "rogue_cheap_shot",
+        "name": "Cheap Shot",
+        "is_passive": 1,
+        "_note": "ENGINE: All attacks vs Blinded targets deal +20% damage. Requires integration in the damage pipeline — check target for blinded status, apply 1.2 multiplier. Similar to how damage_dealt_mult works but conditional on target status."
+    },
+    {
+        "id": "rogue_lacerate",
+        "name": "Lacerate",
+        "category": "Attack",
+        "cost": 6,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Dagger"},
+        "timeline": [
+            {"type": "damage", "formula": "DEX * 1.0", "damage_type": "Slashing", "text": "(I) slashes across (target) with a quick laceration! ([dmg] Damage)"},
+            {"type": "inflict", "status": "minor_wound", "duration": 3, "chance": 70}
+        ]
+    },
+    {
+        "id": "rogue_backstab",
+        "name": "Backstab",
+        "category": "Attack",
+        "cost": 8,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Dagger", "req_target_or_user_status": {"target": ["blinded"], "user": ["vanished"]}},
+        "timeline": [
+            {"type": "damage", "formula": "DEX * 2.0", "damage_type": "Piercing", "bypass": 4, "text": "(I) strikes (target) from behind! ([dmg] Damage)"}
+        ]
+    },
+    {
+        "id": "rogue_nimble",
+        "name": "Nimble",
+        "is_passive": 1,
+        "passive_stat_pct_mods": {
+            "base_dexterity": 0.10,
+            "base_vitality": -0.05
+        }
+    },
+    {
+        "id": "rogue_toxic_blade",
+        "name": "Toxic Blade",
+        "category": "Attack",
+        "cost": 10,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Dagger"},
+        "timeline": [
+            {"type": "damage", "formula": "STR * 1.2", "damage_type": "Piercing", "text": "(I) drives a toxin-coated blade into (target)! ([dmg] Damage)"},
+            {
+                "type": "condition",
+                "formula": "HAS_STATUS(poisoned)",
+                "if_true": [
+                    {"type": "remove_status", "status": "poisoned"},
+                    {"type": "inflict", "status": "poisoned_ga", "duration": 4, "chance": 100},
+                    {"type": "message", "text": "The poison intensifies!"}
+                ],
+                "if_false": [
+                    {"type": "inflict", "status": "poisoned", "duration": 4, "chance": 80}
+                ]
+            }
+        ]
+    },
+    {
+        "id": "rogue_vanish",
+        "name": "Vanish",
+        "category": "Buff",
+        "cost": 10,
+        "charge_time": 2,
+        "target_flags": ["TARGET_SELF"],
+        "timeline": [
+            {"type": "message", "text": "(I) melts into the shadows!"},
+            {"type": "inflict", "status": "vanished", "duration": 1, "chance": 100, "target": "self"}
+        ],
+        "_note": "ENGINE: The +50% damage on next attack from Vanish needs custom handling. Could be done via a damage_dealt_mult status that removes itself after one attack, or a signal-based approach."
+    },
+    {
+        "id": "rogue_gash",
+        "name": "Gash",
+        "category": "Attack",
+        "cost": 9,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Dagger"},
+        "timeline": [
+            {"type": "damage", "formula": "DEX * 1.3", "damage_type": "Slashing", "text": "(I) rips a deep gash into (target)! ([dmg] Damage)"},
+            {
+                "type": "condition",
+                "formula": "HAS_STATUS(minor_wound)",
+                "if_true": [
+                    {"type": "remove_status", "status": "minor_wound"},
+                    {"type": "inflict", "status": "wound", "duration": 3, "chance": 100},
+                    {"type": "message", "text": "(target)'s wound deepens!"}
+                ],
+                "if_false": [
+                    {
+                        "type": "condition",
+                        "formula": "HAS_STATUS(wound)",
+                        "if_true": [
+                            {"type": "inflict", "status": "wound", "duration": 3, "chance": 100}
+                        ],
+                        "if_false": [
+                            {"type": "inflict", "status": "minor_wound", "duration": 3, "chance": 75}
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "rogue_fan_of_knives",
+        "name": "Fan of Knives",
+        "category": "Attack",
+        "cost": 14,
+        "target_flags": ["TARGET_AOE"],
+        "timeline": [
+            {"type": "message", "text": "(I) hurls a spread of daggers across the field!"},
+            {"type": "damage", "formula": "DEX * 0.7", "damage_type": "Piercing", "text": "(E) is struck by a blade! ([dmg] Damage)"},
+            {"type": "inflict", "status": "poisoned", "duration": 3, "chance": 20}
+        ]
+    },
+    {
+        "id": "rogue_exploit_weakness",
+        "name": "Exploit Weakness",
+        "is_passive": 1,
+        "_note": "ENGINE: All attacks vs targets with BOTH poisoned (any tier) AND wound (any tier) deal +20% damage. Requires damage pipeline integration — check target for both status families, apply 1.2 multiplier."
+    },
+    {
+        "id": "rogue_ambush",
+        "name": "Ambush",
+        "category": "Attack",
+        "cost": 12,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Dagger"},
+        "timeline": [
+            {"type": "damage", "formula": "DEX * 1.8", "damage_type": "Piercing", "text": "(I) ambushes (target) from the shadows! ([dmg] Damage)"}
+        ],
+        "_note": "ENGINE: Can only target enemies that haven't acted this encounter OR targets the Rogue hasn't previously attacked. Needs custom targeting validation — track attacked_targets list on the mob and check encounter turn history."
+    },
+    {
+        "id": "rogue_shadow_dance",
+        "name": "Shadow Dance",
+        "category": "Attack",
+        "cost": 16,
+        "charge_time": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "requirements": {"req_weapon_type": "Dagger"},
+        "on_target_death": "STOP",
+        "timeline": [
+            {"type": "message", "text": "(I) begins a deadly shadow dance!"},
+            {"type": "damage", "formula": "DEX * 0.8", "damage_type": "Piercing", "text": "(I) dashes in and strikes! ([dmg] Damage)"},
+            {"type": "damage", "delay": 5, "formula": "DEX * 0.8", "damage_type": "Piercing", "text": "(I) vanishes and strikes from behind! ([dmg] Damage)"},
+            {"type": "damage", "delay": 5, "formula": "DEX * 1.5", "damage_type": "Piercing", "text": "(I) reappears for the final blow! ([dmg] Damage)"}
+        ],
+        "_note": "ENGINE: Final hit should gain +10% per debuff on target at time of cast (max +40%). Needs snapshot of debuff count at skill start, then modify the final hit formula. Complex — may need a custom event or pre-computed variable."
+    },
+
+    {"_comment": "========== MAGE SKILLS =========="},
+
+    {
+        "id": "mage_fire",
+        "name": "Fire",
+        "category": "Spell",
+        "cost": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "INT * 1.5", "damage_type": "Fire", "text": "(I) conjures a burst of flame at (target)! ([dmg] Fire Damage)"},
+            {"type": "inflict", "status": "minor_burn", "duration": 3, "chance": 20}
+        ]
+    },
+    {
+        "id": "mage_blizzard",
+        "name": "Blizzard",
+        "category": "Spell",
+        "cost": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "INT * 1.3", "damage_type": "Ice", "text": "(I) blasts (target) with a wave of frost! ([dmg] Ice Damage)"},
+            {"type": "inflict", "status": "frozen", "duration": 1, "chance": 25}
+        ]
+    },
+    {
+        "id": "mage_thunder",
+        "name": "Thunder",
+        "category": "Spell",
+        "cost": 6,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "INT * 1.8", "damage_type": "Lightning", "text": "(I) calls down a bolt of lightning on (target)! ([dmg] Lightning Damage)"},
+            {"type": "inflict", "status": "stunned", "duration": 1, "chance": 20}
+        ]
+    },
+    {
+        "id": "mage_arcane_focus",
+        "name": "Arcane Focus",
+        "is_passive": 1,
+        "passive_stat_pct_mods": {
+            "base_intelligence": 0.10,
+            "base_vitality": -0.05
+        }
+    },
+    {
+        "id": "mage_siphon",
+        "name": "Siphon",
+        "category": "Spell",
+        "cost": 7,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "INT * 1.0", "damage_type": "Necrotic", "leech": 0.0, "text": "(I) drains aether from (target)! ([dmg] Necrotic Damage)"}
+        ],
+        "_note": "ENGINE: Should restore MP equal to 25% of damage dealt after RES. Leech field currently only restores HP. Needs a 'mp_leech' field or custom event that converts damage to MP restoration."
+    },
+    {
+        "id": "mage_mana_shield",
+        "name": "Mana Shield",
+        "category": "Buff",
+        "cost": 8,
+        "target_flags": ["TARGET_SELF"],
+        "timeline": [
+            {"type": "message", "text": "(I) surrounds themselves with a barrier of pure mana!"},
+            {"type": "inflict", "status": "mana_shield_status", "duration": 3, "chance": 100, "target": "self"}
+        ]
+    },
+    {
+        "id": "mage_fire_rain",
+        "name": "Fire Rain",
+        "category": "Spell",
+        "cost": 14,
+        "charge_time": 5,
+        "target_flags": ["TARGET_AOE"],
+        "timeline": [
+            {"type": "message", "text": "(I) calls down a rain of fire from the sky!"},
+            {"type": "damage", "formula": "INT * 1.3", "damage_type": "Fire", "text": "(E) is scorched by the fire rain! ([dmg] Fire Damage)"},
+            {"type": "inflict", "status": "minor_burn", "duration": 3, "chance": 20}
+        ]
+    },
+    {
+        "id": "mage_attunement",
+        "name": "Attunement",
+        "is_passive": 1,
+        "_note": "ENGINE: When casting the same element consecutively, +15% damage. Does not stack. Resets on element switch. Requires tracking last_element_used on the mob and applying a multiplier in the damage pipeline when elements match."
+    },
+    {
+        "id": "mage_blizzard_storm",
+        "name": "Blizzard Storm",
+        "category": "Spell",
+        "cost": 14,
+        "charge_time": 5,
+        "target_flags": ["TARGET_AOE"],
+        "timeline": [
+            {"type": "message", "text": "(I) unleashes a devastating blizzard!"},
+            {"type": "damage", "formula": "INT * 1.1", "damage_type": "Ice", "text": "(E) is frozen by the storm! ([dmg] Ice Damage)"},
+            {"type": "inflict", "status": "frozen", "duration": 1, "chance": 20}
+        ]
+    },
+    {
+        "id": "mage_elemental_sight",
+        "name": "Elemental Sight",
+        "is_passive": 1,
+        "_note": "ENGINE: Spells hitting elemental weakness deal +20% bonus. Requires checking the element_factory weakness result in the damage pipeline and applying an additional 1.2 multiplier when this passive is equipped. Stacks multiplicatively with the existing 1.2x weakness bonus for a total of 1.44x."
+    },
+    {
+        "id": "mage_fira",
+        "name": "Fira",
+        "category": "Spell",
+        "cost": 18,
+        "charge_time": 7,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "message", "text": "(I) conjures an immense fireball!"},
+            {"type": "damage", "formula": "INT * 2.5", "damage_type": "Fire", "text": "The fireball engulfs (target)! ([dmg] Fire Damage)"},
+            {"type": "inflict", "status": "burned", "duration": 4, "chance": 30}
+        ]
+    },
+    {
+        "id": "mage_thunder_storm",
+        "name": "Thunder Storm",
+        "category": "Spell",
+        "cost": 16,
+        "charge_time": 5,
+        "target_flags": ["TARGET_AOE"],
+        "timeline": [
+            {"type": "message", "text": "(I) calls forth a storm of lightning!"},
+            {"type": "damage", "formula": "INT * 1.4", "damage_type": "Lightning", "text": "(E) is struck by lightning! ([dmg] Lightning Damage)"},
+            {"type": "inflict", "status": "stunned", "duration": 1, "chance": 15}
+        ]
+    },
+    {
+        "id": "mage_concentrate",
+        "name": "Concentrate",
+        "is_passive": 1,
+        "_note": "ENGINE: After using Defend (SIG_WAIT), next spell deals +25%. Does not stack. Persists until a spell is cast. Requires a flag on the mob (is_concentrated) set by SIG_WAIT signal, consumed on next spell cast, applying 1.25 multiplier."
+    },
+    {
+        "id": "mage_barrier_burst",
+        "name": "Barrier Burst",
+        "category": "Spell",
+        "cost": 20,
+        "charge_time": 7,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {
+                "type": "condition",
+                "formula": "USER_HAS_STATUS(mana_shield_status)",
+                "if_true": [
+                    {"type": "remove_status", "status": "mana_shield_status", "target": "self"},
+                    {"type": "message", "text": "(I) shatters their Mana Shield, channeling it into a devastating blast!"},
+                    {"type": "damage", "formula": "INT * 3.0", "damage_type": "Fire", "text": "(target) is consumed by the explosion! ([dmg] Fire Damage)"}
+                ],
+                "if_false": [
+                    {"type": "message", "text": "(I) releases a concentrated burst of fire!"},
+                    {"type": "damage", "formula": "INT * 2.0", "damage_type": "Fire", "text": "(target) is blasted! ([dmg] Fire Damage)"}
+                ]
+            }
+        ]
+    },
+    {
+        "id": "mage_explosion",
+        "name": "Explosion",
+        "category": "Spell",
+        "cost": 25,
+        "charge_time": 10,
+        "target_flags": ["TARGET_AOE"],
+        "timeline": [
+            {"type": "message", "text": "(I) channels an immense amount of aether..."},
+            {"type": "message", "delay": 3, "text": "The air crackles with energy!"},
+            {"type": "damage", "formula": "INT * 2.2", "damage_type": "Fire", "text": "A massive explosion engulfs (E)! ([dmg] Fire Damage)"}
+        ]
+    },
+
+    {"_comment": "========== CLERIC SKILLS =========="},
+
+    {
+        "id": "cleric_cure",
+        "name": "Cure",
+        "category": "Spell",
+        "cost": 7,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) channels healing light toward (target)!"},
+            {"type": "heal", "formula": "MND * 1.5"}
+        ]
+    },
+    {
+        "id": "cleric_detox",
+        "name": "Detox",
+        "category": "Spell",
+        "cost": 4,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) purges the toxins from (target)!"},
+            {"type": "remove_status", "status": "poisoned"},
+            {"type": "remove_status", "status": "poisoned_ga"},
+            {"type": "remove_status", "status": "poisoned_ja"}
+        ]
+    },
+    {
+        "id": "cleric_protect",
+        "name": "Protect",
+        "category": "Buff",
+        "cost": 6,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) casts a protective ward on (target)!"},
+            {"type": "inflict", "status": "guard_boost", "duration": 4, "chance": 100}
+        ],
+        "_note": "Currently applies flat guard_boost (+15 RES). Design calls for +15% of target's own RES. Needs a percentage-based guard status."
+    },
+    {
+        "id": "cleric_replenish",
+        "name": "Replenish",
+        "category": "Buff",
+        "cost": 6,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) bestows a gentle healing warmth upon (target)!"},
+            {"type": "inflict", "status": "replenish", "duration": 4, "chance": 100}
+        ]
+    },
+    {
+        "id": "cleric_mend",
+        "name": "Mend",
+        "category": "Spell",
+        "cost": 4,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) mends (target)'s wounds!"},
+            {"type": "remove_status", "status": "minor_wound"},
+            {"type": "remove_status", "status": "wound"},
+            {"type": "remove_status", "status": "fatal_wound"},
+            {"type": "remove_status", "status": "lethal_wound"},
+            {"type": "remove_status", "status": "terminal_wound"}
+        ]
+    },
+    {
+        "id": "cleric_holy_light",
+        "name": "Holy Light",
+        "category": "Spell",
+        "cost": 8,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "MND * 1.2", "damage_type": "Light", "text": "(I) smites (target) with holy light! ([dmg] Light Damage)"}
+        ],
+        "_note": "ENGINE: Should deal +50% vs Undead race. Needs a condition check: if target.race == Undead, use MND*1.8 instead. Could use a condition event checking race, but parser doesn't support race checks yet."
+    },
+    {
+        "id": "cleric_regen",
+        "name": "Regen",
+        "category": "Buff",
+        "cost": 10,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) blesses (target) with powerful regeneration!"},
+            {"type": "inflict", "status": "replenish_ga", "duration": 5, "chance": 100}
+        ],
+        "_note": "Using replenish_ga (4 HP/turn) as a stand-in. Design calls for 5% max HP per turn. Needs a percentage-based HoT status in Statuses.json."
+    },
+    {
+        "id": "cleric_release",
+        "name": "Release",
+        "category": "Spell",
+        "cost": 10,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) releases (target) from their afflictions!"},
+            {"type": "remove_status", "status": "de_armor"},
+            {"type": "remove_status", "status": "de_strength"},
+            {"type": "remove_status", "status": "de_dodge"},
+            {"type": "remove_status", "status": "de_power"}
+        ]
+    },
+    {
+        "id": "cleric_cura",
+        "name": "Cura",
+        "category": "Spell",
+        "cost": 14,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) channels a powerful healing light!"},
+            {"type": "heal", "formula": "MND * 2.5"}
+        ]
+    },
+    {
+        "id": "cleric_raise",
+        "name": "Raise",
+        "category": "Spell",
+        "cost": 16,
+        "charge_time": 10,
+        "target_flags": ["TARGET_SINGLE", "TARGET_REVIVE"],
+        "requirements": {"target_dead": 1},
+        "timeline": [
+            {"type": "message", "text": "(I) calls upon the light to bring (target) back!"},
+            {"type": "heal", "formula": "VIT * 3 * 0.25"}
+        ],
+        "_note": "Heal formula is an approximation of 25% max HP. Since max_hp = 15 + VIT*3, healing VIT*3*0.25 gives roughly 25% of the VIT-derived portion. Not exact but close."
+    },
+    {
+        "id": "cleric_light_valor",
+        "name": "Light Valor",
+        "is_passive": 1,
+        "_note": "ENGINE: Dark attribute enemies are biased to target caster. While caster alive, all allies take -10% Dark damage. Requires: 1) AI targeting bias when this passive is equipped (similar to provoke but only for Dark attribute enemies), 2) A party-wide damage reduction aura — needs custom component or encounter-level check."
+    },
+    {
+        "id": "cleric_cure_wave",
+        "name": "Cure Wave",
+        "category": "Spell",
+        "cost": 20,
+        "charge_time": 5,
+        "target_flags": ["TARGET_AOE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) sends a wave of healing light across the party!"},
+            {"type": "heal", "formula": "MND * 1.2"}
+        ]
+    },
+    {
+        "id": "cleric_barrier",
+        "name": "Barrier",
+        "category": "Buff",
+        "cost": 14,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) conjures a protective barrier around (target)!"},
+            {"type": "inflict", "status": "barrier_shield", "duration": 3, "chance": 100}
+        ],
+        "_note": "ENGINE: barrier_shield status needs to be added to Statuses.json. Should create a shield HP pool equal to MND*2.0 that absorbs damage. Could use the existing shield component system but needs the amount to be formula-driven from the caster's MND."
+    },
+    {
+        "id": "cleric_haste",
+        "name": "Haste",
+        "category": "Buff",
+        "cost": 12,
+        "charge_time": 5,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) accelerates (target)'s reflexes!"},
+            {"type": "inflict", "status": "haste", "duration": 4, "chance": 100}
+        ]
+    },
+    {
+        "id": "cleric_curaga",
+        "name": "Curaga",
+        "category": "Spell",
+        "cost": 22,
+        "charge_time": 7,
+        "target_flags": ["TARGET_SINGLE", "TARGET_HEAL"],
+        "timeline": [
+            {"type": "message", "text": "(I) channels an immense healing light!"},
+            {"type": "heal", "formula": "MND * 3.5"}
+        ]
+    },
+
+    {"_comment": "========== ORACLE SKILLS =========="},
+
+    {
+        "id": "oracle_hex",
+        "name": "Hex",
+        "category": "Spell",
+        "cost": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "INT * 1.0", "damage_type": "Necrotic", "text": "(I) places a hex on (target)! ([dmg] Necrotic Damage)"},
+            {"type": "inflict", "status": "de_strength", "duration": 3, "chance": 80}
+        ]
+    },
+    {
+        "id": "oracle_read_fate",
+        "name": "Read Fate",
+        "category": "Spell",
+        "cost": 4,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "message", "text": "(I) peers into (target)'s fate..."},
+            {"type": "scan"}
+        ]
+    },
+    {
+        "id": "oracle_curse_mark",
+        "name": "Curse Mark",
+        "category": "Debuff",
+        "cost": 6,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "message", "text": "(I) brands (target) with a curse mark!"},
+            {"type": "inflict", "status": "curse_marked", "duration": 4, "chance": 100}
+        ],
+        "_note": "ENGINE: curse_marked status needs to be added to Statuses.json. Should increase ALL damage taken by 10% (including DoTs). Could use a negative damage_resist_pct of -0.10 or a custom damage_taken_mult field."
+    },
+    {
+        "id": "oracle_foresight",
+        "name": "Foresight",
+        "is_passive": 1,
+        "_note": "ENGINE: 15% flat dodge chance that stacks with Dodge passive and other sources. When equipped, adds 15 to the mob's dodge calculation. Could be implemented via passive_stat_mods adding to a dodge_bonus var, or a flat dodge_chance field on the passive."
+    },
+    {
+        "id": "oracle_enfeeble",
+        "name": "Enfeeble",
+        "category": "Debuff",
+        "cost": 7,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "message", "text": "(I) enfeebles (target), stripping their defenses!"},
+            {"type": "inflict", "status": "de_armor", "duration": 3, "chance": 85}
+        ]
+    },
+    {
+        "id": "oracle_sap",
+        "name": "Sap",
+        "category": "Spell",
+        "cost": 7,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "INT * 1.2", "damage_type": "Necrotic", "leech": 0.25, "text": "(I) saps the life from (target)! ([dmg] Necrotic Damage)"}
+        ]
+    },
+    {
+        "id": "oracle_doom_gaze",
+        "name": "Doom Gaze",
+        "category": "Spell",
+        "cost": 12,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "INT * 1.5", "damage_type": "Necrotic", "text": "(I) fixes (target) with a baleful gaze! ([dmg] Necrotic Damage)"}
+        ],
+        "_note": "ENGINE: If target has 2+ debuffs, damage should be +50% (INT*2.25). Needs a condition that counts active debuffs on the target. Parser doesn't currently support COUNT_DEBUFFS. Could use nested HAS_STATUS checks but that's fragile — better to add a debuff counter to the parser."
+    },
+    {
+        "id": "oracle_slow",
+        "name": "Slow",
+        "category": "Debuff",
+        "cost": 8,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "message", "text": "(I) warps the flow of time around (target)!"},
+            {"type": "inflict", "status": "slowed", "duration": 4, "chance": 80}
+        ]
+    },
+    {
+        "id": "oracle_dispel",
+        "name": "Dispel",
+        "category": "Debuff",
+        "cost": 10,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "message", "text": "(I) strips away (target)'s protections!"},
+            {"type": "dispel"}
+        ]
+    },
+    {
+        "id": "oracle_evil_eye",
+        "name": "Evil Eye",
+        "category": "Debuff",
+        "cost": 10,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "message", "text": "(I) fixes (target) with the Evil Eye!"},
+            {"type": "inflict", "status": "blinded", "duration": 3, "chance": 85},
+            {
+                "type": "condition",
+                "formula": "HAS_STATUS(curse_marked) == 0",
+                "if_true": [
+                    {"type": "inflict", "status": "curse_marked", "duration": 4, "chance": 100},
+                    {"type": "message", "text": "A curse mark appears on (target)!"}
+                ]
+            }
+        ],
+        "_note": "The condition checks if Curse Mark is NOT present. However, this fires regardless of whether Blind landed. Ideally, Curse Mark should only auto-apply if Blind successfully lands. May need sequencing logic."
+    },
+    {
+        "id": "oracle_drain_touch",
+        "name": "Drain Touch",
+        "category": "Spell",
+        "cost": 12,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "INT * 1.8", "damage_type": "Necrotic", "leech": 0.50, "text": "(I) drains (target)'s life force! ([dmg] Necrotic Damage)"}
+        ]
+    },
+    {
+        "id": "oracle_weaken",
+        "name": "Weaken",
+        "category": "Debuff",
+        "cost": 14,
+        "charge_time": 5,
+        "target_flags": ["TARGET_AOE"],
+        "timeline": [
+            {"type": "message", "text": "(I) curses the entire battlefield!"},
+            {"type": "inflict", "status": "de_strength", "duration": 3, "chance": 80}
+        ]
+    },
+    {
+        "id": "oracle_misfortune",
+        "name": "Misfortune",
+        "is_passive": 1,
+        "_note": "ENGINE: Enemies with 3+ debuffs have ALL healing received reduced by 30%. Requires: count debuffs on a mob, and if >=3, reduce all healing by 30%. Could be implemented as a check in ApplyHeal or as a debuff-count-triggered status. Complex — needs custom code."
+    },
+    {
+        "id": "oracle_mind_break",
+        "name": "Mind Break",
+        "category": "Spell",
+        "cost": 14,
+        "hitrate": 90,
+        "charge_time": 5,
+        "target_flags": ["TARGET_SINGLE"],
+        "timeline": [
+            {"type": "damage", "formula": "MND * 1.5", "damage_type": "Necrotic", "text": "(I) assaults (target)'s mind! ([dmg] Necrotic Damage)"},
+            {
+                "type": "condition",
+                "formula": "HAS_STATUS(curse_marked)",
+                "if_true": [
+                    {"type": "inflict", "status": "muted", "duration": 3, "chance": 75}
+                ],
+                "if_false": [
+                    {"type": "inflict", "status": "muted", "duration": 2, "chance": 75}
+                ]
+            }
+        ]
+    },
+    {
+        "id": "oracle_unravel",
+        "name": "Unravel",
+        "category": "Spell",
+        "cost": 20,
+        "charge_time": 10,
+        "target_flags": ["TARGET_AOE"],
+        "timeline": [
+            {"type": "message", "text": "(I) unravels the threads of fate!"},
+            {"type": "damage", "formula": "INT * 1.2", "damage_type": "Necrotic", "text": "Fate tears at (E)! ([dmg] Necrotic Damage)"}
+        ],
+        "_note": "ENGINE: Damage should be INT*1.2 PER DEBUFF on each target, max 4 debuffs (INT*4.8 max). Needs a debuff counter per target that multiplies the base formula. The current single damage event fires once at INT*1.2 — needs custom scaling logic. Most complex skill in the game to implement correctly."
     }
 ]

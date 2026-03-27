@@ -421,6 +421,64 @@ datum/skill_event/backup
             i++
 
 /**
+ * Scan Event — reveals target information to the caster (HP%, attribute, weakness, active statuses)
+ */
+datum/skill_event/scan
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!target || !user) return
+        var/hp_pct = round((target.hp / max(1, target.max_hp)) * 100)
+        var/attr = ("attribute" in target.vars && target.attribute != "") ? target.attribute : "None"
+
+        user << "<b>=== [target.name] ===</b>"
+        user << "HP: [hp_pct]% | Attribute: [attr]"
+
+        // List active statuses
+        var/list/status_names = list()
+        for(var/datum/component/status/C in target.components)
+            status_names += "[C.name] ([C.duration] turns)"
+        if(status_names.len)
+            user << "Active Effects: [jointext(status_names, ", ")]"
+        else
+            user << "Active Effects: None"
+
+        // Check elemental weakness via element_factory
+        if(attr != "None" && attr != "")
+            var/list/weak_list = list()
+            for(var/elem_id in element_factory.loaded_elements)
+                var/mult = element_factory.GetMultiplier(elem_id, attr)
+                if(mult > 1.0) weak_list += elem_id
+            if(weak_list.len)
+                user << "<font color='#FF4444'>Weak to: [jointext(weak_list, ", ")]</font>"
+            else
+                user << "No elemental weakness detected."
+        user << "<b>==================</b>"
+
+/**
+ * Dispel Event — removes the most recently applied positive buff from the target
+ */
+datum/skill_event/dispel
+    Run(mob/user, mob/target, datum/skill/S, datum/encounter/E)
+        if(!target) return
+        var/datum/component/status/newest_buff = null
+        for(var/datum/component/status/C in target.components)
+            var/is_buff = 0
+            if(C.stat_amount > 0) is_buff = 1
+            if(C.hot_amount > 0) is_buff = 1
+            if(C.hot_mp > 0) is_buff = 1
+            if(C.dodge_chance > 0) is_buff = 1
+            if(C.reraise) is_buff = 1
+            if(C.damage_dealt_mult > 1.0) is_buff = 1
+            if(C.provoke) is_buff = 1
+            if(C.vanish) is_buff = 1
+            if(is_buff) newest_buff = C  // Keep overwriting — last one in list is newest
+        if(newest_buff)
+            world << "<i>[newest_buff.name] was dispelled from [target.name]!</i>"
+            if(hascall(target, "RemoveStatus"))
+                target.RemoveStatus(newest_buff)
+        else
+            world << "<i>[target.name] has no buffs to dispel.</i>"
+
+/**
  * Remove Status Event — removes a specific status from the target (or caster if target_self=1)
  */
 datum/skill_event/remove_status
