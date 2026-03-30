@@ -24,6 +24,7 @@
 #include "Code\Mobs\Enemy_Ai.dm"
 #include "Code\Mobs\NPCS.dm"
 #include "Code\Player\Player_Logic.dm"
+#include "Code\Player\player_skin.dm"
 #include "Code\Player\player_verbs.dm"
 #include "Code\Player\Players.dm"
 #include "Code\Skill\skill_base.dm"

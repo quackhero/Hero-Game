@@ -44,6 +44,9 @@ mob
     var/is_marked = 0          // Set by the mark skill event; TARGET_MARKED AOE only hits marked mobs
     var/is_imprisoned = 0      // Set by the prism skill event; imprisoned mob cannot act or be targeted
 
+    var/pending_death = 0          // Set by TakeDamage when HP <= threshold; processed by damage event
+    var/mob/pending_death_killer   // The mob that dealt the killing blow
+
     var/channel_start_state = "" // Positional state stored when channeling begins
     var/override_attack_damage_type = "" // Computed by BasicAttack; read by the damage event to apply weapon subtype/element
 
@@ -148,6 +151,7 @@ mob
             if(C.zombie_mode)
                 src << "<font color='#00AA00'><b>[src.name] is Zombified — healing deals damage instead!</b></font>"
                 src.TakeDamage(amount, healer, "True", 0)
+                src.ProcessPendingDeath()
                 return
         // Misfortune: enemies with 3+ debuffs receive reduced healing
         if(src.current_encounter)
@@ -173,8 +177,24 @@ mob
             src.is_downed = 1
             src.SendSignal("SIG_DOWNED")
 
+        // Death is NO LONGER triggered here automatically.
+        // TakeDamage defers death so damage messages print first.
+        // Non-TakeDamage HP reductions must call CheckDeath() explicitly.
+
+    // For non-TakeDamage HP reductions (DoT, environmental, debug).
+    // Checks if this mob should die and processes death immediately.
+    proc/CheckDeath()
         if(src.hp <= src.death_threshold && !src.is_dead)
             src.HandleDeath(src.last_attacker)
+
+    // Processes a pending death that was deferred by TakeDamage.
+    // Called by the damage event AFTER it prints its flavor message.
+    proc/ProcessPendingDeath()
+        if(!src.pending_death) return
+        src.pending_death = 0
+        var/mob/killer = src.pending_death_killer
+        src.pending_death_killer = null
+        src.HandleDeath(killer)
 
     // Call this explicitly from revive skills — never runs automatically.
     proc/Revive(heal_amount = 1)
@@ -537,6 +557,12 @@ mob
                 break  // only one counter fires per hit
 
         src.ClampStats()
+
+        // Defer death — let the damage event print its message first
+        if(src.hp <= src.death_threshold && !src.is_dead && !src.pending_death)
+            src.pending_death = 1
+            src.pending_death_killer = attacker
+
         return DC.final_damage
 
     proc/HandleDeath(mob/killer)
@@ -565,8 +591,9 @@ mob
         src.atb_gauge = 0
         src.is_busy = 0
         src.SendSignal("SIG_DEATH", killer) // After is_dead: death confirmation
-        world << "<b>*** [src.name] has been defeated! ***</b>"
+        // Death bark first (the enemy's death cry), then the defeat announcement
         if(hascall(src, "Bark")) src:Bark("death")
+        world << "<b>*** [src.name] has been defeated! ***</b>"
         if(killer && killer != src)
             killer.SendSignal("SIG_KILL", src) // Fires on the killer, passing the defeated mob
             if(hascall(killer, "Bark")) killer:Bark("kill")
@@ -649,11 +676,12 @@ mob
                 return 1
         return 0
 
-    proc/RemoveStatus(datum/component/status/S)
+    proc/RemoveStatus(datum/component/status/S, silent = 0)
         var/sid = S.id // Save before del()
         src.components -= S
         S.OnRemove(src)
-        world << "<i><font color='#B19CD9'>[src.name] ([S.name] has worn off!)</font></i>"
+        if(!silent)
+            world << "<i><font color='#B19CD9'>[src.name] ([S.name] has worn off!)</font></i>"
         src.SendSignal(SIG_ON_EXPIRE, S)   // Step 2: fire before del() so datum is still valid
         // Per-status targeted expire signal — e.g. "SIG_EXPIRED_SLEEPING"
         src.SendSignal("SIG_EXPIRED_[uppertext(sid)]", S)

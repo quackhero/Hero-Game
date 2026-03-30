@@ -159,5 +159,53 @@
 
         "opportunities": [],
         "finisher_opportunities": []
-    }
+    },
+    {
+    "id": "venom_wolf",
+    "name": "Venom Wolf",
+    "race": "Beast",
+    "attribute": "",
+    "target_type": "Ground",
+
+    "stats": {
+        "max_hp": 35,
+        "max_mp": 15,
+        "strength": 9,
+        "dexterity": 10,
+        "intelligence": 0,
+        "mind": 2,
+        "vitality": 5,
+        "resilience": 4
+    },
+
+    "level": 5,
+    "gil": 25,
+    "exp": 35,
+    "difficulty": 2,
+    "hero_status": 0,
+
+    "skills": ["basic_attack", "enemy_bite", "enemy_poison_bite"],
+
+    "equipment": {"weapon": "", "armor": "", "accessory": ""},
+    "items": [],
+
+    "attack_messages": [
+        "(I) lunges at (target) with bared fangs!",
+        "(I) snaps at (target)!"
+    ],
+
+    "drops": {"antidote": 40, "health_potion": 25},
+
+    "barks": {
+        "war_cry": ["A Venom Wolf snarls, drool dripping from its fangs!"],
+        "taunt": ["The wolf circles menacingly...", "The wolf growls low..."],
+        "death": ["The wolf collapses with a whimper!"],
+        "kill": ["The wolf howls in triumph over its prey!"],
+        "hurt": ["The wolf yelps!"],
+        "win": ["The wolf pack devours its fallen prey!"]
+    },
+
+    "opportunities": [],
+    "finisher_opportunities": []
+}
 ]

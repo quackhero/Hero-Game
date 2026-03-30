@@ -1,0 +1,892 @@
+
+window "default"
+	elem "default"
+		type = MAIN
+		pos = 291,0
+		size = 640x480
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		saved-params = "pos;size;is-minimized;is-maximized"
+		outer-size = 656x538
+		outer-pos = 291,0
+		inner-pos = 8,31
+		screen-size = 1920x1032
+
+window "default"
+	elem "default"
+		type = MAIN
+		pos = 291,0
+		size = 640x480
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		saved-params = "pos;size;is-minimized;is-maximized"
+		outer-size = 656x538
+		outer-pos = 291,0
+		inner-pos = 8,31
+		screen-size = 1920x1032
+	elem "mapwindow"
+		type = MAP
+		pos = 0,0
+		size = 640x640
+		anchor1 = 0,0
+		anchor2 = 69,84
+		saved-params = "zoom=0;iconsize=0;tile-override=0;tile-style=normal;zoom-mode=normal;scale-x=100;scale-y=100;letterbox=1"
+	elem "output"
+		type = OUTPUT
+		pos = 645,0
+		size = 280x640
+		anchor1 = 69,0
+		anchor2 = 100,84
+		font-family = "Tahoma"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #1a1a2e
+		saved-params = ""
+	elem "name"
+		type = LABEL
+		pos = 5,645
+		size = 220x24
+		anchor1 = 0,85
+		anchor2 = 24,88
+		font-family = "Malgun Gothic"
+		font-size = 10
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #1a1a2e
+		saved-params = ""
+		text = "Hero"
+	elem "labelhp"
+		type = LABEL
+		pos = 5,673
+		size = 28x18
+		anchor1 = 0,88
+		anchor2 = 3,91
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #1a1a2e
+		saved-params = ""
+		text = "HP"
+	elem "barhp"
+		type = BAR
+		pos = 36,673
+		size = 220x18
+		anchor1 = 4,88
+		anchor2 = 28,91
+		background-color = #2a2a2a
+		saved-params = "dir=east"
+		bar-color = #00cc44
+		is-slider = false
+		dir = east
+	elem "labelsk"
+		type = LABEL
+		pos = 5,694
+		size = 28x18
+		anchor1 = 0,91
+		anchor2 = 3,94
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #6699ff
+		background-color = #1a1a2e
+		saved-params = ""
+		text = "MP"
+	elem "barsk"
+		type = BAR
+		pos = 36,694
+		size = 220x18
+		anchor1 = 4,91
+		anchor2 = 28,94
+		background-color = #2a2a2a
+		saved-params = "dir=east"
+		bar-color = #6699ff
+		is-slider = false
+		dir = east
+	elem "labelxp"
+		type = LABEL
+		pos = 265,673
+		size = 28x18
+		anchor1 = 29,88
+		anchor2 = 32,91
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffdd44
+		background-color = #1a1a2e
+		saved-params = ""
+		text = "XP"
+	elem "barxp"
+		type = BAR
+		pos = 296,673
+		size = 220x18
+		anchor1 = 32,88
+		anchor2 = 56,91
+		background-color = #2a2a2a
+		saved-params = "dir=east"
+		bar-color = #ffaa00
+		is-slider = false
+		dir = east
+	elem "labelup"
+		type = LABEL
+		pos = 5,716
+		size = 28x18
+		anchor1 = 0,94
+		anchor2 = 3,97
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ff88ff
+		background-color = #1a1a2e
+		is-visible = false
+		saved-params = ""
+		text = "UP"
+	elem "barup"
+		type = BAR
+		pos = 36,716
+		size = 220x18
+		anchor1 = 4,94
+		anchor2 = 28,97
+		background-color = #2a2a2a
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #ff00ff
+		is-slider = false
+		dir = east
+	elem "labelvp"
+		type = LABEL
+		pos = 265,716
+		size = 28x18
+		anchor1 = 29,94
+		anchor2 = 32,97
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #00ffff
+		background-color = #1a1a2e
+		is-visible = false
+		saved-params = ""
+		text = "VP"
+	elem "barvp"
+		type = BAR
+		pos = 296,716
+		size = 220x18
+		anchor1 = 32,94
+		anchor2 = 56,97
+		background-color = #2a2a2a
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #00ffff
+		is-slider = false
+		dir = east
+	elem "labelT"
+		type = LABEL
+		pos = 525,673
+		size = 28x18
+		anchor1 = 57,88
+		anchor2 = 60,91
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ff8800
+		background-color = #1a1a2e
+		is-visible = false
+		saved-params = ""
+		text = "T"
+	elem "bart"
+		type = BAR
+		pos = 556,673
+		size = 200x18
+		anchor1 = 60,88
+		anchor2 = 82,91
+		background-color = #2a2a2a
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #ff8800
+		is-slider = false
+		dir = east
+	elem "labelhyp"
+		type = LABEL
+		pos = 525,694
+		size = 28x18
+		anchor1 = 57,91
+		anchor2 = 60,94
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ff0066
+		background-color = #1a1a2e
+		is-visible = false
+		saved-params = ""
+		text = "HYP"
+	elem "barhyp"
+		type = BAR
+		pos = 556,694
+		size = 200x18
+		anchor1 = 60,91
+		anchor2 = 82,94
+		background-color = #2a2a2a
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #ff0066
+		is-slider = false
+		dir = east
+	elem "labelmxp"
+		type = LABEL
+		pos = 525,716
+		size = 28x18
+		anchor1 = 57,94
+		anchor2 = 60,97
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #9900ff
+		background-color = #1a1a2e
+		is-visible = false
+		saved-params = ""
+		text = "MXP"
+	elem "barmxp"
+		type = BAR
+		pos = 556,716
+		size = 200x18
+		anchor1 = 60,94
+		anchor2 = 82,97
+		background-color = #2a2a2a
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #9900ff
+		is-slider = false
+		dir = east
+	elem "time"
+		type = LABEL
+		pos = 760,645
+		size = 165x20
+		anchor1 = 82,85
+		anchor2 = 100,88
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffffff
+		background-color = none
+		is-visible = false
+		saved-params = ""
+		text = "0:00"
+	elem "bartime"
+		type = BAR
+		pos = 760,668
+		size = 165x18
+		anchor1 = 82,88
+		anchor2 = 100,91
+		background-color = #2a2a2a
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #00aaff
+		is-slider = false
+		dir = east
+	elem "union1"
+		type = LABEL
+		pos = 0,738
+		size = 130x22
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #2a2a2a
+		is-visible = false
+		border = line
+		saved-params = ""
+		text = ""
+	elem "union1hp"
+		type = BAR
+		pos = 0,762
+		size = 130x8
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #333333
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #00cc44
+		is-slider = false
+		dir = east
+	elem "union2"
+		type = LABEL
+		pos = 135,738
+		size = 130x22
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #2a2a2a
+		is-visible = false
+		border = line
+		saved-params = ""
+		text = ""
+	elem "union2hp"
+		type = BAR
+		pos = 135,762
+		size = 130x8
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #333333
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #00cc44
+		is-slider = false
+		dir = east
+	elem "union3"
+		type = LABEL
+		pos = 270,738
+		size = 130x22
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #2a2a2a
+		is-visible = false
+		border = line
+		saved-params = ""
+		text = ""
+	elem "union3hp"
+		type = BAR
+		pos = 270,762
+		size = 130x8
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #333333
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #00cc44
+		is-slider = false
+		dir = east
+	elem "union4"
+		type = LABEL
+		pos = 405,738
+		size = 130x22
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #2a2a2a
+		is-visible = false
+		border = line
+		saved-params = ""
+		text = ""
+	elem "union4hp"
+		type = BAR
+		pos = 405,762
+		size = 130x8
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #333333
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #00cc44
+		is-slider = false
+		dir = east
+	elem "union5"
+		type = LABEL
+		pos = 540,738
+		size = 130x22
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #2a2a2a
+		is-visible = false
+		border = line
+		saved-params = ""
+		text = ""
+	elem "union5hp"
+		type = BAR
+		pos = 540,762
+		size = 130x8
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #333333
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #00cc44
+		is-slider = false
+		dir = east
+	elem "union6"
+		type = LABEL
+		pos = 675,738
+		size = 130x22
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #2a2a2a
+		is-visible = false
+		border = line
+		saved-params = ""
+		text = ""
+	elem "union6hp"
+		type = BAR
+		pos = 675,762
+		size = 130x8
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #333333
+		is-visible = false
+		saved-params = "dir=east"
+		bar-color = #00cc44
+		is-slider = false
+		dir = east
+	elem "unioncmd1"
+		type = BUTTON
+		pos = 810,738
+		size = 110x22
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Malgun Gothic"
+		font-size = 9
+		background-color = none
+		is-visible = false
+		saved-params = ""
+		text = "Union Cmd 1"
+		command = ""
+	elem "unioncmd2"
+		type = BUTTON
+		pos = 810,762
+		size = 110x22
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Malgun Gothic"
+		font-size = 9
+		background-color = none
+		is-visible = false
+		saved-params = ""
+		text = "Union Cmd 2"
+		command = ""
+	elem "unioncmd3"
+		type = BUTTON
+		pos = 810,786
+		size = 110x22
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Malgun Gothic"
+		font-size = 9
+		background-color = none
+		is-visible = false
+		saved-params = ""
+		text = "Union Cmd 3"
+		command = ""
+
+window "asheet2"
+	elem "asheet2"
+		type = MAIN
+		pos = 291,0
+		size = 640x480
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		saved-params = "pos;size;is-minimized;is-maximized"
+		outer-size = 656x538
+		outer-pos = 291,0
+		inner-pos = 8,31
+		screen-size = 1920x1032
+
+window "asheet2"
+	elem "asheet2"
+		type = MAIN
+		pos = 291,0
+		size = 640x480
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		saved-params = "pos;size;is-minimized;is-maximized"
+		outer-size = 656x538
+		outer-pos = 291,0
+		inner-pos = 8,31
+		screen-size = 1920x1032
+	elem "s_name"
+		type = LABEL
+		pos = 5,5
+		size = 630x28
+		anchor1 = 1,1
+		anchor2 = 99,6
+		font-family = "Malgun Gothic"
+		font-size = 12
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #222244
+		border = line
+		saved-params = ""
+		text = "  Name"
+	elem "s_level"
+		type = LABEL
+		pos = 5,36
+		size = 630x26
+		anchor1 = 1,7
+		anchor2 = 99,12
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #aaaaff
+		background-color = #1a1a3a
+		border = line
+		saved-params = ""
+		text = " Lv.1 Fighter"
+	elem "s_hp"
+		type = LABEL
+		pos = 5,66
+		size = 90x20
+		anchor1 = 1,12
+		anchor2 = 15,16
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #333344
+		saved-params = ""
+		text = "HP: 0/0"
+	elem "s_hpbar"
+		type = BAR
+		pos = 100,66
+		size = 535x20
+		anchor1 = 16,12
+		anchor2 = 99,16
+		background-color = #2a2a2a
+		saved-params = "dir=east"
+		bar-color = #00cc44
+		is-slider = false
+		dir = east
+	elem "s_sk"
+		type = LABEL
+		pos = 5,89
+		size = 90x20
+		anchor1 = 1,16
+		anchor2 = 15,20
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #6699ff
+		background-color = #333344
+		saved-params = ""
+		text = "MP: 0/0"
+	elem "s_skbar"
+		type = BAR
+		pos = 100,89
+		size = 535x20
+		anchor1 = 16,16
+		anchor2 = 99,20
+		background-color = #2a2a2a
+		saved-params = "dir=east"
+		bar-color = #6699ff
+		is-slider = false
+		dir = east
+	elem "s_exp"
+		type = LABEL
+		pos = 5,112
+		size = 140x20
+		anchor1 = 1,20
+		anchor2 = 23,24
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #ffdd44
+		background-color = #333344
+		saved-params = ""
+		text = " EXP: 0/0"
+	elem "s_expbar"
+		type = BAR
+		pos = 150,112
+		size = 485x20
+		anchor1 = 24,20
+		anchor2 = 99,24
+		background-color = #2a2a2a
+		saved-params = "dir=east"
+		bar-color = #ffaa00
+		is-slider = false
+		dir = east
+	elem "s_atk"
+		type = LABEL
+		pos = 5,136
+		size = 100x25
+		anchor1 = 1,24
+		anchor2 = 18,28
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #494949
+		border = line
+		saved-params = ""
+		text = "STR: 0"
+	elem "s_def"
+		type = LABEL
+		pos = 110,136
+		size = 100x25
+		anchor1 = 18,24
+		anchor2 = 35,28
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #494949
+		border = line
+		saved-params = ""
+		text = "RES: 0"
+	elem "s_spd"
+		type = LABEL
+		pos = 215,136
+		size = 100x25
+		anchor1 = 35,24
+		anchor2 = 52,28
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #494949
+		border = line
+		saved-params = ""
+		text = "DEX: 0"
+	elem "s_ap"
+		type = LABEL
+		pos = 320,136
+		size = 100x25
+		anchor1 = 52,24
+		anchor2 = 69,28
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #494949
+		border = line
+		saved-params = ""
+		text = "INT: 0"
+	elem "s_age"
+		type = LABEL
+		pos = 425,136
+		size = 205x25
+		anchor1 = 69,24
+		anchor2 = 99,28
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #494949
+		is-visible = false
+		border = line
+		saved-params = ""
+		text = "VIT: 0"
+	elem "s_cha"
+		type = LABEL
+		pos = 5,165
+		size = 195x28
+		anchor1 = 1,29
+		anchor2 = 32,34
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #333333
+		border = line
+		saved-params = ""
+		text = " STR: 0+0"
+	elem "s_int"
+		type = LABEL
+		pos = 5,196
+		size = 195x28
+		anchor1 = 1,34
+		anchor2 = 32,39
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #333333
+		border = line
+		saved-params = ""
+		text = " DEX: 0+0"
+	elem "s_str"
+		type = LABEL
+		pos = 5,227
+		size = 195x28
+		anchor1 = 1,39
+		anchor2 = 32,44
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #333333
+		border = line
+		saved-params = ""
+		text = " INT: 0+0"
+	elem "s_end"
+		type = LABEL
+		pos = 5,258
+		size = 195x28
+		anchor1 = 1,44
+		anchor2 = 32,49
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #333333
+		border = line
+		saved-params = ""
+		text = " MND: 0+0"
+	elem "s_agi"
+		type = LABEL
+		pos = 5,289
+		size = 195x28
+		anchor1 = 1,49
+		anchor2 = 32,54
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #333333
+		border = line
+		saved-params = ""
+		text = " VIT: 0+0"
+	elem "s_sty"
+		type = LABEL
+		pos = 5,320
+		size = 195x28
+		anchor1 = 1,54
+		anchor2 = 32,59
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #333333
+		border = line
+		saved-params = ""
+		text = " RES: 0+0"
+	elem "s_wpn1"
+		type = LABEL
+		pos = 205,165
+		size = 430x28
+		anchor1 = 32,29
+		anchor2 = 99,34
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #3a3a3a
+		border = line
+		saved-params = ""
+		text = "Weapon"
+	elem "s_wpn2"
+		type = LABEL
+		pos = 205,196
+		size = 350x28
+		anchor1 = 32,34
+		anchor2 = 87,39
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #888888
+		background-color = #2a2a2a
+		border = line
+		saved-params = ""
+		text = "Secondary"
+	elem "button16"
+		type = BUTTON
+		pos = 560,196
+		size = 75x28
+		anchor1 = 88,34
+		anchor2 = 99,39
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #888888
+		background-color = #2a2a2a
+		is-disabled = true
+		border = line
+		saved-params = ""
+		text = "Equip"
+		command = ""
+	elem "s_arm"
+		type = LABEL
+		pos = 205,227
+		size = 430x28
+		anchor1 = 32,39
+		anchor2 = 99,44
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #3a3a3a
+		border = line
+		saved-params = ""
+		text = "Armor"
+	elem "s_acc1"
+		type = LABEL
+		pos = 205,258
+		size = 430x28
+		anchor1 = 32,44
+		anchor2 = 99,49
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffffff
+		background-color = #3a3a3a
+		border = line
+		saved-params = ""
+		text = "Accessory"
+	elem "s_acc2"
+		type = LABEL
+		pos = 205,289
+		size = 350x28
+		anchor1 = 32,49
+		anchor2 = 87,54
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #888888
+		background-color = #2a2a2a
+		border = line
+		saved-params = ""
+		text = "Accessory 2"
+	elem "button19"
+		type = BUTTON
+		pos = 560,289
+		size = 75x28
+		anchor1 = 88,49
+		anchor2 = 99,54
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #888888
+		background-color = #2a2a2a
+		is-disabled = true
+		border = line
+		saved-params = ""
+		text = "Equip"
+		command = ""
+	elem "s_acc3"
+		type = LABEL
+		pos = 205,320
+		size = 350x28
+		anchor1 = 32,54
+		anchor2 = 87,59
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #888888
+		background-color = #2a2a2a
+		border = line
+		saved-params = ""
+		text = "Accessory 3"
+	elem "button20"
+		type = BUTTON
+		pos = 560,320
+		size = 75x28
+		anchor1 = 88,54
+		anchor2 = 99,59
+		font-family = "Malgun Gothic"
+		font-size = 9
+		text-color = #888888
+		background-color = #2a2a2a
+		is-disabled = true
+		border = line
+		saved-params = ""
+		text = "Equip"
+		command = ""
+	elem "s_gil"
+		type = LABEL
+		pos = 5,352
+		size = 630x26
+		anchor1 = 1,60
+		anchor2 = 99,65
+		font-family = "Malgun Gothic"
+		font-size = 10
+		text-color = #ffdd44
+		background-color = #222222
+		border = line
+		saved-params = ""
+		text = " Gil: 0"
+
+window "Macro"
+	elem "Macro"
+		type = MAIN
+		pos = 291,0
+		size = 640x480
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		saved-params = "pos;size;is-minimized;is-maximized"
+		outer-size = 656x538
+		outer-pos = 291,0
+		inner-pos = 8,31
+		screen-size = 1920x1032
+

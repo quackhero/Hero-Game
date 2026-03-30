@@ -14,6 +14,161 @@
         ]
     },
 
+    {"_comment": "========== ENEMY SKILLS =========="},
+
+{
+    "id": "enemy_bite",
+    "name": "Bite",
+    "category": "Attack",
+    "cost": 0,
+    "target_flags": ["TARGET_SINGLE"],
+    "timeline": [
+        {"type": "damage", "formula": "STR * 1.2", "damage_type": "Piercing", "text": "(I) bites down on (target)! ([dmg] Damage)"}
+    ]
+},
+{
+    "id": "enemy_poison_bite",
+    "name": "Poison Bite",
+    "category": "Attack",
+    "cost": 3,
+    "target_flags": ["TARGET_SINGLE"],
+    "timeline": [
+        {"type": "damage", "formula": "STR * 1.0", "damage_type": "Piercing", "text": "(I) sinks venomous fangs into (target)! ([dmg] Damage)"},
+        {"type": "inflict", "status": "poisoned", "duration": 3, "chance": 60}
+    ]
+},
+{
+    "id": "enemy_howl",
+    "name": "Howl",
+    "category": "Buff",
+    "cost": 5,
+    "target_flags": ["TARGET_SELF"],
+    "timeline": [
+        {"type": "message", "text": "(I) lets out a terrifying howl!"},
+        {"type": "inflict", "status": "attack_up", "duration": 3, "chance": 100, "target": "self"}
+    ]
+},
+{
+    "id": "enemy_flame_breath",
+    "name": "Flame Breath",
+    "category": "Spell",
+    "cost": 8,
+    "target_flags": ["TARGET_AOE"],
+    "timeline": [
+        {"type": "message", "text": "(I) unleashes a torrent of flame!"},
+        {"type": "damage", "formula": "INT * 1.3", "damage_type": "Fire", "text": "(E) is scorched! ([dmg] Fire Damage)"},
+        {"type": "inflict", "status": "minor_burn", "duration": 3, "chance": 25}
+    ]
+},
+{
+    "id": "enemy_fireball",
+    "name": "Fireball",
+    "category": "Spell",
+    "cost": 6,
+    "target_flags": ["TARGET_SINGLE"],
+    "timeline": [
+        {"type": "damage", "formula": "INT * 1.5", "damage_type": "Fire", "text": "(I) hurls a fireball at (target)! ([dmg] Fire Damage)"}
+    ]
+},
+{
+    "id": "enemy_tail_swipe",
+    "name": "Tail Swipe",
+    "category": "Attack",
+    "cost": 5,
+    "target_flags": ["TARGET_AOE"],
+    "timeline": [
+        {"type": "message", "text": "(I) sweeps its massive tail across the battlefield!"},
+        {"type": "damage", "formula": "STR * 0.8", "damage_type": "Blunt", "text": "(E) is struck by the tail! ([dmg] Damage)"}
+    ]
+},
+{
+    "id": "enemy_stomp",
+    "name": "Stomp",
+    "category": "Attack",
+    "cost": 4,
+    "target_flags": ["TARGET_SINGLE"],
+    "timeline": [
+        {"type": "damage", "formula": "STR * 1.5", "damage_type": "Blunt", "text": "(I) stomps on (target) with tremendous force! ([dmg] Damage)"},
+        {"type": "inflict", "status": "stunned", "duration": 1, "chance": 30}
+    ]
+},
+{
+    "id": "enemy_terrify",
+    "name": "Terrify",
+    "category": "Debuff",
+    "cost": 6,
+    "target_flags": ["TARGET_SINGLE"],
+    "timeline": [
+        {"type": "message", "text": "(I) locks eyes with (target), radiating primal terror!"},
+        {"type": "inflict", "status": "feared", "duration": 2, "chance": 70}
+    ]
+},
+{
+    "id": "enemy_iron_skin",
+    "name": "Iron Skin",
+    "category": "Buff",
+    "cost": 8,
+    "target_flags": ["TARGET_SELF"],
+    "timeline": [
+        {"type": "message", "text": "(I) hardens its body, scales turning to iron!"},
+        {"type": "inflict", "status": "fortified", "duration": 3, "chance": 100, "target": "self"}
+    ]
+},
+{
+    "id": "enemy_crush",
+    "name": "Crush",
+    "category": "Attack",
+    "cost": 10,
+    "target_flags": ["TARGET_SINGLE"],
+    "timeline": [
+        {"type": "damage", "formula": "STR * 2.0", "damage_type": "Blunt", "text": "(I) brings both claws down on (target)! ([dmg] Damage)"}
+    ]
+},
+{
+    "id": "enemy_enrage",
+    "name": "Enrage",
+    "category": "Buff",
+    "cost": 10,
+    "target_flags": ["TARGET_SELF"],
+    "timeline": [
+        {"type": "message", "text": "(I) enters a berserk rage! Its eyes glow red!"},
+        {"type": "inflict", "status": "berserk", "duration": 4, "chance": 100, "target": "self"}
+    ]
+},
+{
+    "id": "enemy_dark_pulse",
+    "name": "Dark Pulse",
+    "category": "Spell",
+    "cost": 12,
+    "target_flags": ["TARGET_AOE"],
+    "timeline": [
+        {"type": "message", "text": "(I) releases a wave of dark energy!"},
+        {"type": "damage", "formula": "INT * 1.5", "damage_type": "Dark", "text": "(E) is consumed by darkness! ([dmg] Dark Damage)"},
+        {"type": "inflict", "status": "de_strength", "duration": 3, "chance": 30}
+    ]
+},
+{
+    "id": "enemy_drain_life",
+    "name": "Drain Life",
+    "category": "Spell",
+    "cost": 8,
+    "target_flags": ["TARGET_SINGLE"],
+    "timeline": [
+        {"type": "damage", "formula": "INT * 1.3", "damage_type": "Dark", "leech": 0.50, "text": "(I) drains the life from (target)! ([dmg] Dark Damage)"}
+    ]
+},
+{
+    "id": "enemy_summon_bones",
+    "name": "Summon Bones",
+    "category": "Buff",
+    "cost": 15,
+    "target_flags": ["TARGET_SELF"],
+    "timeline": [
+        {"type": "message", "text": "(I) raises its claws and bones erupt from the earth!"},
+        {"type": "backup", "npc_id": "skeleton_minion"}
+    ]
+},
+
     {"_comment": "========== FIGHTER SKILLS =========="},
 
     {

@@ -222,6 +222,10 @@ datum/encounter
                 for(var/datum/counter_window/CW in M.active_counter_windows)
                     del(CW)
                 M.active_counter_windows = null
+            // Silently remove all active statuses (no "worn off" messages post-battle)
+            if(hascall(M, "RemoveStatus"))
+                for(var/datum/component/status/S in M.components.Copy())
+                    M.RemoveStatus(S, 1)
             if(M.client)
                 M << browse(null, "window=battle_menu")
 

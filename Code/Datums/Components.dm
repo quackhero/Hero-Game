@@ -466,6 +466,7 @@ datum/component/status
                 else
                     M.TakeDamage(dot_dmg, null, src.dot_type, 1)
                     world << "<i><font color='#CC4444'>[M.name] ([src.name]: [dot_dmg] damage, [M.hp] HP remaining)</font></i>"
+                    M.ProcessPendingDeath()
 
         // 2. Parasite burst: fires accumulated damage on the NEXT turn (when duration ticks)
         if(src.dot_delayed_burst && src.dot_accumulated > 0 && src.duration == 1)
@@ -475,6 +476,7 @@ datum/component/status
             if(burst > 0)
                 world << "<font color='#CC0000'><b>[M.name] ([src.name] erupts: [burst] damage!)</b></font>"
                 M.TakeDamage(burst, null, src.dot_type, 1)
+                M.ProcessPendingDeath()
 
         // 3. HP Heal Over Time
         if(src.hot_amount > 0)

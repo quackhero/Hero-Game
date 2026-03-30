@@ -433,6 +433,7 @@ datum/skill
                 world << "<b>[user.name] sacrifices themselves!</b>"
                 user.hp = 0
                 user.ClampStats()
+                user.CheckDeath()
 
             // --- THE REACTION EXIT ---
             if(is_reaction)

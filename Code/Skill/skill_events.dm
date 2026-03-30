@@ -60,6 +60,7 @@ datum/skill_event/damage
             return
 
         var/base_dmg = parser.Evaluate(src.formula, user, target)
+        base_dmg = round(base_dmg)
 
         // Damage Boost / Damage Break: multiply outgoing damage by attacker's status mult.
         // Applied before the pipeline so the multiplier compounds with elemental modifiers.
@@ -111,35 +112,54 @@ datum/skill_event/damage
 
         // ========== END PASSIVE DAMAGE MODIFIERS ==========
 
-        // Show the skill's flavor message.
-        // Uses base_dmg (pre-pipeline) for any (dmg) placeholder — the final resolved
-        // damage and elemental context are shown by TakeDamage.
+        // Minimum 1 damage before the pipeline — ensures resilience/stacked resists
+        // can never completely negate a hit. Explicit blocks (Null, Absorb, Invincibility,
+        // Dodge, full Barrier/Mana Shield absorption) can still return 0 as intended.
+        base_dmg = max(1, base_dmg)
+
+        // === PHASE 1: Apply damage silently — get actual post-pipeline number ===
+        var/target_max_hp = target.max_hp
+        var/actual_dmg = target.TakeDamage(base_dmg, user, eff_type, 1, src.bypass)
+
+        // === PHASE 2: Determine kill state ===
+        var/kill_tag = ""
+        if(target.pending_death || target.is_dead)
+            if(target.hp <= -(target_max_hp))
+                kill_tag = ", Overkill"
+            else
+                kill_tag = ", Killed"
+
+        // === PHASE 3: Display the flavor message with actual damage and kill tag ===
         var/msg = src.txt
         if(msg)
-            // 1. Names
             msg = replacetext(msg, "(I)", user.name)
             msg = replacetext(msg, "(user)", user.name)
             msg = replacetext(msg, "(E)", target.name)
             msg = replacetext(msg, "(enemy)", target.name)
             msg = replacetext(msg, "(target)", target.name)
-
-            // 2. Damage
-            msg = replacetext(msg, "\[dmg]", "[base_dmg]")
-            msg = replacetext(msg, "(dmg)", "[base_dmg]")
-
-            // 3. Type
+            msg = replacetext(msg, "\[dmg]", "[actual_dmg]")
+            msg = replacetext(msg, "(dmg)", "[actual_dmg]")
             msg = replacetext(msg, "\[type]", eff_type)
             msg = replacetext(msg, "(type)", eff_type)
 
+            if(kill_tag != "")
+                // Insert kill tag before the last closing parenthesis
+                var/last_pos = 0
+                var/search_pos = 1
+                while(findtext(msg, ")", search_pos))
+                    last_pos = findtext(msg, ")", search_pos)
+                    search_pos = last_pos + 1
+                if(last_pos)
+                    msg = copytext(msg, 1, last_pos) + kill_tag + copytext(msg, last_pos)
+
             world << "<b>[msg]</b>"
         else
-            world << "<b>[user.name]</b> uses <b>[eff_type]</b> on <b>[target.name]</b>!"
+            world << "<b>[user.name]</b> hits <b>[target.name]</b>! ([actual_dmg] Damage[kill_tag])"
 
-        // Resilience, elemental cycle, affinity, and defending are all resolved
-        // inside TakeDamage via DamageContext.ResolveDamage(). Pass bypass through
-        // so skills that ignore resilience (bypass=-1) still work correctly.
-        var/actual_dmg = target.TakeDamage(base_dmg, user, eff_type, 1, src.bypass)
+        // === PHASE 4: Process deferred death AFTER message is displayed ===
+        target.ProcessPendingDeath()
 
+        // === PHASE 5: Leech ===
         if(src.leech > 0 && actual_dmg > 0)
             var/heal = round(actual_dmg * src.leech)
             if(heal > 0)
@@ -147,7 +167,6 @@ datum/skill_event/damage
                 user.ClampStats()
                 world << "<i>[user.name] absorbs [heal] HP!</i>"
 
-        // MP Leech
         if(src.mp_leech > 0 && actual_dmg > 0)
             var/mp_restore = round(actual_dmg * src.mp_leech)
             if(mp_restore > 0)

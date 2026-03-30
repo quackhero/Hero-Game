@@ -303,6 +303,7 @@ mob/verb/Debug_Set_HP()
     if(isnull(new_hp)) return
     src.hp = new_hp
     src.ClampStats()
+    src.CheckDeath()
     src << "<b>HP set to [src.hp].</b>"
 
 // Set MP to an exact value. Use to test: CanAct MP check, mana shield, AI MP items.
@@ -480,6 +481,7 @@ mob/verb/Debug_Kill_Target()
     var/mob/T = input(src, "Kill which mob?", "Kill Target") in candidates
     if(!T) return
     T.TakeDamage(99999, src, "True", 0)
+    T.ProcessPendingDeath()
 
 // ============================================================
 // JSON NPC ADMIN VERBS
