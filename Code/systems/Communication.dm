@@ -39,7 +39,7 @@ mob
             set name = "Say"
             if(!msg) return
             // Format: Name :: Message
-            var/full_msg = "<b>[src.name] ::</b> [msg]"
+            var/full_msg = "<b>[src.name]</b> ::  [msg]"
             AddLog(full_msg)
             world << full_msg
         ooc(msg as text)
@@ -47,7 +47,7 @@ mob
             set name = "OOC"
             if(!msg) return
             // Format: (OOC) Name :: Message
-            world << "<font color='#4B0082'>(OOC) [src.name] :: [msg]</font>"
+            world << output("<font color='#4B0082'>[src.name] :: [msg]</font>", "output2")
         emote(msg as text)
             set category = "Communication"
             set name = "Emote"

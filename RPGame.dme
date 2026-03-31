@@ -15,6 +15,7 @@
 // BEGIN_INCLUDE
 #include "_Defines.dm"
 #include "Main.dm"
+#include "skin.dmf"
 #include "Code\definitions_starter.dm"
 #include "Code\Admin Stuff\admin_combat.dm"
 #include "Code\Datums\Classes.dm"

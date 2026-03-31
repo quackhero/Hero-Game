@@ -1,892 +1,2408 @@
+macro "macro"
+	elem 
+		name = "CENTER+REP"
+		command = ".center"
+	elem 
+		name = "NORTHEAST+REP"
+		command = ".northeast"
+	elem 
+		name = "SOUTHEAST+REP"
+		command = ".southeast"
+	elem 
+		name = "SOUTHWEST+REP"
+		command = ".southwest"
+	elem 
+		name = "NORTHWEST+REP"
+		command = ".northwest"
+	elem 
+		name = "WEST+REP"
+		command = ".west"
+	elem 
+		name = "NORTH+REP"
+		command = ".north"
+	elem 
+		name = "EAST+REP"
+		command = ".east"
+	elem 
+		name = "SOUTH+REP"
+		command = ".south"
 
-window "default"
-	elem "default"
+
+menu "menu"
+	elem 
+		name = "File"
+		command = ""
+		saved-params = "is-checked"
+	elem 
+		name = "Quit"
+		command = ".quit"
+		category = "File"
+		saved-params = "is-checked"
+	elem 
+		name = "Scripts"
+		command = ""
+		saved-params = "is-checked"
+	elem 
+		name = "Script 1"
+		command = "Execute-Script-1"
+		category = "Scripts"
+		saved-params = "is-checked"
+	elem 
+		name = "Script 2"
+		command = "Execute-Script-1"
+		category = "Scripts"
+		saved-params = "is-checked"
+	elem 
+		name = "Script 3"
+		command = "Execute-Script-1"
+		category = "Scripts"
+		saved-params = "is-checked"
+	elem 
+		name = "Rp Radio"
+		command = ""
+		saved-params = "is-checked"
+	elem 
+		name = "Change Name"
+		command = "Change-Name"
+		category = "Rp Radio"
+		saved-params = "is-checked"
+	elem 
+		name = "Whisper"
+		command = "whisper"
+		category = "Rp Radio"
+		saved-params = "is-checked"
+	elem 
+		name = "Send Log"
+		command = "Send-Log"
+		category = "Rp Radio"
+		saved-params = "is-checked"
+	elem "menu1"
+		name = " "
+		command = ""
+		is-disabled = true
+		saved-params = "is-checked"
+	elem "customoption"
+		name = "???"
+		command = ".say ???"
+		category = " "
+		saved-params = "is-checked"
+
+
+window "custominput"
+	elem "custominput"
 		type = MAIN
 		pos = 291,0
-		size = 640x480
+		size = 320x120
 		anchor1 = -1,-1
 		anchor2 = -1,-1
-		background-color = none
+		is-visible = false
 		saved-params = "pos;size;is-minimized;is-maximized"
-		outer-size = 656x538
-		outer-pos = 291,0
-		inner-pos = 8,31
-		screen-size = 1920x1032
-
-window "default"
-	elem "default"
-		type = MAIN
-		pos = 291,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = none
-		saved-params = "pos;size;is-minimized;is-maximized"
-		outer-size = 656x538
-		outer-pos = 291,0
-		inner-pos = 8,31
-		screen-size = 1920x1032
-	elem "mapwindow"
-		type = MAP
+		title = "Input"
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+	elem "inputmessage"
+		type = LABEL
 		pos = 0,0
-		size = 640x640
+		size = 320x96
 		anchor1 = 0,0
-		anchor2 = 69,84
-		saved-params = "zoom=0;iconsize=0;tile-override=0;tile-style=normal;zoom-mode=normal;scale-x=100;scale-y=100;letterbox=1"
-	elem "output"
-		type = OUTPUT
-		pos = 645,0
-		size = 280x640
-		anchor1 = 69,0
-		anchor2 = 100,84
-		font-family = "Tahoma"
+		anchor2 = 100,80
+		font-family = "Arial"
 		font-size = 10
-		text-color = #ffffff
-		background-color = #1a1a2e
+		background-color = #ffffff
+		is-transparent = true
+		border = line
 		saved-params = ""
-	elem "name"
+		text = ""
+		text-wrap = true
+	elem "inputtext"
+		type = INPUT
+		pos = 0,96
+		size = 320x24
+		anchor1 = 0,80
+		anchor2 = 100,100
+		background-color = #dfe7f7
+		border = sunken
+		saved-params = ""
+		command = "sendtext"
+
+window "default"
+	elem "default"
+		type = MAIN
+		pos = 291,0
+		size = 1016x642
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		is-default = true
+		border = line
+		saved-params = "pos;size;is-maximized"
+		statusbar = false
+		image-mode = tile
+		macro = "macro"
+		menu = "menu"
+		outer-size = 1032x701
+		outer-pos = 291,0
+		inner-size = 1016x642
+		inner-pos = 8,51
+		screen-size = 1920x1032
+	elem "label28"
 		type = LABEL
-		pos = 5,645
-		size = 220x24
-		anchor1 = 0,85
+		pos = 208,528
+		size = 60x20
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		saved-params = ""
+		text = ""
+	elem "resolution"
+		type = LABEL
+		pos = 0,0
+		size = 1016x642
+		anchor1 = 0,0
+		anchor2 = 100,100
+		background-color = none
+		saved-params = ""
+		text = ""
+	elem "labelvp"
+		type = LABEL
+		pos = 187,542
+		size = 60x20
+		anchor1 = 18,84
 		anchor2 = 24,88
-		font-family = "Malgun Gothic"
-		font-size = 10
+		font-size = 4
 		font-style = "bold"
-		text-color = #ffffff
-		background-color = #1a1a2e
+		text-color = #ffff00
+		background-color = none
+		is-visible = false
+		is-transparent = true
 		saved-params = ""
-		text = "Hero"
-	elem "labelhp"
-		type = LABEL
-		pos = 5,673
-		size = 28x18
-		anchor1 = 0,88
-		anchor2 = 3,91
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ffffff
-		background-color = #1a1a2e
-		saved-params = ""
-		text = "HP"
-	elem "barhp"
+		text = "0 VP"
+	elem "barvp"
 		type = BAR
-		pos = 36,673
-		size = 220x18
-		anchor1 = 4,88
-		anchor2 = 28,91
-		background-color = #2a2a2a
-		saved-params = "dir=east"
-		bar-color = #00cc44
+		pos = 200,560
+		size = 32x32
+		anchor1 = 20,87
+		anchor2 = 23,92
+		background-color = #ffffff
+		is-visible = false
+		saved-params = ""
+		bar-color = #ff00ff
+		is-slider = false
+		dir = north
+	elem "barup"
+		type = BAR
+		pos = 88,545
+		size = 88x11
+		anchor1 = 9,85
+		anchor2 = 17,87
+		background-color = none
+		is-visible = false
+		saved-params = ""
+		bar-color = #e10000
 		is-slider = false
 		dir = east
+		value = 80
 	elem "labelsk"
 		type = LABEL
-		pos = 5,694
-		size = 28x18
-		anchor1 = 0,91
-		anchor2 = 3,94
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #6699ff
-		background-color = #1a1a2e
+		pos = 179,576
+		size = 23x16
+		anchor1 = 18,90
+		anchor2 = 20,92
+		text-color = #ffffff
+		background-color = #000040
+		is-visible = false
+		border = sunken
 		saved-params = ""
-		text = "MP"
-	elem "barsk"
-		type = BAR
-		pos = 36,694
-		size = 220x18
-		anchor1 = 4,91
-		anchor2 = 28,94
-		background-color = #2a2a2a
-		saved-params = "dir=east"
-		bar-color = #6699ff
-		is-slider = false
-		dir = east
-	elem "labelxp"
+		text = "SK"
+	elem "labelhp"
 		type = LABEL
-		pos = 265,673
-		size = 28x18
-		anchor1 = 29,88
-		anchor2 = 32,91
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ffdd44
-		background-color = #1a1a2e
+		pos = 179,560
+		size = 23x16
+		anchor1 = 18,87
+		anchor2 = 20,90
+		text-color = #ffffff
+		background-color = #000040
+		is-visible = false
+		border = sunken
+		saved-params = ""
+		text = "HP"
+	elem "labelup"
+		type = LABEL
+		pos = 179,544
+		size = 23x16
+		anchor1 = 18,85
+		anchor2 = 20,87
+		text-color = #ffffff
+		background-color = #000040
+		is-visible = false
+		border = sunken
+		saved-params = ""
+		text = "UP"
+	elem "label7"
+		type = LABEL
+		pos = 129,524
+		size = 25x14
+		anchor1 = 13,82
+		anchor2 = 15,84
+		text-color = #ffffff
+		background-color = #000040
+		border = sunken
 		saved-params = ""
 		text = "XP"
 	elem "barxp"
 		type = BAR
-		pos = 296,673
-		size = 220x18
-		anchor1 = 32,88
-		anchor2 = 56,91
-		background-color = #2a2a2a
-		saved-params = "dir=east"
-		bar-color = #ffaa00
-		is-slider = false
-		dir = east
-	elem "labelup"
-		type = LABEL
-		pos = 5,716
-		size = 28x18
-		anchor1 = 0,94
-		anchor2 = 3,97
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ff88ff
-		background-color = #1a1a2e
-		is-visible = false
-		saved-params = ""
-		text = "UP"
-	elem "barup"
-		type = BAR
-		pos = 36,716
-		size = 220x18
-		anchor1 = 4,94
-		anchor2 = 28,97
-		background-color = #2a2a2a
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #ff00ff
-		is-slider = false
-		dir = east
-	elem "labelvp"
-		type = LABEL
-		pos = 265,716
-		size = 28x18
-		anchor1 = 29,94
-		anchor2 = 32,97
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #00ffff
-		background-color = #1a1a2e
-		is-visible = false
-		saved-params = ""
-		text = "VP"
-	elem "barvp"
-		type = BAR
-		pos = 296,716
-		size = 220x18
-		anchor1 = 32,94
-		anchor2 = 56,97
-		background-color = #2a2a2a
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #00ffff
-		is-slider = false
-		dir = east
-	elem "labelT"
-		type = LABEL
-		pos = 525,673
-		size = 28x18
-		anchor1 = 57,88
-		anchor2 = 60,91
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ff8800
-		background-color = #1a1a2e
-		is-visible = false
-		saved-params = ""
-		text = "T"
-	elem "bart"
-		type = BAR
-		pos = 556,673
-		size = 200x18
-		anchor1 = 60,88
-		anchor2 = 82,91
-		background-color = #2a2a2a
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #ff8800
-		is-slider = false
-		dir = east
-	elem "labelhyp"
-		type = LABEL
-		pos = 525,694
-		size = 28x18
-		anchor1 = 57,91
-		anchor2 = 60,94
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ff0066
-		background-color = #1a1a2e
-		is-visible = false
-		saved-params = ""
-		text = "HYP"
-	elem "barhyp"
-		type = BAR
-		pos = 556,694
-		size = 200x18
-		anchor1 = 60,91
-		anchor2 = 82,94
-		background-color = #2a2a2a
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #ff0066
-		is-slider = false
-		dir = east
-	elem "labelmxp"
-		type = LABEL
-		pos = 525,716
-		size = 28x18
-		anchor1 = 57,94
-		anchor2 = 60,97
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #9900ff
-		background-color = #1a1a2e
-		is-visible = false
-		saved-params = ""
-		text = "MXP"
-	elem "barmxp"
-		type = BAR
-		pos = 556,716
-		size = 200x18
-		anchor1 = 60,94
-		anchor2 = 82,97
-		background-color = #2a2a2a
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #9900ff
-		is-slider = false
-		dir = east
-	elem "time"
-		type = LABEL
-		pos = 760,645
-		size = 165x20
-		anchor1 = 82,85
-		anchor2 = 100,88
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ffffff
+		pos = 88,525
+		size = 36x10
+		anchor1 = 9,82
+		anchor2 = 12,83
 		background-color = none
-		is-visible = false
 		saved-params = ""
-		text = "0:00"
-	elem "bartime"
-		type = BAR
-		pos = 760,668
-		size = 165x18
-		anchor1 = 82,88
-		anchor2 = 100,91
-		background-color = #2a2a2a
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #00aaff
+		bar-color = #0080c0
 		is-slider = false
 		dir = east
-	elem "union1"
+	elem "name"
 		type = LABEL
-		pos = 0,738
-		size = 130x22
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Malgun Gothic"
+		pos = 85,498
+		size = 147x23
+		anchor1 = 8,78
+		anchor2 = 23,81
+		font-family = "serif"
 		font-size = 9
-		text-color = #ffffff
-		background-color = #2a2a2a
-		is-visible = false
-		border = line
-		saved-params = ""
-		text = ""
-	elem "union1hp"
-		type = BAR
-		pos = 0,762
-		size = 130x8
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #333333
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #00cc44
-		is-slider = false
-		dir = east
-	elem "union2"
-		type = LABEL
-		pos = 135,738
-		size = 130x22
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ffffff
-		background-color = #2a2a2a
-		is-visible = false
-		border = line
-		saved-params = ""
-		text = ""
-	elem "union2hp"
-		type = BAR
-		pos = 135,762
-		size = 130x8
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #333333
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #00cc44
-		is-slider = false
-		dir = east
-	elem "union3"
-		type = LABEL
-		pos = 270,738
-		size = 130x22
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ffffff
-		background-color = #2a2a2a
-		is-visible = false
-		border = line
-		saved-params = ""
-		text = ""
-	elem "union3hp"
-		type = BAR
-		pos = 270,762
-		size = 130x8
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #333333
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #00cc44
-		is-slider = false
-		dir = east
-	elem "union4"
-		type = LABEL
-		pos = 405,738
-		size = 130x22
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ffffff
-		background-color = #2a2a2a
-		is-visible = false
-		border = line
-		saved-params = ""
-		text = ""
-	elem "union4hp"
-		type = BAR
-		pos = 405,762
-		size = 130x8
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #333333
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #00cc44
-		is-slider = false
-		dir = east
-	elem "union5"
-		type = LABEL
-		pos = 540,738
-		size = 130x22
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ffffff
-		background-color = #2a2a2a
-		is-visible = false
-		border = line
-		saved-params = ""
-		text = ""
-	elem "union5hp"
-		type = BAR
-		pos = 540,762
-		size = 130x8
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #333333
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #00cc44
-		is-slider = false
-		dir = east
-	elem "union6"
-		type = LABEL
-		pos = 675,738
-		size = 130x22
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ffffff
-		background-color = #2a2a2a
-		is-visible = false
-		border = line
-		saved-params = ""
-		text = ""
-	elem "union6hp"
-		type = BAR
-		pos = 675,762
-		size = 130x8
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #333333
-		is-visible = false
-		saved-params = "dir=east"
-		bar-color = #00cc44
-		is-slider = false
-		dir = east
-	elem "unioncmd1"
-		type = BUTTON
-		pos = 810,738
-		size = 110x22
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Malgun Gothic"
-		font-size = 9
-		background-color = none
-		is-visible = false
-		saved-params = ""
-		text = "Union Cmd 1"
-		command = ""
-	elem "unioncmd2"
-		type = BUTTON
-		pos = 810,762
-		size = 110x22
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Malgun Gothic"
-		font-size = 9
-		background-color = none
-		is-visible = false
-		saved-params = ""
-		text = "Union Cmd 2"
-		command = ""
-	elem "unioncmd3"
-		type = BUTTON
-		pos = 810,786
-		size = 110x22
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Malgun Gothic"
-		font-size = 9
-		background-color = none
-		is-visible = false
-		saved-params = ""
-		text = "Union Cmd 3"
-		command = ""
-
-window "asheet2"
-	elem "asheet2"
-		type = MAIN
-		pos = 291,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = none
-		saved-params = "pos;size;is-minimized;is-maximized"
-		outer-size = 656x538
-		outer-pos = 291,0
-		inner-pos = 8,31
-		screen-size = 1920x1032
-
-window "asheet2"
-	elem "asheet2"
-		type = MAIN
-		pos = 291,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = none
-		saved-params = "pos;size;is-minimized;is-maximized"
-		outer-size = 656x538
-		outer-pos = 291,0
-		inner-pos = 8,31
-		screen-size = 1920x1032
-	elem "s_name"
-		type = LABEL
-		pos = 5,5
-		size = 630x28
-		anchor1 = 1,1
-		anchor2 = 99,6
-		font-family = "Malgun Gothic"
-		font-size = 12
 		font-style = "bold"
 		text-color = #ffffff
-		background-color = #222244
+		background-color = none
+		is-transparent = true
+		saved-params = ""
+		text = "Loading..."
+		align = left
+	elem "avatar"
+		type = LABEL
+		pos = 0,492
+		size = 83x69
+		anchor1 = 0,77
+		anchor2 = 8,87
+		background-color = none
+		is-transparent = true
+		border = sunken
+		saved-params = ""
+		text = ""
+		image-mode = stretch
+	elem "info1"
+		type = INFO
+		pos = 0,0
+		size = 232x492
+		anchor1 = 0,0
+		anchor2 = 23,77
+		is-default = true
 		border = line
 		saved-params = ""
-		text = "  Name"
-	elem "s_level"
-		type = LABEL
-		pos = 5,36
-		size = 630x26
-		anchor1 = 1,7
-		anchor2 = 99,12
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #aaaaff
-		background-color = #1a1a3a
-		border = line
-		saved-params = ""
-		text = " Lv.1 Fighter"
-	elem "s_hp"
-		type = LABEL
-		pos = 5,66
-		size = 90x20
-		anchor1 = 1,12
-		anchor2 = 15,16
-		font-family = "Malgun Gothic"
-		font-size = 9
+		highlight-color = #0000ff
+		tab-background-color = none
+	elem "button1"
+		type = BUTTON
+		pos = 234,0
+		size = 788x83
+		anchor1 = 23,0
+		anchor2 = 100,16
+		font-family = "Base 02"
+		font-size = 20
 		text-color = #ffffff
-		background-color = #333344
+		background-color = #000000
+		border = sunken
+		saved-params = "is-checked"
+		text = "Loading...please wait...."
+		command = "Website"
+	elem "output0"
+		type = OUTPUT
+		pos = 231,80
+		size = 521x516
+		anchor1 = 23,12
+		anchor2 = 74,93
+		text-color = #ffffff
+		background-color = #000000
+		is-default = true
+		border = line
+		saved-params = "max-lines"
+		enable-http-images = true
+	elem "label1say"
+		type = LABEL
+		pos = -4,595
+		size = 61x23
+		anchor1 = 0,93
+		anchor2 = 6,96
+		text-color = #00ff00
+		background-color = #000080
+		border = line
 		saved-params = ""
-		text = "HP: 0/0"
-	elem "s_hpbar"
+		text = "Say"
+	elem "menu_anchor"
+		type = LABEL
+		pos = 440,172
+		size = 24x20
+		anchor1 = 43,27
+		anchor2 = 46,30
+		background-color = none
+		is-visible = false
+		saved-params = ""
+		text = ""
+	elem "input2"
+		type = INPUT
+		pos = 57,596
+		size = 951x22
+		anchor1 = 6,93
+		anchor2 = 99,96
+		background-color = #f1c5f1
+		is-default = true
+		border = sunken
+		saved-params = ""
+		command = "say"
+	elem "label1command"
+		type = LABEL
+		pos = -4,618
+		size = 61x23
+		anchor1 = 0,96
+		anchor2 = 6,100
+		text-color = #00ff00
+		background-color = #000080
+		border = line
+		saved-params = ""
+		text = "Command"
+	elem "input1"
+		type = INPUT
+		pos = 55,616
+		size = 953x25
+		anchor1 = 5,96
+		anchor2 = 99,100
+		background-color = #fcc9d7
+		border = sunken
+		saved-params = ""
+		command = "!Emote \""
+	elem "output2"
+		type = OUTPUT
+		pos = 754,82
+		size = 261x322
+		anchor1 = 74,12
+		anchor2 = 100,62
+		text-color = #808080
+		background-color = #cfcfcf
+		border = line
+		saved-params = "max-lines"
+	elem "input3"
+		type = INPUT
+		pos = 832,400
+		size = 184x24
+		anchor1 = 82,62
+		anchor2 = 100,66
+		background-color = #f0d2ee
+		saved-params = ""
+		command = "OOC"
+	elem "label1ooc"
+		type = LABEL
+		pos = 752,400
+		size = 80x24
+		anchor1 = 74,62
+		anchor2 = 82,66
+		text-color = #00ff00
+		background-color = #000040
+		border = line
+		saved-params = ""
+		text = "OOC"
+	elem "tab1"
+		type = TAB
+		pos = 752,424
+		size = 261x172
+		anchor1 = 74,66
+		anchor2 = 100,93
+		text-color = #cfcfcf
+		background-color = #18160c
+		border = sunken
+		saved-params = ""
+		tabs = "window2"
+		current-tab = "window2"
+	elem "barhp"
 		type = BAR
-		pos = 100,66
-		size = 535x20
-		anchor1 = 16,12
-		anchor2 = 99,16
-		background-color = #2a2a2a
-		saved-params = "dir=east"
-		bar-color = #00cc44
+		pos = 0,559
+		size = 176x18
+		anchor1 = 0,87
+		anchor2 = 17,90
+		background-color = none
+		is-visible = false
+		saved-params = ""
+		bar-color = #00ff00
 		is-slider = false
 		dir = east
-	elem "s_sk"
-		type = LABEL
-		pos = 5,89
-		size = 90x20
-		anchor1 = 1,16
-		anchor2 = 15,20
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #6699ff
-		background-color = #333344
-		saved-params = ""
-		text = "MP: 0/0"
-	elem "s_skbar"
+		value = 100
+	elem "barsk"
 		type = BAR
-		pos = 100,89
-		size = 535x20
-		anchor1 = 16,16
-		anchor2 = 99,20
-		background-color = #2a2a2a
-		saved-params = "dir=east"
-		bar-color = #6699ff
+		pos = 0,577
+		size = 176x16
+		anchor1 = 0,90
+		anchor2 = 19,92
+		background-color = none
+		is-visible = false
+		saved-params = ""
+		bar-color = #0000ff
 		is-slider = false
 		dir = east
-	elem "s_exp"
-		type = LABEL
-		pos = 5,112
-		size = 140x20
-		anchor1 = 1,20
-		anchor2 = 23,24
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #ffdd44
-		background-color = #333344
+		value = 100
+
+window "hidden"
+	elem "hidden"
+		type = MAIN
+		pos = 281,0
+		size = 115x32
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		is-visible = false
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "hide"
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+		image-mode = center
+	elem "browserhidden"
+		type = BROWSER
+		pos = 0,0
+		size = 115x32
+		anchor1 = 0,0
+		anchor2 = 100,100
 		saved-params = ""
-		text = " EXP: 0/0"
-	elem "s_expbar"
-		type = BAR
-		pos = 150,112
-		size = 485x20
-		anchor1 = 24,20
-		anchor2 = 99,24
-		background-color = #2a2a2a
-		saved-params = "dir=east"
-		bar-color = #ffaa00
-		is-slider = false
-		dir = east
-	elem "s_atk"
+
+window "popupwindow"
+	elem "popupwindow"
+		type = MAIN
+		pos = 281,0
+		size = 640x512
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #800000
+		is-visible = false
+		saved-params = "pos;size;is-maximized"
+		titlebar = false
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+		image = 'popupimageshadow_reverse2.PNG'
+		transparent-color = #800000
+	elem "label3"
 		type = LABEL
-		pos = 5,136
-		size = 100x25
-		anchor1 = 1,24
-		anchor2 = 18,28
-		font-family = "Malgun Gothic"
-		font-size = 10
+		pos = 232,0
+		size = 144x32
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-size = 14
 		text-color = #ffffff
-		background-color = #494949
-		border = line
+		background-color = #000000
 		saved-params = ""
-		text = "STR: 0"
-	elem "s_def"
-		type = LABEL
-		pos = 110,136
-		size = 100x25
-		anchor1 = 18,24
-		anchor2 = 35,28
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #494949
-		border = line
-		saved-params = ""
-		text = "RES: 0"
-	elem "s_spd"
-		type = LABEL
-		pos = 215,136
-		size = 100x25
-		anchor1 = 35,24
-		anchor2 = 52,28
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #494949
-		border = line
-		saved-params = ""
-		text = "DEX: 0"
-	elem "s_ap"
-		type = LABEL
-		pos = 320,136
-		size = 100x25
-		anchor1 = 52,24
-		anchor2 = 69,28
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #494949
-		border = line
-		saved-params = ""
-		text = "INT: 0"
-	elem "s_age"
-		type = LABEL
-		pos = 425,136
-		size = 205x25
-		anchor1 = 69,24
-		anchor2 = 99,28
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #494949
+		text = "R P   R A D I O"
+	elem "buttonnone"
+		type = BUTTON
+		pos = 520,40
+		size = 32x24
+		anchor1 = 81,8
+		anchor2 = 86,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "None"
+		command = "shownone"
+	elem "craftbutton2"
+		type = BUTTON
+		pos = 269,304
+		size = 59x32
+		anchor1 = 16,8
+		anchor2 = 21,13
+		font-size = 12
+		text-color = #c0efed
+		background-color = #2c615f
+		is-visible = false
+		saved-params = "is-checked"
+		text = "Craft!"
+		command = "gocrafts"
+	elem "tab2"
+		type = TAB
+		pos = 24,80
+		size = 200x392
+		anchor1 = 59,16
+		anchor2 = 90,92
+		text-color = #00ff00
+		background-color = #000000
 		is-visible = false
 		border = line
 		saved-params = ""
-		text = "VIT: 0"
-	elem "s_cha"
-		type = LABEL
-		pos = 5,165
-		size = 195x28
-		anchor1 = 1,29
-		anchor2 = 32,34
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #333333
-		border = line
-		saved-params = ""
-		text = " STR: 0+0"
-	elem "s_int"
-		type = LABEL
-		pos = 5,196
-		size = 195x28
-		anchor1 = 1,34
-		anchor2 = 32,39
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #333333
-		border = line
-		saved-params = ""
-		text = " DEX: 0+0"
-	elem "s_str"
-		type = LABEL
-		pos = 5,227
-		size = 195x28
-		anchor1 = 1,39
-		anchor2 = 32,44
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #333333
-		border = line
-		saved-params = ""
-		text = " INT: 0+0"
-	elem "s_end"
-		type = LABEL
-		pos = 5,258
-		size = 195x28
-		anchor1 = 1,44
-		anchor2 = 32,49
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #333333
-		border = line
-		saved-params = ""
-		text = " MND: 0+0"
-	elem "s_agi"
-		type = LABEL
-		pos = 5,289
-		size = 195x28
-		anchor1 = 1,49
-		anchor2 = 32,54
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #333333
-		border = line
-		saved-params = ""
-		text = " VIT: 0+0"
-	elem "s_sty"
-		type = LABEL
-		pos = 5,320
-		size = 195x28
-		anchor1 = 1,54
-		anchor2 = 32,59
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #333333
-		border = line
-		saved-params = ""
-		text = " RES: 0+0"
-	elem "s_wpn1"
-		type = LABEL
-		pos = 205,165
-		size = 430x28
-		anchor1 = 32,29
-		anchor2 = 99,34
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #3a3a3a
-		border = line
-		saved-params = ""
-		text = "Weapon"
-	elem "s_wpn2"
-		type = LABEL
-		pos = 205,196
-		size = 350x28
-		anchor1 = 32,34
-		anchor2 = 87,39
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #888888
-		background-color = #2a2a2a
-		border = line
-		saved-params = ""
-		text = "Secondary"
-	elem "button16"
+		tabs = "runewindow2"
+		current-tab = "runewindow2"
+	elem "craftbutton"
 		type = BUTTON
-		pos = 560,196
-		size = 75x28
-		anchor1 = 88,34
-		anchor2 = 99,39
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #888888
-		background-color = #2a2a2a
-		is-disabled = true
+		pos = 269,254
+		size = 59x48
+		anchor1 = 16,8
+		anchor2 = 21,13
+		font-size = 12
+		text-color = #ffff00
+		background-color = #8a8a00
+		is-visible = false
+		saved-params = "is-checked"
+		text = "Reset"
+		command = "resetcrafts"
+	elem "runetab"
+		type = TAB
+		pos = 376,80
+		size = 200x392
+		anchor1 = 59,16
+		anchor2 = 90,92
+		text-color = #00ff00
+		background-color = #000000
+		is-visible = false
 		border = line
 		saved-params = ""
-		text = "Equip"
-		command = ""
-	elem "s_arm"
-		type = LABEL
-		pos = 205,227
-		size = 430x28
-		anchor1 = 32,39
-		anchor2 = 99,44
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #3a3a3a
-		border = line
-		saved-params = ""
-		text = "Armor"
-	elem "s_acc1"
-		type = LABEL
-		pos = 205,258
-		size = 430x28
-		anchor1 = 32,44
-		anchor2 = 99,49
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffffff
-		background-color = #3a3a3a
-		border = line
-		saved-params = ""
-		text = "Accessory"
-	elem "s_acc2"
-		type = LABEL
-		pos = 205,289
-		size = 350x28
-		anchor1 = 32,49
-		anchor2 = 87,54
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #888888
-		background-color = #2a2a2a
-		border = line
-		saved-params = ""
-		text = "Accessory 2"
-	elem "button19"
+		tabs = "runewindow"
+		current-tab = "runewindow"
+	elem "button4"
 		type = BUTTON
-		pos = 560,289
-		size = 75x28
-		anchor1 = 88,49
-		anchor2 = 99,54
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #888888
-		background-color = #2a2a2a
-		is-disabled = true
-		border = line
-		saved-params = ""
-		text = "Equip"
-		command = ""
-	elem "s_acc3"
+		pos = 560,40
+		size = 24x24
+		anchor1 = 88,8
+		anchor2 = 91,13
+		font-size = 5
+		text-color = #ff0000
+		background-color = #804040
+		saved-params = "is-checked"
+		text = "X"
+		command = "closepopup"
+	elem "label2"
 		type = LABEL
-		pos = 205,320
-		size = 350x28
-		anchor1 = 32,54
-		anchor2 = 87,59
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #888888
-		background-color = #2a2a2a
-		border = line
+		pos = 0,72
+		size = 640x384
+		anchor1 = 0,17
+		anchor2 = 100,92
+		font-family = "Arial"
+		font-size = 7
+		text-color = #ffffff
+		background-color = #000000
+		is-visible = false
 		saved-params = ""
-		text = "Accessory 3"
-	elem "button20"
+		text = ">>Your Sheet<<"
+		image-mode = stretch
+		text-wrap = true
+	elem "child1"
+		type = CHILD
+		pos = 64,88
+		size = 512x384
+		anchor1 = 10,17
+		anchor2 = 90,92
+		background-color = #800000
+		saved-params = "splitter"
+		left = "window1"
+		right = "window1"
+		is-vert = false
+		splitter = 0
+	elem "buttonmap"
 		type = BUTTON
-		pos = 560,320
-		size = 75x28
-		anchor1 = 88,54
-		anchor2 = 99,59
-		font-family = "Malgun Gothic"
-		font-size = 9
-		text-color = #888888
-		background-color = #2a2a2a
-		is-disabled = true
-		border = line
-		saved-params = ""
+		pos = 57,40
+		size = 38x24
+		anchor1 = 9,8
+		anchor2 = 15,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Map"
+		command = "showmap"
+	elem "button5"
+		type = BUTTON
+		pos = 92,40
+		size = 38x24
+		anchor1 = 14,8
+		anchor2 = 20,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Sheet"
+		command = "showsheet"
+	elem "buttonskills"
+		type = BUTTON
+		pos = 129,40
+		size = 38x24
+		anchor1 = 20,8
+		anchor2 = 26,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Skills"
+		command = "editskills"
+	elem "button6"
+		type = BUTTON
+		pos = 311,40
+		size = 38x24
+		anchor1 = 49,8
+		anchor2 = 55,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Scripts"
+		command = "submitscript"
+	elem "button10"
+		type = BUTTON
+		pos = 166,40
+		size = 38x24
+		anchor1 = 26,8
+		anchor2 = 32,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
 		text = "Equip"
-		command = ""
-	elem "s_gil"
-		type = LABEL
-		pos = 5,352
-		size = 630x26
-		anchor1 = 1,60
-		anchor2 = 99,65
-		font-family = "Malgun Gothic"
-		font-size = 10
-		text-color = #ffdd44
-		background-color = #222222
+		command = "editequips"
+	elem "button8"
+		type = BUTTON
+		pos = 202,40
+		size = 38x24
+		anchor1 = 32,8
+		anchor2 = 38,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Styles"
+		command = "editstyles"
+	elem "button9"
+		type = BUTTON
+		pos = 238,40
+		size = 38x24
+		anchor1 = 37,8
+		anchor2 = 43,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Stats"
+		command = "showstats"
+	elem "buttonrune"
+		type = BUTTON
+		pos = 273,40
+		size = 38x24
+		anchor1 = 43,8
+		anchor2 = 49,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		is-disabled = true
+		saved-params = "is-checked"
+		text = "Runes"
+		command = "showrunes"
+	elem "buttonmedals"
+		type = BUTTON
+		pos = 349,40
+		size = 38x24
+		anchor1 = 55,8
+		anchor2 = 60,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Medals"
+		command = "showmedals"
+	elem "output-medals"
+		type = OUTPUT
+		pos = 136,88
+		size = 354x379
+		anchor1 = 21,17
+		anchor2 = 77,91
+		text-color = #00ff00
+		background-color = #000000
+		is-visible = false
 		border = line
-		saved-params = ""
-		text = " Gil: 0"
+		saved-params = "max-lines"
+		max-lines = 0
+	elem "output-stats"
+		type = OUTPUT
+		pos = 128,88
+		size = 354x379
+		anchor1 = 21,17
+		anchor2 = 77,91
+		text-color = #00ff00
+		background-color = #000000
+		is-visible = false
+		border = line
+		saved-params = "max-lines"
+		max-lines = 0
+	elem "buttonspecialties"
+		type = BUTTON
+		pos = 384,40
+		size = 53x24
+		anchor1 = 60,8
+		anchor2 = 68,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Specialties"
+		command = "editspecialties"
+	elem "button11"
+		type = BUTTON
+		pos = 464,40
+		size = 43x24
+		anchor1 = 73,8
+		anchor2 = 79,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Rebirth"
+		command = "rebirth"
+	elem "button13"
+		type = BUTTON
+		pos = 432,40
+		size = 32x24
+		anchor1 = 68,8
+		anchor2 = 73,13
+		font-size = 5
+		text-color = #00ff00
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Colors"
+		command = "editcolors"
 
-window "Macro"
-	elem "Macro"
+window "runewindow"
+	elem "runewindow"
+		type = MAIN
+		pos = 291,0
+		size = 200x392
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		saved-params = "pos;size;is-maximized"
+		title = "Runes"
+		titlebar = false
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+		is-pane = true
+	elem "browser3"
+		type = BROWSER
+		pos = 184,368
+		size = 16x16
+		anchor1 = 92,94
+		anchor2 = 100,98
+		saved-params = ""
+	elem "grid1"
+		type = GRID
+		pos = 0,0
+		size = 200x392
+		anchor1 = 0,0
+		anchor2 = 100,100
+		text-color = #ffffff
+		background-color = #000000
+		border = line
+		saved-params = ""
+		cells = 1x0
+		current-cell = 1,1
+		show-lines = horizontal
+		highlight-color = #000000
+		is-list = true
+
+window "runewindow2"
+	elem "runewindow2"
+		type = MAIN
+		pos = 281,0
+		size = 200x381
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		saved-params = "pos;size;is-maximized"
+		title = "Runes Collection"
+		titlebar = false
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+		is-pane = true
+	elem "browser0"
+		type = BROWSER
+		pos = 184,368
+		size = 16x16
+		anchor1 = 92,97
+		anchor2 = 100,100
+		saved-params = ""
+	elem "browser9"
+		type = BROWSER
+		pos = 528,31
+		size = 16x15
+		anchor1 = 83,8
+		anchor2 = 85,11
+		saved-params = ""
+	elem "browser8"
+		type = BROWSER
+		pos = 528,31
+		size = 16x15
+		anchor1 = 83,8
+		anchor2 = 85,11
+		saved-params = ""
+	elem "browser7"
+		type = BROWSER
+		pos = 528,31
+		size = 16x15
+		anchor1 = 83,8
+		anchor2 = 85,11
+		saved-params = ""
+	elem "browser6"
+		type = BROWSER
+		pos = 528,31
+		size = 16x15
+		anchor1 = 83,8
+		anchor2 = 85,11
+		saved-params = ""
+	elem "browser5"
+		type = BROWSER
+		pos = 528,31
+		size = 16x15
+		anchor1 = 83,8
+		anchor2 = 85,11
+		saved-params = ""
+	elem "browser4"
+		type = BROWSER
+		pos = 528,31
+		size = 16x15
+		anchor1 = 83,8
+		anchor2 = 85,11
+		saved-params = ""
+	elem "browser3"
+		type = BROWSER
+		pos = 528,31
+		size = 16x15
+		anchor1 = 83,8
+		anchor2 = 85,11
+		saved-params = ""
+	elem "browser2"
+		type = BROWSER
+		pos = 528,31
+		size = 16x15
+		anchor1 = 83,8
+		anchor2 = 85,11
+		saved-params = ""
+	elem "browser0"
+		type = BROWSER
+		pos = 528,31
+		size = 16x15
+		anchor1 = 83,8
+		anchor2 = 85,11
+		saved-params = ""
+	elem "grid2"
+		type = GRID
+		pos = 0,0
+		size = 200x381
+		anchor1 = 0,0
+		anchor2 = 100,100
+		text-color = #ffffff
+		background-color = #000000
+		border = line
+		saved-params = ""
+		cells = 1x0
+		current-cell = 1,1
+		show-lines = horizontal
+		is-list = true
+
+window "skillcreator"
+	elem "skillcreator"
+		type = MAIN
+		pos = 291,0
+		size = 280x255
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #400040
+		is-visible = false
+		border = line
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "Quick Skill Creator"
+	elem "search"
+		type = INPUT
+		pos = 200,0
+		size = 80x16
+		anchor1 = 71,0
+		anchor2 = 100,6
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		command = "searchskills"
+	elem "label19"
+		type = LABEL
+		pos = 152,0
+		size = 48x16
+		anchor1 = 54,0
+		anchor2 = 71,6
+		text-color = #ffffff
+		background-color = #0080ff
+		border = sunken
+		saved-params = ""
+		text = "Find"
+	elem "lvl"
+		type = INPUT
+		pos = 200,96
+		size = 40x16
+		anchor1 = 71,38
+		anchor2 = 86,44
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		no-command = true
+	elem "sa"
+		type = INPUT
+		pos = 200,80
+		size = 40x16
+		anchor1 = 71,31
+		anchor2 = 86,38
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		no-command = true
+	elem "cha"
+		type = INPUT
+		pos = 72,24
+		size = 40x24
+		anchor1 = 26,9
+		anchor2 = 40,19
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		no-command = true
+	elem "end"
+		type = INPUT
+		pos = 72,48
+		size = 40x24
+		anchor1 = 26,19
+		anchor2 = 40,28
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		no-command = true
+	elem "int"
+		type = INPUT
+		pos = 72,72
+		size = 40x24
+		anchor1 = 26,28
+		anchor2 = 40,38
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		no-command = true
+	elem "str"
+		type = INPUT
+		pos = 72,96
+		size = 40x24
+		anchor1 = 26,38
+		anchor2 = 40,47
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		no-command = true
+	elem "sty"
+		type = INPUT
+		pos = 72,120
+		size = 40x24
+		anchor1 = 26,47
+		anchor2 = 40,56
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		no-command = true
+	elem "agi"
+		type = INPUT
+		pos = 72,144
+		size = 40x24
+		anchor1 = 26,56
+		anchor2 = 40,66
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		no-command = true
+	elem "race"
+		type = INPUT
+		pos = 72,192
+		size = 192x24
+		anchor1 = 26,75
+		anchor2 = 94,85
+		text-color = #ffffff
+		background-color = #bb3eb1
+		border = sunken
+		saved-params = ""
+		no-command = true
+	elem "label18"
+		type = LABEL
+		pos = 168,96
+		size = 32x16
+		anchor1 = 60,38
+		anchor2 = 71,44
+		text-color = #ffffff
+		background-color = #ca0000
+		border = sunken
+		saved-params = ""
+		text = "LVL"
+	elem "label17"
+		type = LABEL
+		pos = 168,80
+		size = 32x16
+		anchor1 = 60,31
+		anchor2 = 71,38
+		text-color = #ffffff
+		background-color = #ca0000
+		border = sunken
+		saved-params = ""
+		text = "SA"
+	elem "or"
+		type = BUTTON
+		pos = 168,144
+		size = 72x16
+		anchor1 = 60,56
+		anchor2 = 86,63
+		text-color = #ffffff
+		background-color = #ff8080
+		border = line
+		saved-params = "is-checked"
+		text = "-Or- Flag"
+		command = ""
+		button-type = checkbox
+	elem "ultimate"
+		type = BUTTON
+		pos = 168,128
+		size = 72x16
+		anchor1 = 60,50
+		anchor2 = 86,56
+		text-color = #ffffff
+		background-color = #ff8080
+		border = line
+		saved-params = "is-checked"
+		text = "Ultimate"
+		command = ""
+		is-flat = true
+		button-type = checkbox
+	elem "darkskill"
+		type = BUTTON
+		pos = 168,112
+		size = 72x16
+		anchor1 = 60,44
+		anchor2 = 86,50
+		text-color = #ffffff
+		background-color = #ff8080
+		border = line
+		saved-params = "is-checked"
+		text = "Dark Skill"
+		command = ""
+		is-flat = true
+		button-type = checkbox
+	elem "label16"
+		type = LABEL
+		pos = 24,216
+		size = 48x24
+		anchor1 = 9,85
+		anchor2 = 26,94
+		text-color = #ffffff
+		background-color = #0080ff
+		border = sunken
+		saved-params = ""
+		text = "Name"
+	elem "label15"
+		type = LABEL
+		pos = 24,192
+		size = 48x24
+		anchor1 = 9,75
+		anchor2 = 26,85
+		text-color = #ffffff
+		background-color = #0080ff
+		border = sunken
+		saved-params = ""
+		text = "Race"
+	elem "label14"
+		type = LABEL
+		pos = 24,144
+		size = 48x24
+		anchor1 = 9,56
+		anchor2 = 26,66
+		text-color = #ffffff
+		background-color = #ca0000
+		border = sunken
+		saved-params = ""
+		text = "AGI"
+	elem "label13"
+		type = LABEL
+		pos = 24,120
+		size = 48x24
+		anchor1 = 9,47
+		anchor2 = 26,56
+		text-color = #ffffff
+		background-color = #ca0000
+		border = sunken
+		saved-params = ""
+		text = "STY"
+	elem "label12"
+		type = LABEL
+		pos = 24,96
+		size = 48x24
+		anchor1 = 9,38
+		anchor2 = 26,47
+		text-color = #ffffff
+		background-color = #ca0000
+		border = sunken
+		saved-params = ""
+		text = "STR"
+	elem "label11"
+		type = LABEL
+		pos = 24,72
+		size = 48x24
+		anchor1 = 9,28
+		anchor2 = 26,38
+		text-color = #ffffff
+		background-color = #ca0000
+		border = sunken
+		saved-params = ""
+		text = "INT"
+	elem "label10"
+		type = LABEL
+		pos = 24,48
+		size = 48x24
+		anchor1 = 9,19
+		anchor2 = 26,28
+		text-color = #ffffff
+		background-color = #ca0000
+		border = sunken
+		saved-params = ""
+		text = "END"
+	elem "label9"
+		type = LABEL
+		pos = 24,24
+		size = 48x24
+		anchor1 = 9,9
+		anchor2 = 26,19
+		text-color = #ffffff
+		background-color = #ca0000
+		border = sunken
+		saved-params = ""
+		text = "CHA"
+	elem "skillname"
+		type = INPUT
+		pos = 72,216
+		size = 192x24
+		anchor1 = 26,85
+		anchor2 = 94,94
+		border = line
+		saved-params = ""
+		command = "createskill"
+
+window "tradewindow"
+	elem "tradewindow"
+		type = MAIN
+		pos = 281,0
+		size = 400x400
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		is-visible = false
+		border = sunken
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "Trade Window"
+		statusbar = false
+		can-minimize = false
+		can-resize = false
+		image = 'tradewindow.png'
+		transparent-color = #ece9d5
+		on-close = "canceltrade"
+	elem "traderingsbutton"
+		type = BUTTON
+		pos = 120,128
+		size = 32x32
+		anchor1 = 30,32
+		anchor2 = 38,40
+		border = line
+		saved-params = "is-checked"
+		text = ""
+		image = 'sonicring.png'
+		command = "addrings"
+	elem "traderings1"
+		type = LABEL
+		pos = 152,136
+		size = 60x16
+		anchor1 = 38,34
+		anchor2 = 53,38
+		background-color = #ffffff
+		saved-params = ""
+		text = "0 Rings"
+	elem "tradeavatar2"
+		type = LABEL
+		pos = 216,336
+		size = 64x64
+		anchor1 = 54,84
+		anchor2 = 70,100
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "tradeavatar1"
+		type = LABEL
+		pos = 120,64
+		size = 64x64
+		anchor1 = 30,16
+		anchor2 = 46,32
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "button12"
+		type = BUTTON
+		pos = 104,376
+		size = 16x24
+		anchor1 = 26,94
+		anchor2 = 30,100
+		font-size = 12
+		text-color = #ffffff
+		background-color = #ff8000
+		saved-params = "is-checked"
+		text = "X"
+		command = "clearitem"
+	elem "tradeadd1"
+		type = BUTTON
+		pos = 0,376
+		size = 104x24
+		anchor1 = 0,94
+		anchor2 = 26,100
+		font-size = 12
+		text-color = #ffffff
+		background-color = #ff8000
+		saved-params = "is-checked"
+		text = "ADD ITEM"
+		command = "additem"
+	elem "button3"
+		type = BUTTON
+		pos = 168,216
+		size = 72x32
+		anchor1 = 42,54
+		anchor2 = 60,62
+		font-family = "Arial"
+		font-size = 15
+		text-color = #ffffff
+		background-color = #008040
+		saved-params = "is-checked"
+		text = "Trade!"
+		command = "starttrade"
+	elem "traderings2"
+		type = LABEL
+		pos = 188,312
+		size = 60x16
+		anchor1 = 47,78
+		anchor2 = 62,82
+		background-color = #ffffff
+		saved-params = ""
+		text = "0 Rings"
+	elem "label8"
+		type = LABEL
+		pos = 248,304
+		size = 32x32
+		anchor1 = 62,76
+		anchor2 = 70,84
+		border = line
+		saved-params = ""
+		text = ""
+		image = 'sonicring.png'
+		image-mode = stretch
+	elem "tradename2"
+		type = LABEL
+		pos = 280,32
+		size = 120x32
+		anchor1 = 70,8
+		anchor2 = 100,16
+		font-family = "Sonic 3 & Knuckles"
+		font-size = 13
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #ffffff
+		is-transparent = true
+		border = line
+		saved-params = ""
+		text = "Their Name"
+	elem "tradegrid2"
+		type = GRID
+		pos = 280,64
+		size = 120x336
+		anchor1 = 70,16
+		anchor2 = 100,100
+		text-color = #ffffff
+		background-color = #0a0a0a
+		border = sunken
+		saved-params = ""
+		cells = 1x0
+		current-cell = 1,1
+		show-lines = horizontal
+		line-color = #ffffff
+		is-list = true
+	elem "tradename1"
+		type = LABEL
+		pos = 0,32
+		size = 120x32
+		anchor1 = 0,8
+		anchor2 = 30,16
+		font-family = "Sonic 3 & Knuckles"
+		font-size = 13
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #ffffff
+		is-transparent = true
+		border = line
+		saved-params = ""
+		text = "Your Name"
+	elem "tradegrid1"
+		type = GRID
+		pos = 0,64
+		size = 120x312
+		anchor1 = 0,16
+		anchor2 = 30,94
+		text-color = #ffffff
+		background-color = #0a0a0a
+		border = sunken
+		saved-params = ""
+		cells = 1x0
+		current-cell = 1,1
+		show-lines = horizontal
+		line-color = #ffffff
+		is-list = true
+
+window "warwindow"
+	elem "warwindow"
+		type = MAIN
+		pos = 281,0
+		size = 420x120
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #000040
+		is-visible = false
+		border = line
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "War Party Status"
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+		image-mode = tile
+	elem "waravatar8"
+		type = LABEL
+		pos = 142,92
+		size = 26x30
+		anchor1 = 34,77
+		anchor2 = 40,100
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "warstats12"
+		type = LABEL
+		pos = 319,100
+		size = 109x20
+		anchor1 = 76,83
+		anchor2 = 100,100
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "warstats11"
+		type = LABEL
+		pos = 319,69
+		size = 109x19
+		anchor1 = 76,58
+		anchor2 = 100,73
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "warstats10"
+		type = LABEL
+		pos = 319,39
+		size = 109x19
+		anchor1 = 76,33
+		anchor2 = 100,48
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "waravatar12"
+		type = LABEL
+		pos = 294,94
+		size = 25x29
+		anchor1 = 70,78
+		anchor2 = 76,100
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "waravatar11"
+		type = LABEL
+		pos = 294,64
+		size = 25x30
+		anchor1 = 70,53
+		anchor2 = 76,78
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "waravatar10"
+		type = LABEL
+		pos = 294,34
+		size = 25x30
+		anchor1 = 70,28
+		anchor2 = 76,53
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "warstats9"
+		type = LABEL
+		pos = 319,9
+		size = 109x19
+		anchor1 = 76,8
+		anchor2 = 100,23
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "waravatar9"
+		type = LABEL
+		pos = 294,4
+		size = 25x30
+		anchor1 = 70,3
+		anchor2 = 76,28
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "waravatar7"
+		type = LABEL
+		pos = 142,64
+		size = 26x30
+		anchor1 = 34,53
+		anchor2 = 40,78
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "warstats8"
+		type = LABEL
+		pos = 168,100
+		size = 109x20
+		anchor1 = 40,83
+		anchor2 = 66,100
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "warstats7"
+		type = LABEL
+		pos = 168,72
+		size = 109x19
+		anchor1 = 40,60
+		anchor2 = 66,76
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "warstats6"
+		type = LABEL
+		pos = 168,40
+		size = 109x19
+		anchor1 = 40,33
+		anchor2 = 66,49
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "waravatar6"
+		type = LABEL
+		pos = 142,34
+		size = 26x30
+		anchor1 = 34,28
+		anchor2 = 40,53
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "warstats5"
+		type = LABEL
+		pos = 168,10
+		size = 109x25
+		anchor1 = 40,8
+		anchor2 = 66,29
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "waravatar5"
+		type = LABEL
+		pos = 142,4
+		size = 26x30
+		anchor1 = 34,3
+		anchor2 = 40,28
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "waravatar1"
+		type = LABEL
+		pos = 0,2
+		size = 25x30
+		anchor1 = 0,2
+		anchor2 = 6,27
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "warstats4"
+		type = LABEL
+		pos = 25,98
+		size = 109x19
+		anchor1 = 6,82
+		anchor2 = 32,98
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "warstats3"
+		type = LABEL
+		pos = 25,67
+		size = 109x19
+		anchor1 = 6,56
+		anchor2 = 32,72
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "warstats2"
+		type = LABEL
+		pos = 25,37
+		size = 109x19
+		anchor1 = 6,31
+		anchor2 = 32,47
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+	elem "waravatar4"
+		type = LABEL
+		pos = 0,92
+		size = 25x29
+		anchor1 = 0,77
+		anchor2 = 6,100
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "waravatar3"
+		type = LABEL
+		pos = 0,62
+		size = 25x30
+		anchor1 = 0,52
+		anchor2 = 6,77
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "waravatar2"
+		type = LABEL
+		pos = 0,32
+		size = 25x30
+		anchor1 = 0,27
+		anchor2 = 6,52
+		border = sunken
+		saved-params = ""
+		text = ""
+		image = 'avatar3.jpg'
+		image-mode = stretch
+	elem "warstats1"
+		type = LABEL
+		pos = 25,7
+		size = 109x19
+		anchor1 = 6,6
+		anchor2 = 32,22
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000040
+		is-transparent = true
+		saved-params = ""
+		text = "100%, Loading..."
+		align = top-left
+
+window "window1"
+	elem "window1"
+		type = MAIN
+		pos = 281,0
+		size = 640x480
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		saved-params = "pos;size;is-maximized"
+		title = "Browser"
+		titlebar = false
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+		is-pane = true
+	elem "browser1"
+		type = BROWSER
+		pos = 0,0
+		size = 640x480
+		anchor1 = 0,0
+		anchor2 = 100,100
+		is-default = true
+		saved-params = ""
+
+window "window2"
+	elem "window2"
+		type = MAIN
+		pos = 281,0
+		size = 640x484
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		saved-params = "pos;size;is-maximized"
+		title = "Sheets"
+		titlebar = false
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+		is-pane = true
+	elem "output3"
+		type = OUTPUT
+		pos = 0,0
+		size = 640x484
+		anchor1 = 0,0
+		anchor2 = 100,100
+		text-color = #dddddd
+		background-color = #000000
+		saved-params = "max-lines"
+
+window "window3"
+	elem "window3"
+		type = MAIN
+		pos = 418,0
+		size = 179x224
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		saved-params = "pos;size;is-maximized"
+		title = "Logs"
+		titlebar = false
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+		is-pane = true
+	elem "output4"
+		type = OUTPUT
+		pos = 0,0
+		size = 189x224
+		anchor1 = 0,0
+		anchor2 = 100,100
+		text-color = #e2e2e2
+		background-color = #000000
+		saved-params = "max-lines"
+		max-lines = 0
+
+window "commandlist"
+	elem "commandlist"
+		type = MAIN
+		pos = 418,0
+		size = 220x104
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #9dceff
+		border = line
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "Command Menu"
+		titlebar = false
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+		is-pane = true
+		can-scroll = vertical
+	elem "label1"
+		type = LABEL
+		pos = 8,2
+		size = 200x70
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Base 02"
+		font-size = 10
+		text-color = #ffffff
+		is-transparent = true
+		border = sunken
+		saved-params = ""
+		text = "Commands"
+		text-wrap = true
+
+window "commandmenu"
+	elem "commandmenu"
+		type = MAIN
+		pos = 418,0
+		size = 220x310
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #9dceff
+		is-visible = false
+		border = line
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "Command Menu"
+		can-close = false
+		can-minimize = false
+		can-resize = false
+	elem "commandchild"
+		type = CHILD
+		pos = 0,0
+		size = 220x310
+		anchor1 = 0,0
+		anchor2 = 100,100
+		background-color = #8080ff
+		border = sunken
+		saved-params = "splitter"
+		left = "commandlist"
+		right = "commandlist"
+		is-vert = false
+		splitter = 0
+		show-splitter = false
+
+window "KeyEvent"
+	elem "KeyEvent"
+		type = MAIN
+		pos = 291,0
+		size = 8x9
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		is-visible = false
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "Controller"
+		titlebar = false
+		statusbar = false
+		can-close = false
+		can-minimize = false
+		can-resize = false
+	elem "KeyEvent"
+		type = BROWSER
+		pos = 0,0
+		size = 8x9
+		anchor1 = 0,0
+		anchor2 = 100,100
+		is-default = true
+		saved-params = ""
+
+window "worldmap"
+	elem "worldmap"
 		type = MAIN
 		pos = 291,0
 		size = 640x480
 		anchor1 = -1,-1
 		anchor2 = -1,-1
-		background-color = none
+		background-color = #bebbfb
+		is-visible = false
+		border = line
 		saved-params = "pos;size;is-minimized;is-maximized"
-		outer-size = 656x538
-		outer-pos = 291,0
-		inner-pos = 8,31
-		screen-size = 1920x1032
+		title = "Special Stage"
+		on-close = "quitspecial"
+	elem "button7"
+		type = BUTTON
+		pos = 32,448
+		size = 32x32
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		border = sunken
+		saved-params = "is-checked"
+		text = ""
+		command = "editskills"
+	elem "button2"
+		type = BUTTON
+		pos = 0,448
+		size = 32x32
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		border = sunken
+		saved-params = "is-checked"
+		text = ""
+		command = "editequips"
+	elem "tilebar"
+		type = BAR
+		pos = 168,448
+		size = 472x32
+		anchor1 = 26,93
+		anchor2 = 100,100
+		background-color = #060b40
+		saved-params = ""
+		bar-color = #ffff00
+		is-slider = false
+		width = 15
+		dir = east
+	elem "partyleader"
+		type = LABEL
+		pos = 64,448
+		size = 104x32
+		anchor1 = 10,93
+		anchor2 = 26,100
+		font-family = "Courier New"
+		font-size = 8
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #a0a9f5
+		border = line
+		saved-params = ""
+		text = "0/50 Rings"
+	elem "map1"
+		type = MAP
+		pos = 0,-8
+		size = 640x456
+		anchor1 = 0,0
+		anchor2 = 100,93
+		text-color = #000000
+		is-default = true
+		border = sunken
+		saved-params = "icon-size"
+
+window "preferences"
+	elem "preferences"
+		type = MAIN
+		pos = 291,0
+		size = 219x291
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #9492e7
+		is-visible = false
+		border = line
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "Preferences"
+		statusbar = false
+		can-resize = false
+		on-close = "updateprefs"
+	elem "button5"
+		type = BUTTON
+		pos = 10,8
+		size = 97x24
+		anchor1 = 5,3
+		anchor2 = 49,11
+		font-family = "18thCentury"
+		font-size = 14
+		text-color = #ffffff
+		background-color = #5855d9
+		border = sunken
+		saved-params = "is-checked"
+		text = "Advanced"
+		command = "advancedprefs"
+	elem "check12private"
+		type = BUTTON
+		pos = 174,196
+		size = 16x16
+		anchor1 = 79,67
+		anchor2 = 87,73
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check12"
+		button-type = radio
+	elem "check12public"
+		type = BUTTON
+		pos = 125,196
+		size = 16x16
+		anchor1 = 57,67
+		anchor2 = 65,73
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check12"
+		button-type = radio
+	elem "label27"
+		type = LABEL
+		pos = 0,192
+		size = 113x24
+		anchor1 = 0,66
+		anchor2 = 52,74
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Fancy Menu"
+	elem "check11private"
+		type = BUTTON
+		pos = 174,271
+		size = 16x16
+		anchor1 = 79,93
+		anchor2 = 87,99
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check11"
+		button-type = radio
+	elem "check11public"
+		type = BUTTON
+		pos = 125,271
+		size = 16x16
+		anchor1 = 57,93
+		anchor2 = 65,99
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check11"
+		button-type = radio
+	elem "label26"
+		type = LABEL
+		pos = 0,267
+		size = 113x24
+		anchor1 = 0,92
+		anchor2 = 52,100
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Expert Mode"
+	elem "check10private"
+		type = BUTTON
+		pos = 174,253
+		size = 16x16
+		anchor1 = 79,87
+		anchor2 = 87,92
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check10"
+		button-type = radio
+	elem "check10public"
+		type = BUTTON
+		pos = 125,253
+		size = 16x16
+		anchor1 = 57,87
+		anchor2 = 65,92
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check10"
+		button-type = radio
+	elem "label25"
+		type = LABEL
+		pos = 0,249
+		size = 113x24
+		anchor1 = 0,86
+		anchor2 = 52,94
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Favorite Ability"
+	elem "check9private"
+		type = BUTTON
+		pos = 174,233
+		size = 16x16
+		anchor1 = 79,80
+		anchor2 = 87,86
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check9"
+		button-type = radio
+	elem "check9public"
+		type = BUTTON
+		pos = 125,233
+		size = 16x16
+		anchor1 = 57,80
+		anchor2 = 65,86
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check9"
+		button-type = radio
+	elem "label24"
+		type = LABEL
+		pos = 0,229
+		size = 113x24
+		anchor1 = 0,79
+		anchor2 = 52,87
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Emote Default"
+	elem "check8private"
+		type = BUTTON
+		pos = 174,214
+		size = 16x16
+		anchor1 = 79,74
+		anchor2 = 87,79
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check8"
+		button-type = radio
+	elem "check8public"
+		type = BUTTON
+		pos = 125,214
+		size = 16x16
+		anchor1 = 57,74
+		anchor2 = 65,79
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check8"
+		button-type = radio
+	elem "label23"
+		type = LABEL
+		pos = 0,210
+		size = 113x24
+		anchor1 = 0,72
+		anchor2 = 52,80
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Enlarge Maps"
+	elem "check7private"
+		type = BUTTON
+		pos = 174,179
+		size = 16x16
+		anchor1 = 79,62
+		anchor2 = 87,67
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check7"
+		button-type = radio
+	elem "check7public"
+		type = BUTTON
+		pos = 125,179
+		size = 16x16
+		anchor1 = 57,62
+		anchor2 = 65,67
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check7"
+		button-type = radio
+	elem "label22"
+		type = LABEL
+		pos = 0,175
+		size = 128x24
+		anchor1 = 0,60
+		anchor2 = 52,68
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Hear Music"
+	elem "check6private"
+		type = BUTTON
+		pos = 174,157
+		size = 16x16
+		anchor1 = 79,54
+		anchor2 = 87,59
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check6"
+		button-type = radio
+	elem "check6public"
+		type = BUTTON
+		pos = 125,157
+		size = 16x16
+		anchor1 = 57,54
+		anchor2 = 65,59
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check6"
+		button-type = radio
+	elem "label21"
+		type = LABEL
+		pos = 0,153
+		size = 128x23
+		anchor1 = 0,53
+		anchor2 = 52,61
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Hear Combat"
+	elem "check5private"
+		type = BUTTON
+		pos = 174,135
+		size = 16x16
+		anchor1 = 79,46
+		anchor2 = 87,52
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check5"
+		button-type = radio
+	elem "check5public"
+		type = BUTTON
+		pos = 125,135
+		size = 16x16
+		anchor1 = 57,46
+		anchor2 = 65,52
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check5"
+		button-type = radio
+	elem "label20"
+		type = LABEL
+		pos = 0,131
+		size = 128x24
+		anchor1 = 0,45
+		anchor2 = 58,53
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Show Experience"
+	elem "check4private"
+		type = BUTTON
+		pos = 174,112
+		size = 16x16
+		anchor1 = 79,38
+		anchor2 = 87,44
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check4"
+		button-type = radio
+	elem "check4public"
+		type = BUTTON
+		pos = 125,112
+		size = 16x16
+		anchor1 = 57,38
+		anchor2 = 65,44
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check4"
+		button-type = radio
+	elem "label7"
+		type = LABEL
+		pos = 0,108
+		size = 128x22
+		anchor1 = 0,37
+		anchor2 = 51,45
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Show Honor"
+	elem "check3private"
+		type = BUTTON
+		pos = 174,86
+		size = 16x16
+		anchor1 = 79,30
+		anchor2 = 87,35
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check3"
+		button-type = radio
+	elem "check3public"
+		type = BUTTON
+		pos = 125,86
+		size = 16x16
+		anchor1 = 57,30
+		anchor2 = 65,35
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check3"
+		button-type = radio
+	elem "label6"
+		type = LABEL
+		pos = 0,82
+		size = 121x24
+		anchor1 = 0,28
+		anchor2 = 55,36
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Show Karma"
+	elem "check2private"
+		type = BUTTON
+		pos = 174,62
+		size = 16x16
+		anchor1 = 79,21
+		anchor2 = 87,27
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check2"
+		button-type = radio
+	elem "check2public"
+		type = BUTTON
+		pos = 125,62
+		size = 16x16
+		anchor1 = 57,21
+		anchor2 = 64,27
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check2"
+		button-type = radio
+	elem "label5"
+		type = LABEL
+		pos = 0,58
+		size = 121x24
+		anchor1 = 0,20
+		anchor2 = 55,28
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Mastery Gauge"
+	elem "check1private"
+		type = BUTTON
+		pos = 174,40
+		size = 16x16
+		anchor1 = 79,14
+		anchor2 = 87,19
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		group = "check1"
+		button-type = radio
+	elem "check1public"
+		type = BUTTON
+		pos = 125,40
+		size = 16x16
+		anchor1 = 57,14
+		anchor2 = 65,19
+		background-color = #9492e7
+		saved-params = "is-checked"
+		text = ""
+		command = ""
+		is-checked = true
+		group = "check1"
+		button-type = radio
+	elem "label4"
+		type = LABEL
+		pos = 118,15
+		size = 79x24
+		anchor1 = 54,5
+		anchor2 = 90,13
+		font-family = "18thCentury"
+		font-size = 16
+		font-style = "bold"
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "ON | OFF"
+	elem "label2"
+		type = LABEL
+		pos = 0,36
+		size = 120x24
+		anchor1 = 0,12
+		anchor2 = 55,21
+		font-family = "18thCentury"
+		font-size = 13
+		text-color = #ffffff
+		is-transparent = true
+		saved-params = ""
+		text = "Show Join Date"
 
